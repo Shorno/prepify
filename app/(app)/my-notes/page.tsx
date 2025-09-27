@@ -3,6 +3,7 @@ import {unauthorized} from "next/navigation";
 
 export default async function MyNotesPage() {
     const user = await checkAuth()
+    console.log(user)
     if (!user){
         unauthorized()
     }
