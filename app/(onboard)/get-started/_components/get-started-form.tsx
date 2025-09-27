@@ -33,37 +33,27 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+    Drawer,
+    DrawerContent,
+    DrawerTrigger,
+} from "@/components/ui/drawer"
 import ThemeSelector from "@/components/ThemeSelector"
 import {useTheme} from "next-themes";
 import {onBoardFormData, onBoardSchema} from "@/zodSchema/onBoardSchema";
 import updateUserOnboarding from "@/actions/update-user-onboarding";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-
-
-const departments = [
-    {value: "computer-science", label: "Computer Science"},
-    {value: "engineering", label: "Engineering"},
-    {value: "business-administration", label: "Business Administration"},
-    {value: "mathematics", label: "Mathematics"},
-    {value: "physics", label: "Physics"},
-    {value: "chemistry", label: "Chemistry"},
-    {value: "biology", label: "Biology"},
-    {value: "psychology", label: "Psychology"},
-    {value: "english-literature", label: "English Literature"},
-    {value: "history", label: "History"},
-    {value: "art-design", label: "Art & Design"},
-    {value: "music", label: "Music"},
-    {value: "economics", label: "Economics"},
-    {value: "political-science", label: "Political Science"},
-    {value: "philosophy", label: "Philosophy"}
-];
+import {faculties} from "@/db/data/factulties";
+import {useIsMobile} from "@/hooks/use-mobile";
+import {DialogTitle} from "@/components/ui/dialog"; // Your custom hook
 
 export default function GetStartedForm() {
     const [open, setOpen] = useState(false);
     const [isPending, startTransition] = useTransition()
     const {theme} = useTheme();
     const router = useRouter();
+    const isMobile = useIsMobile(); // Using your custom hook
 
     const form = useForm<onBoardFormData>({
         resolver: zodResolver(onBoardSchema),
@@ -73,8 +63,6 @@ export default function GetStartedForm() {
             theme: "system"
         },
     })
-
-    const selectedRole = form.watch("role")
 
     useEffect(() => {
         if (theme) {
@@ -95,11 +83,9 @@ export default function GetStartedForm() {
                         description: error instanceof Error ? error.message : "An unknown error occurred"
                     })
                 }
-
             }
         )
     }
-
 
     return (
         <Card
@@ -187,13 +173,15 @@ export default function GetStartedForm() {
                             )}
                         />
 
-                        {selectedRole === "student" && (
-                            <FormField
-                                control={form.control}
-                                name="department"
-                                render={({field}) => (
-                                    <FormItem className="animate-in slide-in-from-top-2 duration-300">
-                                        <FormLabel className="text-base font-medium">Department</FormLabel>
+                        <FormField
+                            control={form.control}
+                            name="department"
+                            render={({field}) => (
+                                <FormItem className="animate-in slide-in-from-top-2 duration-300">
+                                    <FormLabel className="text-base font-medium">Department</FormLabel>
+
+                                    {/* Responsive Combobox - Desktop Popover */}
+                                    {!isMobile ? (
                                         <Popover open={open} onOpenChange={setOpen}>
                                             <PopoverTrigger asChild>
                                                 <FormControl>
@@ -205,54 +193,62 @@ export default function GetStartedForm() {
                                                             !field.value && "text-muted-foreground"
                                                         )}
                                                     >
-                                                        {field.value
-                                                            ? departments.find(
-                                                                (department) => department.value === field.value
-                                                            )?.label
-                                                            : "Choose your department"}
+                                                        {
+                                                            faculties.map((faculty) => faculty.departments).flat().find(dept => dept.value === field.value)?.label || "Select your department"
+                                                        }
                                                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                                     </Button>
                                                 </FormControl>
                                             </PopoverTrigger>
-                                            <PopoverContent className="w-full p-0">
-                                                <Command>
-                                                    <CommandInput placeholder="Search department..."/>
-                                                    <CommandList>
-                                                        <CommandEmpty>No department found.</CommandEmpty>
-                                                        <CommandGroup>
-                                                            {departments.map((department) => (
-                                                                <CommandItem
-                                                                    value={department.label}
-                                                                    key={department.value}
-                                                                    onSelect={() => {
-                                                                        setOpen(false)
-                                                                        form.setValue("department", department.value)
-                                                                    }}
-                                                                >
-                                                                    {department.label}
-                                                                    <Check
-                                                                        className={cn(
-                                                                            " h-4 w-4 ml-auto",
-                                                                            department.value === field.value
-                                                                                ? "opacity-100"
-                                                                                : "opacity-0"
-                                                                        )}
-                                                                    />
-                                                                </CommandItem>
-                                                            ))}
-                                                        </CommandGroup>
-                                                    </CommandList>
-                                                </Command>
+                                            <PopoverContent className="w-full p-0" align="start">
+                                                <DepartmentList
+                                                    setOpen={setOpen}
+                                                    selectedValue={field.value}
+                                                    onSelect={(value) => form.setValue("department", value)}
+                                                />
                                             </PopoverContent>
                                         </Popover>
-                                        <FormDescription>
-                                            Select your field of study
-                                        </FormDescription>
-                                        <FormMessage/>
-                                    </FormItem>
-                                )}
-                            />
-                        )}
+                                    ) : (
+                                        /* Mobile Drawer */
+                                        <Drawer open={open} onOpenChange={setOpen}>
+                                            <DrawerTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        variant="outline"
+                                                        role="combobox"
+                                                        className={cn(
+                                                            "w-full h-12 justify-between text-base",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        {
+                                                            faculties.map((faculty) => faculty.departments).flat().find(dept => dept.value === field.value)?.label || "Select your department"
+                                                        }
+                                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                                                    </Button>
+                                                </FormControl>
+                                            </DrawerTrigger>
+                                            <DialogTitle/>
+                                            <DrawerContent>
+                                                <div className="mt-4 border-t">
+                                                    <DepartmentList
+                                                        setOpen={setOpen}
+                                                        selectedValue={field.value}
+                                                        onSelect={(value) => form.setValue("department", value)}
+                                                    />
+                                                </div>
+                                            </DrawerContent>
+                                        </Drawer>
+                                    )}
+
+                                    <FormDescription>
+                                        Select your field of study
+                                    </FormDescription>
+                                    <FormMessage/>
+                                </FormItem>
+                            )}
+                        />
+
                         <ThemeSelector control={form.control} name="theme"/>
 
                         <div className="pt-4">
@@ -268,5 +264,47 @@ export default function GetStartedForm() {
                 </Form>
             </CardContent>
         </Card>
+    )
+}
+
+// Extracted component for the department list
+function DepartmentList({
+                            setOpen,
+                            selectedValue,
+                            onSelect,
+                        }: {
+    setOpen: (open: boolean) => void
+    selectedValue: string | undefined
+    onSelect: (value: string) => void
+}) {
+    return (
+        <Command>
+            <CommandInput placeholder="Search department..."/>
+            <CommandList>
+                <CommandEmpty>No department found.</CommandEmpty>
+                {faculties.map((faculty) => (
+                    <CommandGroup key={faculty.label} heading={faculty.label}>
+                        {faculty.departments.map((department) => (
+                            <CommandItem
+                                value={department.label}
+                                key={department.value}
+                                onSelect={() => {
+                                    setOpen(false);
+                                    onSelect(department.value);
+                                }}
+                            >
+                                {department.label}
+                                <Check
+                                    className={cn(
+                                        "h-4 w-4 ml-auto",
+                                        department.value === selectedValue ? "opacity-100" : "opacity-0"
+                                    )}
+                                />
+                            </CommandItem>
+                        ))}
+                    </CommandGroup>
+                ))}
+            </CommandList>
+        </Command>
     )
 }
