@@ -2,7 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
     experimental: {
-        authInterrupts: true
+        authInterrupts: true,
+        useCache : true
     },
 };
 

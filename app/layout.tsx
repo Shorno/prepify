@@ -1,16 +1,15 @@
 import type {Metadata} from "next";
 import "./globals.css";
-import Navbar from "@/components/header/navbar";
 import {ThemeProvider} from "@/components/theme-provider";
 import {Poppins} from "next/font/google"
+import {Toaster} from "sonner";
 
 const poppins = Poppins({
     subsets: ['latin'],
     weight: ['400', '500', '600', '700'],
     variable: '--font-poppins',
-    fallback : ['sans-serif']
+    fallback: ['sans-serif']
 })
-
 
 
 export const metadata: Metadata = {
@@ -29,15 +28,14 @@ export default function RootLayout({
             className={`antialiased`}
         >
         <ThemeProvider
-        attribute={"class"}
-        defaultTheme={"system"}
-        enableSystem
-        disableTransitionOnChange
+            attribute={"class"}
+            defaultTheme={"system"}
+            enableSystem
+            storageKey={"theme"}
+            disableTransitionOnChange
         >
-            <Navbar/>
-            <div className={"container mx-auto px-4 xl:px-0"}>
-                {children}
-            </div>
+            {children}
+            <Toaster position={"top-right"} richColors/>
         </ThemeProvider>
         </body>
         </html>
