@@ -17,7 +17,7 @@ export const faculties = [
         departments: [
             { value: "cse", label: "Computer Science & Engineering" },
             { value: "cis", label: "Computing & Information System (CIS)" },
-            { value: "software-engineering", label: "Software Engineering" },
+            { value: "swe", label: "Software Engineering (SWE)" },
             { value: "environmental-science", label: "Environmental Science and Disaster Management" },
             { value: "mct", label: "Multimedia & Creative Technology (MCT)" },
             { value: "itm", label: "Information Technology and Management" },

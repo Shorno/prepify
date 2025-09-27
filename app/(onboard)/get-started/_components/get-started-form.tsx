@@ -76,7 +76,7 @@ export default function GetStartedForm() {
                     const result = await updateUserOnboarding(values)
                     if (result.success) {
                         toast.success(result.message)
-                        router.push("/notes")
+                        router.replace("/notes")
                     }
                 } catch (error) {
                     toast.error("Failed to onboard", {
