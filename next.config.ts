@@ -5,6 +5,13 @@ const nextConfig: NextConfig = {
         authInterrupts: true,
         useCache : true
     },
+    images : {
+        remotePatterns : [
+            {
+                hostname : "*",
+            }
+        ]
+    }
 };
 
 export default nextConfig;
