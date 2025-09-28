@@ -4,9 +4,6 @@ import {headers} from "next/headers";
 
 export default async function middleware(request: NextRequest) {
     const session = await auth.api.getSession({
-        query : {
-            disableCookieCache : true
-        },
         headers: await headers()
     })
 
