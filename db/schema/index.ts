@@ -1,1 +1,5 @@
 export * from "./auth-schema"
+export * from "./depertment"
+export * from "./faculty"
+export * from "./course"
+export * from "./batch"

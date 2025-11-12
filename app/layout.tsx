@@ -1,8 +1,7 @@
 import type {Metadata} from "next";
 import "./globals.css";
-import {ThemeProvider} from "@/components/theme-provider";
 import {Poppins} from "next/font/google"
-import {Toaster} from "sonner";
+import Providers from "@/app/providers";
 
 const poppins = Poppins({
     subsets: ['latin'],
@@ -27,16 +26,9 @@ export default function RootLayout({
         <body
             className={`antialiased`}
         >
-        <ThemeProvider
-            attribute={"class"}
-            defaultTheme={"system"}
-            enableSystem
-            storageKey={"theme"}
-            disableTransitionOnChange
-        >
+        <Providers>
             {children}
-            <Toaster position={"top-right"} richColors/>
-        </ThemeProvider>
+        </Providers>
         </body>
         </html>
     );

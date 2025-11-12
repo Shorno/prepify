@@ -4,7 +4,7 @@ export default function AppLayout({children}: { children: React.ReactNode }) {
     return (
         <div>
             <Navbar/>
-            <div className={"container mx-auto px-4 xl:px-0"}>
+            <div>
                 {children}
             </div>
         </div>

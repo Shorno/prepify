@@ -14,6 +14,7 @@ export const user = pgTable("user", {
         .notNull(),
     role: text("role").default("STUDENT").notNull(),
     department: text("department").default("cse").notNull(),
+    batch: text("batch"),
     hasCompletedOnboarding: boolean("has_completed_onboarding")
         .default(false)
         .notNull(),

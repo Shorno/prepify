@@ -39,6 +39,7 @@ export default async function updateUserOnboarding(data: onBoardFormData): Promi
             .set({
                 role: result.data.role.toUpperCase(),
                 department: result.data.department,
+                batch: result.data.role === "student" ? result.data.batch || null : null,
                 hasCompletedOnboarding: true
             })
             .where(eq(user.id, session.user.id));

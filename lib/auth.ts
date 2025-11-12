@@ -21,6 +21,11 @@ export const auth = betterAuth({
                 defaultValue: "cse",
                 input: true
             },
+            batch: {
+                type: "string",
+                required: false,
+                input: true,
+            },
             hasCompletedOnboarding: {
                 type: "boolean",
                 required: true,
@@ -46,7 +51,7 @@ export const auth = betterAuth({
         },
     },
 
-    plugins : [nextCookies()]
+    plugins: [nextCookies()]
 });
 
 
