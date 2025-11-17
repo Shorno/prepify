@@ -50,6 +50,7 @@ import DepartmentList from "@/components/shared/department-list";
 import {useQuery} from "@tanstack/react-query";
 import {getBatches, getFacultiesWithDepartments} from "@/actions/university-info";
 
+
 export default function GetStartedForm() {
     const [openDepartment, setOpenDepartment] = useState(false);
     const [openBatch, setOpenBatch] = useState(false);
@@ -76,7 +77,7 @@ export default function GetStartedForm() {
         defaultValues: {
             role: undefined,
             batch: undefined,
-            department: undefined,
+            departmentId: undefined,
             theme: "system"
         },
     })
@@ -205,7 +206,7 @@ export default function GetStartedForm() {
 
                         <FormField
                             control={form.control}
-                            name="department"
+                            name="departmentId"
                             render={({field}) => (
                                 <FormItem>
                                     <FormLabel className="text-base font-medium">Department</FormLabel>
@@ -223,11 +224,12 @@ export default function GetStartedForm() {
                                                             !field.value && "text-muted-foreground"
                                                         )}
                                                     >
-                                                        {field.value
-                                                            ? data?.flatMap(f => f.departments)
-                                                                .find(dept => dept.departmentCode === field.value)?.name
-                                                            : "Select your department"
-                                                        }
+                                                        {field.value != null ? (
+                                                            data?.flatMap(f => f.departments)
+                                                                .find(dept => dept.id.toString() === field.value)?.name
+                                                        ) : (
+                                                            "Select your department"
+                                                        )}
                                                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                                     </Button>
                                                 </FormControl>
@@ -236,7 +238,9 @@ export default function GetStartedForm() {
                                                 <DepartmentList
                                                     setOpen={setOpenDepartment}
                                                     selectedValue={field.value}
-                                                    onSelect={(value) => form.setValue("department", value)}
+                                                    onSelect={(value) => {
+                                                        form.setValue("departmentId", value);
+                                                    }}
                                                 />
                                             </PopoverContent>
                                         </Popover>
@@ -253,11 +257,12 @@ export default function GetStartedForm() {
                                                             !field.value && "text-muted-foreground"
                                                         )}
                                                     >
-                                                        {field.value
-                                                            ? data?.flatMap(f => f.departments)
-                                                                .find(dept => dept.departmentCode === field.value)?.name
-                                                            : "Select your department"
-                                                        }
+                                                        {field.value != null ? (
+                                                            data?.flatMap(f => f.departments)
+                                                                .find(dept => dept.id.toString() === field.value)?.name
+                                                        ) : (
+                                                            "Select your department"
+                                                        )}
                                                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                                     </Button>
                                                 </FormControl>
@@ -268,7 +273,9 @@ export default function GetStartedForm() {
                                                     <DepartmentList
                                                         setOpen={setOpenDepartment}
                                                         selectedValue={field.value}
-                                                        onSelect={(value) => form.setValue("department", value)}
+                                                        onSelect={(value) => {
+                                                            form.setValue("departmentId", value);
+                                                        }}
                                                     />
                                                 </div>
                                             </DrawerContent>

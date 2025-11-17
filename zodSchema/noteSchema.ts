@@ -7,7 +7,10 @@ export const noteSchema = z.object({
         .array(z.url("Please enter a valid image URL."))
         .max(10, "You can upload a maximum of 10 files.")
         .default([]).nonoptional(),
-    courseId: z.string().min(1, "Course is required"),
+    courseId: z.string({message : "Course is required"}),
+    resources: z.array(z.object({
+        url: z.url("Please enter a valid URL")
+    })).default([]).optional()
 
 })
 

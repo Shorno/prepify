@@ -15,10 +15,9 @@ export const auth = betterAuth({
                 defaultValue: "STUDENT",
                 input: true
             },
-            department: {
-                type: "string",
+            departmentId: {
+                type: "number",
                 required: true,
-                defaultValue: "cse",
                 input: true
             },
             batch: {

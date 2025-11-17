@@ -42,11 +42,12 @@ export default function DepartmentList({
                             <CommandGroup key={faculty.name} heading={faculty.name}>
                                 {faculty.departments.map((department) => (
                                     <CommandItem
-                                        value={department.name}
-                                        key={department.name}
+                                        value={department.id.toString()}
+                                        key={department.id}
                                         onSelect={() => {
                                             setOpen(false);
-                                            onSelect(department.departmentCode);
+                                            // Pass the department id as a string
+                                            onSelect(department.id.toString());
                                         }}
                                         className="flex items-start py-3" // Changed from items-center, added padding
 
@@ -57,7 +58,7 @@ export default function DepartmentList({
                                         <Check
                                             className={cn(
                                                 "h-4 w-4 ml-auto",
-                                                department.departmentCode === selectedValue ? "opacity-100" : "opacity-0"
+                                                department.id.toString() === selectedValue ? "opacity-100" : "opacity-0"
                                             )}
                                         />
                                     </CommandItem>

@@ -51,11 +51,11 @@ export default function CourseList({
                                         setOpen(false);
                                         onSelect(course.id.toString());
                                     }}
-                                    className="flex items-start py-3" // Changed from items-center, added padding
+                                    className="flex items-start py-3"
 
                                 >
-                                    <div className="flex flex-col flex-1 gap-0.5 pr-2"> {/* Added pr-2 for spacing */}
-                                        <span className="line-clamp-2 leading-tight"> {/* Allow 2 lines */}
+                                    <div className="flex flex-col flex-1 gap-0.5 pr-2">
+                                        <span className="line-clamp-2 leading-tight">
                                             {course.name}
                                         </span>
                                         <span className="text-xs text-muted-foreground">

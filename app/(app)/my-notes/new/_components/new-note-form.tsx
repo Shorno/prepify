@@ -1,6 +1,6 @@
 "use client"
 import {Card, CardContent} from "@/components/ui/card";
-import {Check, ChevronsUpDown, Loader} from "lucide-react";
+import {ChevronsUpDown, Loader, Plus, X} from "lucide-react";
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
 import {Button} from "@/components/ui/button";
@@ -12,7 +12,7 @@ import * as React from "react";
 import {useState, useTransition} from "react";
 import {useRouter} from "next/navigation";
 import {useIsMobile} from "@/hooks/use-mobile";
-import {useForm} from "react-hook-form";
+import {useFieldArray, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {toast} from "sonner";
 import {noteFormData, noteSchema} from "@/zodSchema/noteSchema";
@@ -44,10 +44,17 @@ export default function NewNoteForm() {
             courseId: undefined,
             title: "",
             files: [],
+            resources:  [],
         },
     })
 
+    const {fields, append, remove} = useFieldArray({
+        control : form.control,
+        name : "resources"
+    })
+
     const selectedDepartment = form.watch("department");
+    console.log(selectedDepartment)
 
     const departmentId = data?.flatMap(f => f.departments)
         .find(dept => dept.departmentCode === selectedDepartment)?.id;
@@ -99,7 +106,7 @@ export default function NewNoteForm() {
                                                                 variant="outline"
                                                                 role="combobox"
                                                                 className={cn(
-                                                                    "w-full justify-between text-sm",
+                                                                    "w-full overflow-hidden justify-between text-sm",
                                                                     !field.value && "text-muted-foreground"
                                                                 )}
                                                             >
@@ -110,14 +117,15 @@ export default function NewNoteForm() {
                                                     : "Select department"
                                                 }
                                             </span>
-                                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                                                                <ChevronsUpDown
+                                                                    className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                                             </Button>
                                                         </FormControl>
                                                     </PopoverTrigger>
                                                     <PopoverContent
                                                         className="w-full p-0"
                                                         align="start"
-                                                        style={{ width: 'var(--radix-popover-trigger-width)' }}
+                                                        style={{width: 'var(--radix-popover-trigger-width)'}}
                                                     >
                                                         <DepartmentList
                                                             setOpen={setOpen}
@@ -145,7 +153,8 @@ export default function NewNoteForm() {
                                                     : "Select department"
                                                 }
                                             </span>
-                                                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                                                                <ChevronsUpDown
+                                                                    className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                                             </Button>
                                                         </FormControl>
                                                     </DrawerTrigger>
@@ -187,33 +196,28 @@ export default function NewNoteForm() {
                                                                 role="combobox"
                                                                 disabled={!selectedDepartment || isLoading}
                                                                 className={cn(
-                                                                    "w-full justify-between text-sm",
+                                                                    "w-full overflow-hidden justify-between text-sm",
                                                                     !field.value && "text-muted-foreground"
                                                                 )}
                                                             >
-                                                                {isLoading ? (
-                                                                    <>
-                                                                        <Loader className="h-4 w-4 animate-spin mr-2" />
-                                                                        Loading...
-                                                                    </>
-                                                                ) : (
-                                                                    <>
+
                                                     <span className="line-clamp-1 text-left flex-1">
                                                         {field.value
                                                             ? courses?.find((c) => c.id.toString() === field.value)?.name
                                                             : "Select course"
                                                         }
                                                     </span>
-                                                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
-                                                                    </>
-                                                                )}
+                                                                <ChevronsUpDown
+                                                                    className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+
+
                                                             </Button>
                                                         </FormControl>
                                                     </PopoverTrigger>
                                                     <PopoverContent
                                                         className="w-full p-0"
                                                         align="start"
-                                                        style={{ width: 'var(--radix-popover-trigger-width)' }}
+                                                        style={{width: 'var(--radix-popover-trigger-width)'}}
                                                     >
                                                         <CourseList
                                                             courses={courses}
@@ -239,7 +243,7 @@ export default function NewNoteForm() {
                                                             >
                                                                 {isLoading ? (
                                                                     <>
-                                                                        <Loader className="h-4 w-4 animate-spin mr-2" />
+                                                                        <Loader className="h-4 w-4 animate-spin mr-2"/>
                                                                         Loading...
                                                                     </>
                                                                 ) : (
@@ -250,7 +254,8 @@ export default function NewNoteForm() {
                                                             : "Select course"
                                                         }
                                                     </span>
-                                                                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                                                                        <ChevronsUpDown
+                                                                            className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                                                     </>
                                                                 )}
                                                             </Button>
@@ -322,6 +327,63 @@ export default function NewNoteForm() {
                                     </FormItem>
                                 )}
                             />
+
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <FormLabel>Resources & Links</FormLabel>
+                                        <FormDescription className="text-xs mt-1">
+                                            Add external resources or reference links
+                                        </FormDescription>
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => append({ url: "" })}
+                                        className="gap-2"
+                                    >
+                                        <Plus className="h-4 w-4" />
+                                        Add Link
+                                    </Button>
+                                </div>
+
+                                {fields.length > 0 && (
+                                    <div className="space-y-3">
+                                        {fields.map((field, index) => (
+                                            <FormField
+                                                key={field.id}
+                                                control={form.control}
+                                                name={`resources.${index}.url`}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <div className="flex gap-2">
+                                                            <FormControl>
+                                                                <Input
+                                                                    {...field}
+                                                                    placeholder="https://example.com/resource"
+                                                                    className="flex-1"
+                                                                />
+                                                            </FormControl>
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => remove(index)}
+                                                                className="shrink-0"
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
 
                             <div className="pt-4">
                                 <Button
