@@ -20,6 +20,11 @@ export const auth = betterAuth({
                 required: true,
                 input: true
             },
+            facultyId: {
+                type: "number",
+                required: true,
+                input: true
+            },
             batch: {
                 type: "string",
                 required: false,

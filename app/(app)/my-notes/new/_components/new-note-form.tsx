@@ -21,8 +21,12 @@ import FileUploader from "@/components/file-uploader";
 import {useQuery} from "@tanstack/react-query";
 import {getCoursesByDepartment, getFacultiesWithDepartments} from "@/actions/university-info";
 import CourseList from "@/components/shared/course-list";
+import {authClient} from "@/lib/auth-client";
 
 export default function NewNoteForm() {
+    const {data: sessionData} = authClient.useSession()
+
+    console.log(sessionData)
 
     const [open, setOpen] = useState(false);
     const [openCourse, setOpenCourse] = useState(false);
@@ -35,6 +39,7 @@ export default function NewNoteForm() {
         queryKey: ["faculties-departments"],
         queryFn: getFacultiesWithDepartments
     })
+    console.log(data)
 
 
     const form = useForm<noteFormData>({

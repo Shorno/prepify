@@ -3,7 +3,8 @@ import {z} from "zod";
 export const onBoardSchema = z.object({
     role: z.enum(["student", "teacher"], {error: "Please select your role"}),
     departmentId: z.string({error: "Please select your department"}),
-    batch: z.string().optional(),
+    facultyId: z.string({error: "Faculty ID is required"}),
+    batch: z.string(),
     theme: z.enum(["light", "dark", "system"]).default("system").nonoptional(),
 }).refine((data) => {
     if (data.role === "student") {

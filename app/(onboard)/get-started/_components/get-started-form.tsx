@@ -77,12 +77,12 @@ export default function GetStartedForm() {
         defaultValues: {
             role: undefined,
             batch: undefined,
+            facultyId:undefined,
             departmentId: undefined,
             theme: "system"
         },
     })
 
-    // Watch the role field to conditionally show batch
     const selectedRole = useWatch({
         control: form.control,
         name: "role",
@@ -94,10 +94,9 @@ export default function GetStartedForm() {
         }
     }, [theme, form])
 
-    // Reset batch field when role changes from student to teacher
     useEffect(() => {
         if (selectedRole === "teacher") {
-            form.setValue("batch", undefined);
+            form.setValue("batch", "");
         }
     }, [selectedRole, form]);
 
@@ -238,8 +237,9 @@ export default function GetStartedForm() {
                                                 <DepartmentList
                                                     setOpen={setOpenDepartment}
                                                     selectedValue={field.value}
-                                                    onSelect={(value) => {
-                                                        form.setValue("departmentId", value);
+                                                    onSelect={(departmentId, facultyId) => {
+                                                        form.setValue("departmentId", departmentId);
+                                                        form.setValue("facultyId", facultyId);
                                                     }}
                                                 />
                                             </PopoverContent>
@@ -273,8 +273,9 @@ export default function GetStartedForm() {
                                                     <DepartmentList
                                                         setOpen={setOpenDepartment}
                                                         selectedValue={field.value}
-                                                        onSelect={(value) => {
-                                                            form.setValue("departmentId", value);
+                                                        onSelect={(departmentId, facultyId) => {
+                                                            form.setValue("departmentId", departmentId);
+                                                            form.setValue("facultyId", facultyId);
                                                         }}
                                                     />
                                                 </div>
@@ -289,6 +290,7 @@ export default function GetStartedForm() {
                                 </FormItem>
                             )}
                         />
+
 
                         {/* Conditionally render Batch field only for students - NO ANIMATION */}
                         {selectedRole === "student" && (

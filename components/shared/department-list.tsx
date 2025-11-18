@@ -10,7 +10,7 @@ import {Skeleton} from "@/components/ui/skeleton";
 interface DepartmentListProps {
     setOpen: (open: boolean) => void
     selectedValue: string | undefined
-    onSelect: (value: string) => void
+    onSelect: (departmentId: string, facultyId: string) => void
 }
 
 export default function DepartmentList({
@@ -42,19 +42,18 @@ export default function DepartmentList({
                             <CommandGroup key={faculty.name} heading={faculty.name}>
                                 {faculty.departments.map((department) => (
                                     <CommandItem
-                                        value={department.id.toString()}
+                                        value={`${department.name} ${department.departmentCode || ''}`}
                                         key={department.id}
                                         onSelect={() => {
                                             setOpen(false);
-                                            // Pass the department id as a string
-                                            onSelect(department.id.toString());
+                                            // Pass both department id and faculty id
+                                            onSelect(department.id.toString(), faculty.id.toString());
                                         }}
-                                        className="flex items-start py-3" // Changed from items-center, added padding
-
+                                        className="flex items-start py-3"
                                     >
-                                          <span className="flex-1 line-clamp-2 leading-tight">
-                                              {department.name}
-                                </span>
+                                        <span className="flex-1 line-clamp-2 leading-tight">
+                                            {department.name}
+                                        </span>
                                         <Check
                                             className={cn(
                                                 "h-4 w-4 ml-auto",

@@ -1,4 +1,4 @@
-import {pgTable, text, timestamp, boolean, integer} from "drizzle-orm/pg-core";
+import {pgTable, text, timestamp, boolean} from "drizzle-orm/pg-core";
 
 
 export const user = pgTable("user", {
@@ -13,7 +13,8 @@ export const user = pgTable("user", {
         .$onUpdate(() => /* @__PURE__ */ new Date())
         .notNull(),
     role: text("role").default("STUDENT").notNull(),
-    departmentId: integer("department_id").notNull(),
+    departmentId: text("department_id"),
+    facultyId: text("faculty_id"),
     batch: text("batch"),
     hasCompletedOnboarding: boolean("has_completed_onboarding")
         .default(false)
