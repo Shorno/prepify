@@ -9,24 +9,23 @@ import DepartmentList from "@/components/shared/department-list";
 import {Drawer, DrawerContent, DrawerTrigger} from "@/components/ui/drawer";
 import {DialogTitle} from "@/components/ui/dialog";
 import * as React from "react";
-import {useState, useTransition} from "react";
+import {useState, useTransition, useEffect} from "react";
 import {useRouter} from "next/navigation";
 import {useIsMobile} from "@/hooks/use-mobile";
 import {useFieldArray, useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {toast} from "sonner";
-import {noteFormData, noteSchema} from "@/zodSchema/noteSchema";
+import {NoteFormData, noteSchema} from "@/zodSchema/noteSchema";
 import {Input} from "@/components/ui/input";
 import FileUploader from "@/components/file-uploader";
 import {useQuery} from "@tanstack/react-query";
 import {getCoursesByDepartment, getFacultiesWithDepartments} from "@/actions/university-info";
 import CourseList from "@/components/shared/course-list";
 import {authClient} from "@/lib/auth-client";
+import saveNote from "@/actions/notes/save-note";
 
 export default function NewNoteForm() {
-    const {data: sessionData} = authClient.useSession()
-
-    console.log(sessionData)
+    const {data: session} = authClient.useSession()
 
     const [open, setOpen] = useState(false);
     const [openCourse, setOpenCourse] = useState(false);
@@ -39,48 +38,80 @@ export default function NewNoteForm() {
         queryKey: ["faculties-departments"],
         queryFn: getFacultiesWithDepartments
     })
-    console.log(data)
 
-
-    const form = useForm<noteFormData>({
+    const form = useForm<NoteFormData>({
         resolver: zodResolver(noteSchema),
         defaultValues: {
-            department: "cse",
+            departmentId: session?.user?.departmentId.toString() || undefined,
+            facultyId: session?.user?.facultyId.toString() || undefined,
             courseId: undefined,
             title: "",
             files: [],
-            resources:  [],
+            resources: [],
         },
     })
 
+    useEffect(() => {
+        if (session?.user?.departmentId && session?.user?.facultyId) {
+            form.setValue("departmentId", session.user.departmentId.toString());
+            form.setValue("facultyId", session.user.facultyId.toString());
+        }
+    }, [form, session]);
+
     const {fields, append, remove} = useFieldArray({
-        control : form.control,
-        name : "resources"
+        control: form.control,
+        name: "resources"
     })
 
-    const selectedDepartment = form.watch("department");
-    console.log(selectedDepartment)
+    // eslint-disable-next-line react-hooks/incompatible-library
+    const selectedDepartmentId = form.watch("departmentId");
 
-    const departmentId = data?.flatMap(f => f.departments)
-        .find(dept => dept.departmentCode === selectedDepartment)?.id;
+    useEffect(() => {
+        if (selectedDepartmentId && data) {
+            const department = data.flatMap(f => f.departments)
+                .find(dept => dept.id.toString() === selectedDepartmentId);
 
-    const {data: courses, isLoading} = useQuery({
-        queryKey: ["department-courses", departmentId],
-        queryFn: () => getCoursesByDepartment(departmentId!),
-        enabled: !!departmentId,
-    })
+            if (department) {
+                const faculty = data.find(f =>
+                    f.departments.some(d => d.id.toString() === selectedDepartmentId)
+                );
 
-
-    function onSubmit(values: noteFormData) {
-        startTransition(async () => {
-                try {
-                    console.log(values)
-                    // values.files will contain array of Cloudinary URLs
-                } catch (error) {
-                    toast.error("There was an error. Please try again.")
+                if (faculty) {
+                    form.setValue("facultyId", faculty.id.toString());
                 }
             }
-        )
+        }
+    }, [selectedDepartmentId, data, form]);
+
+    const {data: courses, isLoading} = useQuery({
+        queryKey: ["department-courses", selectedDepartmentId],
+        queryFn: () => getCoursesByDepartment(Number(selectedDepartmentId)),
+        enabled: !!selectedDepartmentId,
+    })
+
+    const selectedDepartment = data?.flatMap(f => f.departments)
+        .find(dept => dept.id.toString() === selectedDepartmentId);
+
+    function onSubmit(values: NoteFormData) {
+        startTransition(async () => {
+            try {
+                const result = await saveNote(values);
+
+                if (result.success) {
+                    toast.success(result.message || "Note saved successfully!");
+                    router.push("/my-notes");
+                    form.reset();
+                } else {
+                    toast.error(result.error);
+                    if (result.details) {
+                        console.error("Validation errors:", result.details);
+                    }
+                }
+            } catch (error) {
+                console.error("Unexpected error:", error);
+                toast.error("An unexpected error occurred. Please try again.");
+            }
+        });
     }
 
     return (
@@ -92,13 +123,12 @@ export default function NewNoteForm() {
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
 
-                            {/* Grid container for Department and Course */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
 
                                 {/* Department Field */}
                                 <FormField
                                     control={form.control}
-                                    name="department"
+                                    name="departmentId"
                                     render={({field}) => (
                                         <FormItem>
                                             <FormLabel className="text-base font-medium">Department</FormLabel>
@@ -117,8 +147,7 @@ export default function NewNoteForm() {
                                                             >
                                             <span className="line-clamp-1 text-left flex-1">
                                                 {field.value
-                                                    ? data?.flatMap(f => f.departments)
-                                                        .find(dept => dept.departmentCode === field.value)?.name
+                                                    ? selectedDepartment?.name
                                                     : "Select department"
                                                 }
                                             </span>
@@ -135,7 +164,10 @@ export default function NewNoteForm() {
                                                         <DepartmentList
                                                             setOpen={setOpen}
                                                             selectedValue={field.value}
-                                                            onSelect={(value) => form.setValue("department", value)}
+                                                            onSelect={(departmentId) => {
+                                                                form.setValue("departmentId", departmentId);
+                                                                form.setValue("courseId", "");
+                                                            }}
                                                         />
                                                     </PopoverContent>
                                                 </Popover>
@@ -153,8 +185,7 @@ export default function NewNoteForm() {
                                                             >
                                             <span className="line-clamp-1 text-left flex-1">
                                                 {field.value
-                                                    ? data?.flatMap(f => f.departments)
-                                                        .find(dept => dept.departmentCode === field.value)?.name
+                                                    ? selectedDepartment?.name
                                                     : "Select department"
                                                 }
                                             </span>
@@ -169,7 +200,10 @@ export default function NewNoteForm() {
                                                             <DepartmentList
                                                                 setOpen={setOpen}
                                                                 selectedValue={field.value}
-                                                                onSelect={(value) => form.setValue("department", value)}
+                                                                onSelect={(departmentId) => {
+                                                                    form.setValue("departmentId", departmentId);
+                                                                    form.setValue("courseId", "");
+                                                                }}
                                                             />
                                                         </div>
                                                     </DrawerContent>
@@ -199,13 +233,12 @@ export default function NewNoteForm() {
                                                             <Button
                                                                 variant="outline"
                                                                 role="combobox"
-                                                                disabled={!selectedDepartment || isLoading}
+                                                                disabled={!selectedDepartmentId || isLoading}
                                                                 className={cn(
                                                                     "w-full overflow-hidden justify-between text-sm",
                                                                     !field.value && "text-muted-foreground"
                                                                 )}
                                                             >
-
                                                     <span className="line-clamp-1 text-left flex-1">
                                                         {field.value
                                                             ? courses?.find((c) => c.id.toString() === field.value)?.name
@@ -214,8 +247,6 @@ export default function NewNoteForm() {
                                                     </span>
                                                                 <ChevronsUpDown
                                                                     className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
-
-
                                                             </Button>
                                                         </FormControl>
                                                     </PopoverTrigger>
@@ -240,7 +271,7 @@ export default function NewNoteForm() {
                                                             <Button
                                                                 variant="outline"
                                                                 role="combobox"
-                                                                disabled={!selectedDepartment || isLoading}
+                                                                disabled={!selectedDepartmentId || isLoading}
                                                                 className={cn(
                                                                     "w-full justify-between text-xs",
                                                                     !field.value && "text-muted-foreground"
@@ -282,7 +313,7 @@ export default function NewNoteForm() {
                                             )}
 
                                             <FormDescription className="text-xs">
-                                                {!selectedDepartment
+                                                {!selectedDepartmentId
                                                     ? "Select department first"
                                                     : "Select the course"
                                                 }
@@ -292,7 +323,6 @@ export default function NewNoteForm() {
                                     )}
                                 />
                             </div>
-
 
                             <FormField
                                 control={form.control}
@@ -308,8 +338,6 @@ export default function NewNoteForm() {
                                 )}
                             />
 
-
-                            {/* Updated file uploader with form integration */}
                             <FormField
                                 control={form.control}
                                 name="files"
@@ -345,10 +373,10 @@ export default function NewNoteForm() {
                                         type="button"
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => append({ url: "" })}
+                                        onClick={() => append({url: ""})}
                                         className="gap-2"
                                     >
-                                        <Plus className="h-4 w-4" />
+                                        <Plus className="h-4 w-4"/>
                                         Add Link
                                     </Button>
                                 </div>
@@ -360,7 +388,7 @@ export default function NewNoteForm() {
                                                 key={field.id}
                                                 control={form.control}
                                                 name={`resources.${index}.url`}
-                                                render={({ field }) => (
+                                                render={({field}) => (
                                                     <FormItem>
                                                         <div className="flex gap-2">
                                                             <FormControl>
@@ -377,10 +405,10 @@ export default function NewNoteForm() {
                                                                 onClick={() => remove(index)}
                                                                 className="shrink-0"
                                                             >
-                                                                <X className="h-4 w-4" />
+                                                                <X className="h-4 w-4"/>
                                                             </Button>
                                                         </div>
-                                                        <FormMessage />
+                                                        <FormMessage/>
                                                     </FormItem>
                                                 )}
                                             />
@@ -388,7 +416,6 @@ export default function NewNoteForm() {
                                     </div>
                                 )}
                             </div>
-
 
                             <div className="pt-4">
                                 <Button

@@ -1,7 +1,8 @@
 import {z} from "zod";
 
 export const noteSchema = z.object({
-    department: z.string().min(1, "Department is required"),
+    departmentId: z.string({message : "Department is required"}),
+    facultyId: z.string({message : "Faculty is required"}),
     title: z.string().min(1, "Title is required"),
     files: z
         .array(z.url("Please enter a valid image URL."))
@@ -14,4 +15,4 @@ export const noteSchema = z.object({
 
 })
 
-export type noteFormData = z.infer<typeof noteSchema>
+export type NoteFormData = z.infer<typeof noteSchema>

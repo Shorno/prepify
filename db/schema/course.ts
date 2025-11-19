@@ -1,6 +1,6 @@
 import { pgTable, serial, varchar, integer } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { department } from "./depertment";
+import {department} from "@/db/schema/department";
 
 export const course = pgTable("course", {
     id: serial("id").primaryKey(),
@@ -15,3 +15,6 @@ export const courseRelations = relations(course, ({ one }) => ({
         references: [department.id],
     }),
 }));
+
+
+export type Course = typeof course.$inferSelect

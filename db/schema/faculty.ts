@@ -1,6 +1,6 @@
 import {pgTable, serial, varchar} from "drizzle-orm/pg-core";
 import {relations} from "drizzle-orm";
-import {department} from "@/db/schema/depertment";
+import {department} from "./department";
 
 export const faculty = pgTable("faculty", {
     id: serial("id").primaryKey(),
@@ -11,3 +11,5 @@ export const faculty = pgTable("faculty", {
 export const facultyRelations = relations(faculty, ({ many }) => ({
     departments: many(department),
 }));
+
+export type Faculty = typeof faculty.$inferSelect
