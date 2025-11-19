@@ -1,7 +1,9 @@
-export default function NotesPage() {
+import NotesList from "@/components/notes-list";
+
+export default async function NotesPage() {
     return (
         <div  className={"main-container"}>
-            All notes
+            <NotesList/>
         </div>
     )
 }

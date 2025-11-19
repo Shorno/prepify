@@ -2,7 +2,7 @@
 
 import {useSuspenseQuery} from "@tanstack/react-query";
 import getUserNotes from "@/actions/notes/get-user-notes";
-import {NoteCard} from "@/components/note-card";
+import {UserNoteCard} from "@/components/user-note-card";
 
 export default function MyNotesList() {
     const {data: result} = useSuspenseQuery({
@@ -29,7 +29,7 @@ export default function MyNotesList() {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {result.map((note) => (
-                <NoteCard key={note.id} data={note} />
+                <UserNoteCard key={note.id} data={note} />
             ))}
         </div>
     );

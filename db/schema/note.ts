@@ -4,7 +4,7 @@ import {relations} from "drizzle-orm";
 import {Course, course} from "@/db/schema/course";
 import {Faculty, faculty} from "@/db/schema/faculty";
 import {Department, department} from "@/db/schema/department";
-import {user} from "@/db/schema/auth-schema";
+import {User, user} from "@/db/schema/auth-schema";
 
 export const note = pgTable("note", {
     id: serial("id").primaryKey(),
@@ -30,6 +30,10 @@ export const file = pgTable("file", {
 });
 
 export const noteRelations = relations(note, ({one, many}) => ({
+    user : one(user, {
+       fields : [note.userId],
+       references : [user.id],
+    }),
     course: one(course, {
         fields: [note.courseId],
         references: [course.id],
@@ -67,6 +71,7 @@ export type File = typeof file.$inferSelect;
 
 
 export type NotesWithRelations = Note & {
+    user: User
     course: Course
     department: Department
     faculty: Faculty

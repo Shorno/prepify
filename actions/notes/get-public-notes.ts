@@ -1,26 +1,16 @@
 "use server"
 
-import {checkAuth} from "@/app/actions/user/checkAuth";
 import {ActionResult} from "@/types/action-response";
 import {NotesWithRelations} from "@/db/schema/note";
 import {db} from "@/db/config";
 
-export default async function getUserNotes(): Promise<ActionResult<NotesWithRelations[]>> {
-    const session = await checkAuth();
+export default async function getPublicNotes(): Promise<ActionResult<NotesWithRelations[]>> {
 
-    if (!session?.user) {
-        return {
-            status: 401,
-            success: false,
-            error: "Unauthorized",
-        }
-    }
 
     try {
         const notes = await db.query.note.findMany({
-            where: (note, {eq}) => eq(note.userId, session.user.id),
             with: {
-                user: true,
+                user : true,
                 course: true,
                 department: true,
                 faculty: true,
@@ -45,7 +35,7 @@ export default async function getUserNotes(): Promise<ActionResult<NotesWithRela
         }
 
     } catch (error) {
-        console.error("Error fetching user notes:", error);
+        console.error("Error fetching  notes:", error);
 
         return {
             status: 500,

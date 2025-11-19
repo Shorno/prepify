@@ -11,6 +11,7 @@ import MyNotesList from "@/app/(app)/my-notes/_components/my-notes-list";
 
 export default async function MyNotesPage() {
     const user = await checkAuth();
+    console.log(user)
 
     if (!user) {
         unauthorized();
