@@ -13,7 +13,9 @@ export const user = pgTable("user", {
         .$onUpdate(() => /* @__PURE__ */ new Date())
         .notNull(),
     role: text("role").default("STUDENT").notNull(),
-    department: text("department").default("cse").notNull(),
+    departmentId: text("department_id"),
+    facultyId: text("faculty_id"),
+    batch: text("batch"),
     hasCompletedOnboarding: boolean("has_completed_onboarding")
         .default(false)
         .notNull(),
@@ -66,3 +68,6 @@ export const verification = pgTable("verification", {
         .$onUpdate(() => /* @__PURE__ */ new Date())
         .notNull(),
 });
+
+
+export type User = typeof user.$inferSelect;

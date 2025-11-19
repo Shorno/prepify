@@ -163,3 +163,9 @@
 
   }
 }
+
+@layer utilities {
+  .main-container {
+    @apply container mx-auto mt-28 px-4 xl:px-0
+  }
+}

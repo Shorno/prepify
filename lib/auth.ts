@@ -15,11 +15,20 @@ export const auth = betterAuth({
                 defaultValue: "STUDENT",
                 input: true
             },
-            department: {
-                type: "string",
+            departmentId: {
+                type: "number",
                 required: true,
-                defaultValue: "cse",
                 input: true
+            },
+            facultyId: {
+                type: "number",
+                required: true,
+                input: true
+            },
+            batch: {
+                type: "string",
+                required: false,
+                input: true,
             },
             hasCompletedOnboarding: {
                 type: "boolean",
@@ -46,7 +55,7 @@ export const auth = betterAuth({
         },
     },
 
-    plugins : [nextCookies()]
+    plugins: [nextCookies()]
 });
 
 

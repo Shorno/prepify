@@ -28,7 +28,7 @@ export default function Navbar() {
     return (
         <div className={"px-4 xl:px-0"}>
             <div
-                className={"h-16 border container mx-auto my-4 rounded-lg md:px-8 shadow-xs dark:shadow-none backdrop-blur-sm"}>
+                className={"h-16 border fixed top-0 right-0 left-0 z-10 container mx-auto my-4 rounded-lg md:px-8 shadow-xs dark:shadow-none backdrop-blur-sm"}>
                 <div className={"container mx-auto h-full px-4 xl:px-0"}>
                     <div className={"grid grid-cols-2 md:grid-cols-3 items-center h-full"}>
                         {/* Left side */}

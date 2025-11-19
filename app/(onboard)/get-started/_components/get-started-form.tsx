@@ -1,10 +1,10 @@
 "use client"
 
 import {zodResolver} from "@hookform/resolvers/zod"
-import {useForm} from "react-hook-form"
+import {useForm, useWatch} from "react-hook-form"
 import {useEffect, useState, useTransition} from "react"
 import * as React from "react"
-import {Check, ChevronsUpDown, Loader} from "lucide-react"
+import {ChevronsUpDown, Loader, Check} from "lucide-react"
 
 import {Button} from "@/components/ui/button"
 import {
@@ -16,10 +16,6 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group"
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
-import {GraduationCap, BookOpen, Info} from "lucide-react"
-import {cn} from "@/lib/utils"
 import {
     Command,
     CommandEmpty,
@@ -28,6 +24,10 @@ import {
     CommandItem,
     CommandList,
 } from "@/components/ui/command"
+import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group"
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import {GraduationCap, BookOpen, Info} from "lucide-react"
+import {cn} from "@/lib/utils"
 import {
     Popover,
     PopoverContent,
@@ -44,31 +44,61 @@ import {onBoardFormData, onBoardSchema} from "@/zodSchema/onBoardSchema";
 import updateUserOnboarding from "@/actions/update-user-onboarding";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
-import {faculties} from "@/db/data/factulties";
 import {useIsMobile} from "@/hooks/use-mobile";
-import {DialogTitle} from "@/components/ui/dialog"; // Your custom hook
+import {DialogTitle} from "@/components/ui/dialog";
+import DepartmentList from "@/components/shared/department-list";
+import {useQuery} from "@tanstack/react-query";
+import {getBatches, getFacultiesWithDepartments} from "@/actions/university-info";
+
 
 export default function GetStartedForm() {
-    const [open, setOpen] = useState(false);
+    const [openDepartment, setOpenDepartment] = useState(false);
+    const [openBatch, setOpenBatch] = useState(false);
     const [isPending, startTransition] = useTransition()
     const {theme} = useTheme();
     const router = useRouter();
-    const isMobile = useIsMobile(); // Using your custom hook
+    const isMobile = useIsMobile();
+
+    const {data} = useQuery({
+        queryKey: ["faculties-departments"],
+        queryFn: getFacultiesWithDepartments
+    })
+
+    const {data: batches} = useQuery({
+        queryKey: ["batches"],
+        queryFn: getBatches
+    })
+    console.log(batches)
+
+
 
     const form = useForm<onBoardFormData>({
         resolver: zodResolver(onBoardSchema),
         defaultValues: {
             role: undefined,
-            department: undefined,
+            batch: undefined,
+            facultyId:undefined,
+            departmentId: undefined,
             theme: "system"
         },
     })
+
+    const selectedRole = useWatch({
+        control: form.control,
+        name: "role",
+    });
 
     useEffect(() => {
         if (theme) {
             form.setValue("theme", theme as "light" | "dark" | "system")
         }
     }, [theme, form])
+
+    useEffect(() => {
+        if (selectedRole === "teacher") {
+            form.setValue("batch", "");
+        }
+    }, [selectedRole, form]);
 
     function onSubmit(values: onBoardFormData) {
         startTransition(async () => {
@@ -175,14 +205,14 @@ export default function GetStartedForm() {
 
                         <FormField
                             control={form.control}
-                            name="department"
+                            name="departmentId"
                             render={({field}) => (
-                                <FormItem className="animate-in slide-in-from-top-2 duration-300">
+                                <FormItem>
                                     <FormLabel className="text-base font-medium">Department</FormLabel>
 
                                     {/* Responsive Combobox - Desktop Popover */}
                                     {!isMobile ? (
-                                        <Popover open={open} onOpenChange={setOpen}>
+                                        <Popover open={openDepartment} onOpenChange={setOpenDepartment}>
                                             <PopoverTrigger asChild>
                                                 <FormControl>
                                                     <Button
@@ -193,24 +223,30 @@ export default function GetStartedForm() {
                                                             !field.value && "text-muted-foreground"
                                                         )}
                                                     >
-                                                        {
-                                                            faculties.map((faculty) => faculty.departments).flat().find(dept => dept.value === field.value)?.label || "Select your department"
-                                                        }
+                                                        {field.value != null ? (
+                                                            data?.flatMap(f => f.departments)
+                                                                .find(dept => dept.id.toString() === field.value)?.name
+                                                        ) : (
+                                                            "Select your department"
+                                                        )}
                                                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                                     </Button>
                                                 </FormControl>
                                             </PopoverTrigger>
                                             <PopoverContent className="w-full p-0" align="start">
                                                 <DepartmentList
-                                                    setOpen={setOpen}
+                                                    setOpen={setOpenDepartment}
                                                     selectedValue={field.value}
-                                                    onSelect={(value) => form.setValue("department", value)}
+                                                    onSelect={(departmentId, facultyId) => {
+                                                        form.setValue("departmentId", departmentId);
+                                                        form.setValue("facultyId", facultyId);
+                                                    }}
                                                 />
                                             </PopoverContent>
                                         </Popover>
                                     ) : (
                                         /* Mobile Drawer */
-                                        <Drawer open={open} onOpenChange={setOpen}>
+                                        <Drawer open={openDepartment} onOpenChange={setOpenDepartment}>
                                             <DrawerTrigger asChild>
                                                 <FormControl>
                                                     <Button
@@ -221,9 +257,12 @@ export default function GetStartedForm() {
                                                             !field.value && "text-muted-foreground"
                                                         )}
                                                     >
-                                                        {
-                                                            faculties.map((faculty) => faculty.departments).flat().find(dept => dept.value === field.value)?.label || "Select your department"
-                                                        }
+                                                        {field.value != null ? (
+                                                            data?.flatMap(f => f.departments)
+                                                                .find(dept => dept.id.toString() === field.value)?.name
+                                                        ) : (
+                                                            "Select your department"
+                                                        )}
                                                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
                                                     </Button>
                                                 </FormControl>
@@ -232,9 +271,12 @@ export default function GetStartedForm() {
                                             <DrawerContent>
                                                 <div className="mt-4 border-t">
                                                     <DepartmentList
-                                                        setOpen={setOpen}
+                                                        setOpen={setOpenDepartment}
                                                         selectedValue={field.value}
-                                                        onSelect={(value) => form.setValue("department", value)}
+                                                        onSelect={(departmentId, facultyId) => {
+                                                            form.setValue("departmentId", departmentId);
+                                                            form.setValue("facultyId", facultyId);
+                                                        }}
                                                     />
                                                 </div>
                                             </DrawerContent>
@@ -248,6 +290,133 @@ export default function GetStartedForm() {
                                 </FormItem>
                             )}
                         />
+
+
+                        {/* Conditionally render Batch field only for students - NO ANIMATION */}
+                        {selectedRole === "student" && (
+                            <FormField
+                                control={form.control}
+                                name="batch"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel className="text-base font-medium">Batch</FormLabel>
+
+                                        {/* Desktop Popover */}
+                                        {!isMobile ? (
+                                            <Popover open={openBatch} onOpenChange={setOpenBatch}>
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant="outline"
+                                                            role="combobox"
+                                                            className={cn(
+                                                                "w-48 h-12 justify-between text-base",
+                                                                !field.value && "text-muted-foreground"
+                                                            )}
+                                                        >
+                                                            {field.value
+                                                                ? batches?.find((batch) => batch.batchCode === field.value)?.name
+                                                                : "Select your batch"}
+                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-40 p-0" align="start">
+                                                    <Command>
+                                                        <CommandInput placeholder="Search batch..."/>
+                                                        <CommandList>
+                                                            <CommandEmpty>No batch found.</CommandEmpty>
+                                                            <CommandGroup>
+                                                                {batches?.map((batch) => (
+                                                                    <CommandItem
+                                                                        className={"flex justify-between"}
+                                                                        key={batch.batchCode}
+                                                                        value={batch.name}
+                                                                        onSelect={() => {
+                                                                            form.setValue("batch", batch.batchCode)
+                                                                            setOpenBatch(false)
+                                                                        }}
+                                                                    >
+                                                                        {batch.name}
+                                                                        <Check
+                                                                            className={cn(
+                                                                                "mr-2 h-4 w-4",
+                                                                                field.value === batch.batchCode
+                                                                                    ? "opacity-100"
+                                                                                    : "opacity-0"
+                                                                            )}
+                                                                        />
+                                                                    </CommandItem>
+                                                                ))}
+                                                            </CommandGroup>
+                                                        </CommandList>
+                                                    </Command>
+                                                </PopoverContent>
+                                            </Popover>
+                                        ) : (
+                                            /* Mobile Drawer */
+                                            <Drawer open={openBatch} onOpenChange={setOpenBatch}>
+                                                <DrawerTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant="outline"
+                                                            role="combobox"
+                                                            className={cn(
+                                                                "w-full h-12 justify-between text-base",
+                                                                !field.value && "text-muted-foreground"
+                                                            )}
+                                                        >
+                                                            {field.value
+                                                                ? batches?.find((batch) => batch.batchCode === field.value)?.name
+                                                                : "Select your batch"}
+                                                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                                                        </Button>
+                                                    </FormControl>
+                                                </DrawerTrigger>
+                                                <DialogTitle/>
+                                                <DrawerContent>
+                                                    <div className="mt-4 border-t">
+                                                        <Command>
+                                                            <CommandInput placeholder="Search batch..."/>
+                                                            <CommandList>
+                                                                <CommandEmpty>No batch found.</CommandEmpty>
+                                                                <CommandGroup>
+                                                                    {batches?.map((batch) => (
+                                                                        <CommandItem
+                                                                            key={batch.batchCode}
+                                                                            value={batch.name}
+                                                                            onSelect={() => {
+                                                                                form.setValue("batch", batch.batchCode)
+                                                                                setOpenBatch(false)
+                                                                            }}
+                                                                        >
+                                                                            <Check
+                                                                                className={cn(
+                                                                                    "mr-2 h-4 w-4",
+                                                                                    field.value === batch.batchCode
+                                                                                        ? "opacity-100"
+                                                                                        : "opacity-0"
+                                                                                )}
+                                                                            />
+                                                                            {batch.name}
+                                                                        </CommandItem>
+                                                                    ))}
+                                                                </CommandGroup>
+                                                            </CommandList>
+                                                        </Command>
+                                                    </div>
+                                                </DrawerContent>
+                                            </Drawer>
+                                        )}
+
+                                        <FormDescription>
+                                            Select your batch year and section
+                                        </FormDescription>
+                                        <FormMessage/>
+                                    </FormItem>
+                                )}
+                            />
+                        )}
 
                         <ThemeSelector control={form.control} name="theme"/>
 
@@ -264,47 +433,5 @@ export default function GetStartedForm() {
                 </Form>
             </CardContent>
         </Card>
-    )
-}
-
-// Extracted component for the department list
-function DepartmentList({
-                            setOpen,
-                            selectedValue,
-                            onSelect,
-                        }: {
-    setOpen: (open: boolean) => void
-    selectedValue: string | undefined
-    onSelect: (value: string) => void
-}) {
-    return (
-        <Command>
-            <CommandInput placeholder="Search department..."/>
-            <CommandList>
-                <CommandEmpty>No department found.</CommandEmpty>
-                {faculties.map((faculty) => (
-                    <CommandGroup key={faculty.label} heading={faculty.label}>
-                        {faculty.departments.map((department) => (
-                            <CommandItem
-                                value={department.label}
-                                key={department.value}
-                                onSelect={() => {
-                                    setOpen(false);
-                                    onSelect(department.value);
-                                }}
-                            >
-                                {department.label}
-                                <Check
-                                    className={cn(
-                                        "h-4 w-4 ml-auto",
-                                        department.value === selectedValue ? "opacity-100" : "opacity-0"
-                                    )}
-                                />
-                            </CommandItem>
-                        ))}
-                    </CommandGroup>
-                ))}
-            </CommandList>
-        </Command>
     )
 }
