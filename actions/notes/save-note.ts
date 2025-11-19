@@ -34,6 +34,7 @@ export default async function saveNote(data: NoteFormData): Promise<ActionResult
 
         const savedNote = await db.transaction(async (tx) => {
             const [newNote] = await tx.insert(note).values({
+                userId : session.user.id,
                 title: validData.title,
                 courseId: parseInt(validData.courseId),
                 departmentId: parseInt(validData.departmentId),

@@ -1,12 +1,14 @@
 
-import {integer, pgTable, serial, varchar, timestamp} from "drizzle-orm/pg-core";
+import {integer, pgTable, serial, varchar, timestamp, text} from "drizzle-orm/pg-core";
 import {relations} from "drizzle-orm";
 import {Course, course} from "@/db/schema/course";
 import {Faculty, faculty} from "@/db/schema/faculty";
 import {Department, department} from "@/db/schema/department";
+import {user} from "@/db/schema/auth-schema";
 
 export const note = pgTable("note", {
     id: serial("id").primaryKey(),
+    userId: text("user_id").notNull().references(()=>user.id, {onDelete: "cascade"}),
     title: varchar("title", {length: 255}).notNull(),
     courseId: integer("course_id").notNull().references(() => course.id, {onDelete: "cascade"}),
     departmentId: integer("department_id").notNull().references(() => department.id, {onDelete: "cascade"}),
@@ -64,7 +66,7 @@ export type Resource = typeof resource.$inferSelect;
 export type File = typeof file.$inferSelect;
 
 
-export type NotesWithRelations = typeof note.$inferSelect & {
+export type NotesWithRelations = Note & {
     course: Course
     department: Department
     faculty: Faculty
