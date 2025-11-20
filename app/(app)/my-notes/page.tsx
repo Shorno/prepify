@@ -16,10 +16,6 @@ export default async function MyNotesPage() {
         unauthorized();
     }
 
-    //
-    // const response = await sendEmail()
-    // console.log(response)
-
     const queryClient = getQueryClient();
 
     await queryClient.prefetchQuery({
