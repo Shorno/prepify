@@ -46,5 +46,13 @@ export const pointsTransactionRelations = relations(pointsTransaction, ({one}) =
     }),
 }));
 
+export type LeaderboardEntry = UserPoints & {
+    user: {
+        id: string;
+        name: string;
+        image: string | null;
+    }
+}
+
 export type UserPoints = typeof userPoints.$inferSelect;
 export type PointsTransaction = typeof pointsTransaction.$inferSelect;
