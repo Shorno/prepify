@@ -34,17 +34,20 @@ export async function uploadImageToCloudinary(
             'image/jpeg',
             'image/jpg',
             'image/png',
-            'image/webp'
+            'image/webp',
+            'application/svg+xml',
+            'application/pdf',
+            'pdf'
         ]
 
         if (!allowedTypes.includes(file.type)) {
             return {
                 success: false,
-                error: 'Invalid file type. Please upload JPG, PNG, WebP, or SVG files.'
+                error: 'Invalid file type. Please upload JPG, PNG, WebP, or PDF files.'
             }
         }
 
-        const maxSize = 5 * 1024 * 1024
+        const maxSize = 10 * 1024 * 1024
         if (file.size > maxSize) {
             return {
                 success: false,
