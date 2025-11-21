@@ -97,9 +97,9 @@ export default async function NotePage({ params }: NotePageProps) {
                     {/* Divider */}
                     <hr className="border-border" />
 
-                    {/* Image Gallery */}
+                    {/* Files Gallery */}
                     <div>
-                        <h2 className="text-xl font-semibold mb-4">Images</h2>
+                        <h2 className="text-xl font-semibold mb-4">Files</h2>
                         <NoteImageGallery files={note.files} />
                     </div>
 

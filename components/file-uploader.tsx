@@ -95,6 +95,8 @@ export default function FileUploader({
     const [deletingId, setDeletingId] = useState<string | null>(null)
     const [uploadingCount, setUploadingCount] = useState(0)
 
+    console.log(uploadedFiles)
+
     // Initialize from value prop
     useState(() => {
         if (value.length > 0 && uploadedFiles.length === 0) {

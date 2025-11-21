@@ -51,7 +51,7 @@ export async function uploadImageToCloudinary(
         if (file.size > maxSize) {
             return {
                 success: false,
-                error: 'File too large. Please upload files smaller than 5MB.'
+                error: 'File too large. Please upload files smaller than 10MB.'
             }
         }
 
@@ -98,19 +98,25 @@ export async function deleteImageFromCloudinary(
             return { success: false, error: 'No public ID provided' }
         }
 
-        const result = await cloudinary.uploader.destroy(publicId)
+        // Try to delete as raw resource first (for PDFs and documents)
+        let result = await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' })
+
+        // If not found as raw, try as image
+        if (result.result !== 'ok') {
+            result = await cloudinary.uploader.destroy(publicId, { resource_type: 'image' })
+        }
 
         return {
             success: result.result === 'ok',
             message: result.result === 'ok'
-                ? 'Image deleted successfully'
-                : 'Failed to delete image'
+                ? 'File deleted successfully'
+                : 'Failed to delete file'
         }
     } catch (error) {
         console.error('Cloudinary delete error:', error)
         return {
             success: false,
-            error: 'Failed to delete image'
+            error: 'Failed to delete file'
         }
     }
 }
