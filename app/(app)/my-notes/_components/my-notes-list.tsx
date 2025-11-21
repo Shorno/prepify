@@ -1,12 +1,12 @@
 "use client";
 
-import {useSuspenseQuery} from "@tanstack/react-query";
+import {useQuery} from "@tanstack/react-query";
 import getUserNotes from "@/actions/notes/get-user-notes";
 import {UserNoteCard} from "@/components/user-note-card";
 import {UserNoteCardSkeleton} from "@/app/(app)/my-notes/_components/user-notes-skeleton";
 
 export default function MyNotesList() {
-    const {data: result, isLoading} = useSuspenseQuery({
+    const {data: result, isLoading} = useQuery({
         queryKey: ['user-notes'],
         queryFn: async () => {
             const result = await getUserNotes();
