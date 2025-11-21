@@ -42,7 +42,7 @@ export default async function NotePage({ params }: NotePageProps) {
 
     return (
         <div className="main-container py-8">
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
                 {/* Main Content */}
                 <div className="space-y-6">
                     {/* Note Header */}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition, useCallback } from "react"
+import { useState, useTransition, useCallback, useEffect } from "react"
 import { AlertCircleIcon, FileArchiveIcon, FileIcon, FileSpreadsheetIcon, FileTextIcon, HeadphonesIcon, ImageIcon, Trash2Icon, UploadIcon, VideoIcon, XIcon, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -98,19 +98,34 @@ export default function FileUploader({
     console.log(uploadedFiles)
 
     // Initialize from value prop
-    useState(() => {
+    useEffect(() => {
         if (value.length > 0 && uploadedFiles.length === 0) {
-            const filesFromValue = value.map((url, index) => ({
-                id: `file-${Date.now()}-${index}`,
-                name: url.split("/").pop() || "file",
-                size: 0,
-                type: "application/octet-stream",
-                url,
-                publicId: getPublicIdFromUrl(url) || "",
-            }))
+            const filesFromValue = value.map((url, index) => {
+                // Try to infer file type from URL
+                let type = "application/octet-stream"
+                if (url.includes('.pdf') || url.includes('f_pdf')) {
+                    type = "application/pdf"
+                } else if (url.match(/\.(jpg|jpeg)$/i) || url.includes('f_jpg')) {
+                    type = "image/jpeg"
+                } else if (url.includes('.png') || url.includes('f_png')) {
+                    type = "image/png"
+                } else if (url.includes('.webp') || url.includes('f_webp')) {
+                    type = "image/webp"
+                }
+
+                return {
+                    id: `file-${Date.now()}-${index}`,
+                    name: url.split("/").pop()?.split('.')[0] || "file",
+                    size: 0,
+                    type,
+                    url,
+                    publicId: getPublicIdFromUrl(url) || "",
+                }
+            })
             setUploadedFiles(filesFromValue)
         }
-    })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [value])
 
     const handleFileUpload = useCallback(
         async (files: File[]) => {
