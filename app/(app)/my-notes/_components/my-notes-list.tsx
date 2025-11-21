@@ -3,9 +3,10 @@
 import {useSuspenseQuery} from "@tanstack/react-query";
 import getUserNotes from "@/actions/notes/get-user-notes";
 import {UserNoteCard} from "@/components/user-note-card";
+import {UserNoteCardSkeleton} from "@/app/(app)/my-notes/_components/user-notes-skeleton";
 
 export default function MyNotesList() {
-    const {data: result} = useSuspenseQuery({
+    const {data: result, isLoading} = useSuspenseQuery({
         queryKey: ['user-notes'],
         queryFn: async () => {
             const result = await getUserNotes();
@@ -15,6 +16,14 @@ export default function MyNotesList() {
             return result.data;
         },
     });
+
+    if (isLoading) {
+        return (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {Array.from({length: 4}).map((_, i) => <UserNoteCardSkeleton key={i} />)}
+            </div>
+        );
+    }
 
     if (!result || result.length === 0) {
         return (
