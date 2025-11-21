@@ -6,7 +6,7 @@ import Link from "next/link";
 export function UserNoteCard({ data }: { data: NotesWithRelations }) {
     const fileCount = data.files.length;
     const resourceCount = data.resources.length;
-    const maxPreviews = 5;
+    const maxPreviews = 2;
     const previewFiles = data.files.slice(0, maxPreviews);
     const additionalFiles = Math.max(0, fileCount - maxPreviews);
 
