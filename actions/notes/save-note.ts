@@ -10,6 +10,7 @@ import {db} from "@/db/config";
 import {pointsTransaction, userPoints} from "@/db/schema/leaderboard";
 import {z} from "zod";
 import {sendPointsEmail} from "@/actions/email/send-points-email";
+import {revalidatePath} from "next/cache";
 
 export default async function saveNote(data: NoteFormData): Promise<ActionResult<{
     noteId: number;
@@ -141,7 +142,6 @@ export default async function saveNote(data: NoteFormData): Promise<ActionResult
                 });
             }
 
-            // Calculate next milestone
             const nextMilestoneInfo = getNextMilestone(newNoteCount);
 
 
@@ -154,6 +154,9 @@ export default async function saveNote(data: NoteFormData): Promise<ActionResult
                 breakdown: pointsCalculation.breakdown,
                 nextMilestone: nextMilestoneInfo,
             });
+
+            revalidatePath("/leaderboard");
+            revalidatePath("/notes");
 
             return {
                 savedNote: newNote,

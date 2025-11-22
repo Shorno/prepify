@@ -175,7 +175,7 @@ export default function MultiStepOnboarding() {
                 <form onSubmit={(e) => e.preventDefault()}>
                     {renderStepIndicators()}
 
-                    <div className="min-h-[400px] sm:min-h-[450px] md:min-h-[500px] mb-8">
+                    <div className="min-h-[400px] mb-8">
                         {renderStepContent()}
                     </div>
 
