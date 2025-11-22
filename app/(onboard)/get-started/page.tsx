@@ -3,7 +3,7 @@ import MultiStepOnboarding from "@/app/(onboard)/get-started/_components/multi-s
 export default async function GetStartedPage() {
 
     return (
-        <div className="flex justify-center items-start min-h-screen w-full">
+        <div className="flex justify-center items-start  w-full">
             <MultiStepOnboarding />
         </div>
     )
