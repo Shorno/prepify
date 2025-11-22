@@ -1,10 +1,10 @@
-import GetStartedForm from "@/app/(onboard)/get-started/_components/get-started-form";
+import MultiStepOnboarding from "@/app/(onboard)/get-started/_components/multi-step-onboarding";
 
 export default async function GetStartedPage() {
 
     return (
-        <div className={"flex justify-center items-center min-h-screen"}>
-            <GetStartedForm/>
+        <div className="flex justify-center items-start min-h-screen w-full">
+            <MultiStepOnboarding />
         </div>
     )
 }

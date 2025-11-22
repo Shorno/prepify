@@ -6,6 +6,7 @@ export const onBoardSchema = z.object({
     facultyId: z.string({error: "Faculty ID is required"}),
     batch: z.string(),
     theme: z.enum(["light", "dark", "system"]).default("system").nonoptional(),
+    username: z.string().min(3, {message: "Username must be at least 3 characters"}).max(20, {message: "Username must be at most 20 characters"})
 }).refine((data) => {
     if (data.role === "student") {
         return !!data.batch && data.batch.length > 0;

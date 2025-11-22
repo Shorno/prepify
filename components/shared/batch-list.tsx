@@ -1,0 +1,78 @@
+"use client"
+import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from "@/components/ui/command";
+import {Check} from "lucide-react";
+import {cn} from "@/lib/utils";
+import * as React from "react";
+import {Skeleton} from "@/components/ui/skeleton";
+
+type Batch = {
+    id: number;
+    name: string;
+    batchCode: string;
+}
+
+interface BatchListProps {
+    batches: Batch[] | undefined
+    isLoading: boolean
+    setOpen: (open: boolean) => void
+    selectedValue: string | undefined
+    onSelect: (value: string) => void
+}
+
+export default function BatchList({
+    batches,
+    isLoading,
+    setOpen,
+    selectedValue,
+    onSelect,
+}: BatchListProps) {
+    return (
+        <Command>
+            <CommandInput placeholder="Search batch..."/>
+            <CommandList>
+                {isLoading ? (
+                    <div className="p-2 space-y-2">
+                        <Skeleton className="h-8 w-full"/>
+                        <Skeleton className="h-8 w-full"/>
+                        <Skeleton className="h-8 w-full"/>
+                        <Skeleton className="h-8 w-full"/>
+                        <Skeleton className="h-8 w-full"/>
+                    </div>
+                ) : (
+                    <>
+                        <CommandEmpty>No batch found.</CommandEmpty>
+                        <CommandGroup>
+                            {batches?.map((batch) => (
+                                <CommandItem
+                                    value={batch.name}
+                                    key={batch.id}
+                                    onSelect={() => {
+                                        setOpen(false);
+                                        onSelect(batch.id.toString());
+                                    }}
+                                    className="flex items-start py-3"
+                                >
+                                    <div className="flex flex-col flex-1 gap-0.5 pr-2">
+                                        <span className="line-clamp-2 leading-tight">
+                                            {batch.name}
+                                        </span>
+                                        <span className="text-xs text-muted-foreground">
+                                            {batch.batchCode}
+                                        </span>
+                                    </div>
+                                    <Check
+                                        className={cn(
+                                            "h-4 w-4 ml-auto",
+                                            batch.id.toString() === selectedValue ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </>
+                )}
+            </CommandList>
+        </Command>
+    )
+}
+

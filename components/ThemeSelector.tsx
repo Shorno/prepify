@@ -9,9 +9,9 @@ import {Control, FieldPath, FieldValues} from "react-hook-form"
 import {useTheme} from "next-themes"
 
 const items = [
-    {value: "light", label: "Light", image: "https://originui.com/ui-light.png"},
-    {value: "dark", label: "Dark", image: "https://originui.com/ui-dark.png"},
-    {value: "system", label: "System", image: "https://originui.com/ui-system.png"},
+    {value: "light", label: "Light", image: "/images/light.png"},
+    {value: "dark", label: "Dark", image: "/images/dark.png"},
+    {value: "system", label: "System", image: "/images/system.png"},
 ]
 
 interface ThemeSelectorProps<T extends FieldValues> {

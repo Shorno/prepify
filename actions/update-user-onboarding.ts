@@ -41,6 +41,7 @@ export default async function updateUserOnboarding(data: onBoardFormData): Promi
                 departmentId: result.data.departmentId,
                 facultyId: result.data.facultyId,
                 batch: result.data.role === "student" ? result.data.batch || null : null,
+                username: result.data.username,
                 hasCompletedOnboarding: true
             })
             .where(eq(user.id, session.user.id));

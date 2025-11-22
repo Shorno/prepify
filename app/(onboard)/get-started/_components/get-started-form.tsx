@@ -68,7 +68,6 @@ export default function GetStartedForm() {
         queryKey: ["batches"],
         queryFn: getBatches
     })
-    console.log(batches)
 
 
 
@@ -79,6 +78,7 @@ export default function GetStartedForm() {
             batch: undefined,
             facultyId:undefined,
             departmentId: undefined,
+            username: undefined,
             theme: "system"
         },
     })
@@ -290,6 +290,29 @@ export default function GetStartedForm() {
                                 </FormItem>
                             )}
                         />
+                        <FormField
+                            control={form.control}
+                            name="username"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-base font-medium">Username</FormLabel>
+                                    <FormControl>
+                                        <input
+                                            {...field}
+                                            type="text"
+                                            placeholder="Your unique username"
+                                            className="w-full rounded-md border border-input px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                            autoComplete="off"
+                                        />
+                                    </FormControl>
+                                    <FormDescription>
+                                        Choose a unique username for your profile
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
 
 
                         {/* Conditionally render Batch field only for students - NO ANIMATION */}

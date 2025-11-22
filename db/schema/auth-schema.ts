@@ -16,6 +16,7 @@ export const user = pgTable("user", {
     departmentId: text("department_id"),
     facultyId: text("faculty_id"),
     batch: text("batch"),
+    username : text("username").unique(),
     hasCompletedOnboarding: boolean("has_completed_onboarding")
         .default(false)
         .notNull(),
