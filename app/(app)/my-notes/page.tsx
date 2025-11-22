@@ -21,10 +21,7 @@ export default async function MyNotesPage() {
                     <Link href="/my-notes/new">New Note</Link>
                 </Button>
             </div>
-
-            <Suspense fallback={<MyNotesListSkeleton/>}>
-                <MyNotesList/>
-            </Suspense>
+            <MyNotesList/>
         </div>
     );
 }

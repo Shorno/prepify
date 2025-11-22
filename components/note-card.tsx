@@ -54,19 +54,19 @@ export default function NoteCard({data}: { data: NotesWithRelations }) {
                         {previewFiles.map((file) => (
                             <div
                                 key={file.id}
-                                className="relative w-16 h-16 bg-muted rounded border border-border overflow-hidden flex-shrink-0"
+                                className="relative w-20 h-20 bg-muted rounded border border-border overflow-hidden flex-shrink-0"
                             >
                                 <Image
                                     src={file.url || "/placeholder.svg"}
                                     alt={`File preview ${file.id}`}
                                     fill
-                                    sizes="64px"
+                                    sizes="80px"
                                     className="object-cover"
                                 />
                             </div>
                         ))}
                         {additionalFiles > 0 && (
-                            <div className="w-16 h-16 bg-muted rounded border border-border flex items-center justify-center flex-shrink-0">
+                            <div className="w-20 h-20 bg-muted rounded border border-border flex items-center justify-center flex-shrink-0">
                                 <span className="text-xs font-semibold text-muted-foreground">
                                     +{additionalFiles}
                                 </span>

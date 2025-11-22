@@ -27,7 +27,7 @@ export default async function proxy(request: NextRequest) {
 export const config = {
     matcher: [
         // Only run on app routes, not on static files or API routes
-        '/((?!_next/static|_next/image|favicon.ico|api/).*)',
+        '/((?!_next/static|_next/image|favicon.ico|icon.png|api/).*)',
         // Or be more specific with your protected routes:
         // '/dashboard/:path*',
         // '/profile/:path*',

@@ -6,7 +6,7 @@ import Link from "next/link";
 export function UserNoteCard({ data }: { data: NotesWithRelations }) {
     const fileCount = data.files.length;
     const resourceCount = data.resources.length;
-    const maxPreviews = 2;
+    const maxPreviews = 3; // match NoteCard
     const previewFiles = data.files.slice(0, maxPreviews);
     const additionalFiles = Math.max(0, fileCount - maxPreviews);
 
@@ -30,24 +30,24 @@ export function UserNoteCard({ data }: { data: NotesWithRelations }) {
 
                 {/* Image preview grid */}
                 {fileCount > 0 && (
-                    <div className="grid grid-cols-3 gap-2 mb-3">
+                    <div className="flex gap-2 mb-3 flex-wrap">
                         {previewFiles.map((file) => (
                             <div
                                 key={file.id}
-                                className="relative aspect-square bg-muted rounded border border-border overflow-hidden"
+                                className="relative w-20 h-20 bg-muted rounded border border-border overflow-hidden flex-shrink-0"
                             >
                                 <Image
                                     src={file.url || "/placeholder.svg"}
                                     alt={`File preview ${file.id}`}
                                     fill
-                                    sizes="(max-width: 768px) 25vw, (max-width: 1024px) 20vw, 15vw"
+                                    sizes="80px"
                                     className="object-cover"
                                 />
                             </div>
                         ))}
                         {additionalFiles > 0 && (
-                            <div className="aspect-square bg-muted rounded border border-border flex items-center justify-center">
-                                <span className="text-sm font-semibold text-muted-foreground">
+                            <div className="w-20 h-20 bg-muted rounded border border-border flex items-center justify-center flex-shrink-0">
+                                <span className="text-xs font-semibold text-muted-foreground">
                                     +{additionalFiles}
                                 </span>
                             </div>
