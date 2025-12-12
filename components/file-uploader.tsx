@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { CldImage } from "next-cloudinary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getPublicIdFromUrl } from "@/utils/getPublicIdFromUrl"
-import { deleteImageFromCloudinary, uploadImageToCloudinary } from "@/actions/cloudinary"
+import { deleteImageFromCloudinary } from "@/actions/cloudinary"
 
 interface UploadedFile {
     id: string
@@ -81,13 +81,13 @@ const getFileIcon = (type: string, name: string) => {
 }
 
 export default function FileUploader({
-                                         value = [],
-                                         onChange,
-                                         maxFiles = 10,
-                                         maxSizeMB = 10,
-                                         folder = "notes",
-                                         disabled = false
-                                     }: FileUploaderProps) {
+    value = [],
+    onChange,
+    maxFiles = 10,
+    maxSizeMB = 10,
+    folder = "notes",
+    disabled = false
+}: FileUploaderProps) {
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
     const [isDragging, setIsDragging] = useState(false)
     const [errors, setErrors] = useState<string[]>([])
@@ -156,10 +156,47 @@ export default function FileUploader({
             startTransition(async () => {
                 try {
                     const uploadPromises = files.map(async (file) => {
+                        // Get upload signature from our API
+                        const signatureResponse = await fetch('/api/sign-cloudinary-params', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ folder }),
+                        })
+
+                        if (!signatureResponse.ok) {
+                            throw new Error('Failed to get upload signature')
+                        }
+
+                        const { signature, timestamp, cloudName, apiKey, folder: uploadFolder } = await signatureResponse.json()
+
+                        // Upload directly to Cloudinary
                         const formData = new FormData()
-                        formData.append("file", file)
-                        formData.append("folder", folder)
-                        return await uploadImageToCloudinary(formData)
+                        formData.append('file', file)
+                        formData.append('signature', signature)
+                        formData.append('timestamp', timestamp.toString())
+                        formData.append('api_key', apiKey)
+                        formData.append('folder', uploadFolder)
+
+                        const uploadResponse = await fetch(
+                            `https://api.cloudinary.com/v1_1/${cloudName}/upload`,
+                            {
+                                method: 'POST',
+                                body: formData,
+                            }
+                        )
+
+                        if (!uploadResponse.ok) {
+                            const error = await uploadResponse.json()
+                            throw new Error(error.error?.message || 'Upload failed')
+                        }
+
+                        const result = await uploadResponse.json()
+
+                        return {
+                            success: true,
+                            url: result.secure_url,
+                            publicId: result.public_id,
+                        }
                     })
 
                     const results = await Promise.all(uploadPromises)
@@ -334,7 +371,7 @@ export default function FileUploader({
                 onDrop={handleDrop}
                 data-dragging={isDragging || undefined}
                 data-files={uploadedFiles.length > 0 || uploadingCount > 0 || undefined}
-                // className="border-input relative flex min-h-52 flex-col items-center overflow-hidden rounded-xl border border-dashed p-4 transition-colors not-data-[files]:justify-center data-[dragging=true]:bg-accent/50"
+            // className="border-input relative flex min-h-52 flex-col items-center overflow-hidden rounded-xl border border-dashed p-4 transition-colors not-data-[files]:justify-center data-[dragging=true]:bg-accent/50"
             >
                 {uploadedFiles.length > 0 || uploadingCount > 0 ? (
                     <div className="flex w-full flex-col gap-3">
