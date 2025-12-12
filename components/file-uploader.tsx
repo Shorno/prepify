@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { CldImage } from "next-cloudinary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getPublicIdFromUrl } from "@/utils/getPublicIdFromUrl"
-import { deleteImageFromCloudinary, uploadImageToCloudinary } from "@/actions/cloudinary"
+import { deleteImageFromCloudinary } from "@/actions/cloudinary"
 
 interface UploadedFile {
     id: string
@@ -81,13 +81,13 @@ const getFileIcon = (type: string, name: string) => {
 }
 
 export default function FileUploader({
-                                         value = [],
-                                         onChange,
-                                         maxFiles = 10,
-                                         maxSizeMB = 10,
-                                         folder = "notes",
-                                         disabled = false
-                                     }: FileUploaderProps) {
+    value = [],
+    onChange,
+    maxFiles = 10,
+    maxSizeMB = 10,
+    folder = "notes",
+    disabled = false
+}: FileUploaderProps) {
     const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
     const [isDragging, setIsDragging] = useState(false)
     const [errors, setErrors] = useState<string[]>([])
@@ -156,10 +156,47 @@ export default function FileUploader({
             startTransition(async () => {
                 try {
                     const uploadPromises = files.map(async (file) => {
+                        // Get upload signature from our API
+                        const signatureResponse = await fetch('/api/sign-cloudinary-params', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ folder }),
+                        })
+
+                        if (!signatureResponse.ok) {
+                            throw new Error('Failed to get upload signature')
+                        }
+
+                        const { signature, timestamp, cloudName, apiKey, folder: uploadFolder } = await signatureResponse.json()
+
+                        // Upload directly to Cloudinary
                         const formData = new FormData()
-                        formData.append("file", file)
-                        formData.append("folder", folder)
-                        return await uploadImageToCloudinary(formData)
+                        formData.append('file', file)
+                        formData.append('signature', signature)
+                        formData.append('timestamp', timestamp.toString())
+                        formData.append('api_key', apiKey)
+                        formData.append('folder', uploadFolder)
+
+                        const uploadResponse = await fetch(
+                            `https://api.cloudinary.com/v1_1/${cloudName}/upload`,
+                            {
+                                method: 'POST',
+                                body: formData,
+                            }
+                        )
+
+                        if (!uploadResponse.ok) {
+                            const error = await uploadResponse.json()
+                            throw new Error(error.error?.message || 'Upload failed')
+                        }
+
+                        const result = await uploadResponse.json()
+
+                        return {
+                            success: true,
+                            url: result.secure_url,
+                            publicId: result.public_id,
+                        }
                     })
 
                     const results = await Promise.all(uploadPromises)
@@ -334,7 +371,7 @@ export default function FileUploader({
                 onDrop={handleDrop}
                 data-dragging={isDragging || undefined}
                 data-files={uploadedFiles.length > 0 || uploadingCount > 0 || undefined}
-                // className="border-input relative flex min-h-52 flex-col items-center overflow-hidden rounded-xl border border-dashed p-4 transition-colors not-data-[files]:justify-center data-[dragging=true]:bg-accent/50"
+            // className="border-input relative flex min-h-52 flex-col items-center overflow-hidden rounded-xl border border-dashed p-4 transition-colors not-data-[files]:justify-center data-[dragging=true]:bg-accent/50"
             >
                 {uploadedFiles.length > 0 || uploadingCount > 0 ? (
                     <div className="flex w-full flex-col gap-3">
@@ -394,11 +431,19 @@ export default function FileUploader({
                                 {Array.from({ length: uploadingCount }).map((_, index) => (
                                     <div
                                         key={`skeleton-${index}`}
-                                        className="relative aspect-square rounded-md bg-accent overflow-hidden"
+                                        className="bg-background relative flex flex-col rounded-md border"
                                     >
-                                        <Skeleton className="h-full w-full" />
-                                        <div className="absolute inset-0 flex items-center justify-center bg-background/10">
-                                            <Loader2 className="size-8 opacity-60 animate-spin" />
+                                        {/* Preview area skeleton */}
+                                        <div className="bg-accent flex aspect-square items-center justify-center overflow-hidden rounded-t-[inherit] relative">
+                                            <Skeleton className="h-full w-full" />
+                                            <div className="absolute inset-0 flex items-center justify-center bg-background/10">
+                                                <Loader2 className="size-8 opacity-60 animate-spin" />
+                                            </div>
+                                        </div>
+                                        {/* File info skeleton */}
+                                        <div className="flex min-w-0 flex-col gap-0.5 border-t p-3">
+                                            <Skeleton className="h-[13px] w-3/4 mb-1" />
+                                            <Skeleton className="h-[11px] w-1/2" />
                                         </div>
                                     </div>
                                 ))}

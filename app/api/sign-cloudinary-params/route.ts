@@ -8,9 +8,26 @@ cloudinary.config({
 
 export async function POST(request: Request) {
     const body = await request.json();
-    const { paramsToSign } = body;
+    const { folder = "uploads" } = body;
 
-    const signature = cloudinary.utils.api_sign_request(paramsToSign, process.env.CLOUDINARY_API_SECRET as string);
+    const timestamp = Math.round(new Date().getTime() / 1000);
 
-    return Response.json({ signature });
+    const paramsToSign = {
+        timestamp,
+        folder,
+        upload_preset: undefined, // We're using signed uploads
+    };
+
+    const signature = cloudinary.utils.api_sign_request(
+        paramsToSign,
+        process.env.CLOUDINARY_API_SECRET as string
+    );
+
+    return Response.json({
+        signature,
+        timestamp,
+        cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+        apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+        folder,
+    });
 }
