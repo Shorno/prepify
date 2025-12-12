@@ -431,11 +431,19 @@ export default function FileUploader({
                                 {Array.from({ length: uploadingCount }).map((_, index) => (
                                     <div
                                         key={`skeleton-${index}`}
-                                        className="relative aspect-square rounded-md bg-accent overflow-hidden"
+                                        className="bg-background relative flex flex-col rounded-md border"
                                     >
-                                        <Skeleton className="h-full w-full" />
-                                        <div className="absolute inset-0 flex items-center justify-center bg-background/10">
-                                            <Loader2 className="size-8 opacity-60 animate-spin" />
+                                        {/* Preview area skeleton */}
+                                        <div className="bg-accent flex aspect-square items-center justify-center overflow-hidden rounded-t-[inherit] relative">
+                                            <Skeleton className="h-full w-full" />
+                                            <div className="absolute inset-0 flex items-center justify-center bg-background/10">
+                                                <Loader2 className="size-8 opacity-60 animate-spin" />
+                                            </div>
+                                        </div>
+                                        {/* File info skeleton */}
+                                        <div className="flex min-w-0 flex-col gap-0.5 border-t p-3">
+                                            <Skeleton className="h-[13px] w-3/4 mb-1" />
+                                            <Skeleton className="h-[11px] w-1/2" />
                                         </div>
                                     </div>
                                 ))}
