@@ -116,7 +116,7 @@ export default function NoteImageGallery({ files }: NoteImageGalleryProps) {
                 {/* Image Gallery Section */}
                 {hasOnlyImages && (
                     <>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                             {imageFiles.map((file, idx) => (
                                 <button
                                     key={file.id}
@@ -124,19 +124,19 @@ export default function NoteImageGallery({ files }: NoteImageGalleryProps) {
                                         setIndex(idx);
                                         setOpen(true);
                                     }}
-                                    className="relative aspect-square overflow-hidden rounded-lg border border-border bg-muted hover:opacity-80 transition-opacity cursor-pointer group"
+                                    className="relative aspect-[4/3] overflow-hidden rounded-md border border-border bg-muted hover:opacity-80 transition-opacity cursor-pointer group"
                                 >
                                     <CldImage
                                         src={file.url}
                                         alt={`Image ${file.id}`}
                                         fill
-                                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                                         className="object-cover"
                                         quality="auto"
                                         format="auto"
                                     />
-                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                        <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium">
+                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                                        <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity text-xs font-medium bg-black/50 px-2 py-1 rounded">
                                             View
                                         </span>
                                     </div>
@@ -187,7 +187,7 @@ export default function NoteImageGallery({ files }: NoteImageGalleryProps) {
             </TabsList>
 
             <TabsContent value="images" className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                     {imageFiles.map((file, idx) => (
                         <button
                             key={file.id}
@@ -195,19 +195,19 @@ export default function NoteImageGallery({ files }: NoteImageGalleryProps) {
                                 setIndex(idx);
                                 setOpen(true);
                             }}
-                            className="relative aspect-square overflow-hidden rounded-lg border border-border bg-muted hover:opacity-80 transition-opacity cursor-pointer group"
+                            className="relative aspect-[4/3] overflow-hidden rounded-md border border-border bg-muted hover:opacity-80 transition-opacity cursor-pointer group"
                         >
                             <CldImage
                                 src={file.url}
                                 alt={`Image ${file.id}`}
                                 fill
-                                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                                 className="object-cover"
                                 quality="auto"
                                 format="auto"
                             />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium">
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                                <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity text-xs font-medium bg-black/50 px-2 py-1 rounded">
                                     View
                                 </span>
                             </div>
