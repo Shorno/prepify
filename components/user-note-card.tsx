@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { FileText, BookOpen, ChevronRight } from 'lucide-react';
-import {NotesWithRelations} from "@/db/schema";
+import { NotesWithRelations } from "@/db/schema";
 import Link from "next/link";
 
 export function UserNoteCard({ data }: { data: NotesWithRelations }) {
@@ -31,20 +31,33 @@ export function UserNoteCard({ data }: { data: NotesWithRelations }) {
                 {/* Image preview grid */}
                 {fileCount > 0 && (
                     <div className="flex gap-2 mb-3 flex-wrap">
-                        {previewFiles.map((file) => (
-                            <div
-                                key={file.id}
-                                className="relative w-20 h-20 bg-muted rounded border border-border overflow-hidden flex-shrink-0"
-                            >
-                                <Image
-                                    src={file.url || "/placeholder.svg"}
-                                    alt={`File preview ${file.id}`}
-                                    fill
-                                    sizes="80px"
-                                    className="object-cover"
-                                />
-                            </div>
-                        ))}
+                        {previewFiles.map((file) => {
+                            // Check if file is a PDF
+                            const isPDF = file.url.includes('.pdf') || file.url.includes('f_pdf') || file.url.toLowerCase().endsWith('.pdf')
+
+                            return (
+                                <div
+                                    key={file.id}
+                                    className="relative w-20 h-20 bg-muted rounded border border-border overflow-hidden flex-shrink-0"
+                                >
+                                    {isPDF ? (
+                                        // Show PDF icon for PDF files
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            <FileText className="w-8 h-8 text-muted-foreground" />
+                                        </div>
+                                    ) : (
+                                        // Show image for image files
+                                        <Image
+                                            src={file.url || "/placeholder.svg"}
+                                            alt={`File preview ${file.id}`}
+                                            fill
+                                            sizes="80px"
+                                            className="object-cover"
+                                        />
+                                    )}
+                                </div>
+                            )
+                        })}
                         {additionalFiles > 0 && (
                             <div className="w-20 h-20 bg-muted rounded border border-border flex items-center justify-center flex-shrink-0">
                                 <span className="text-xs font-semibold text-muted-foreground">

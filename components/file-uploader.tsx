@@ -169,6 +169,10 @@ export default function FileUploader({
 
                         const { signature, timestamp, cloudName, apiKey, folder: uploadFolder } = await signatureResponse.json()
 
+                        // Determine resource type based on file
+                        const isImage = file.type.startsWith('image/')
+                        const resourceType = isImage ? 'image' : 'auto'
+
                         // Upload directly to Cloudinary
                         const formData = new FormData()
                         formData.append('file', file)
@@ -177,8 +181,9 @@ export default function FileUploader({
                         formData.append('api_key', apiKey)
                         formData.append('folder', uploadFolder)
 
+                        // Use the appropriate endpoint based on resource type
                         const uploadResponse = await fetch(
-                            `https://api.cloudinary.com/v1_1/${cloudName}/upload`,
+                            `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
                             {
                                 method: 'POST',
                                 body: formData,
@@ -345,8 +350,10 @@ export default function FileUploader({
     }, [onChange])
 
     const getFilePreview = (file: UploadedFile) => {
+        const isPDF = file.type.includes("pdf") || file.name.endsWith(".pdf")
+
         return (
-            <div className="bg-accent flex aspect-square items-center justify-center overflow-hidden rounded-t-[inherit]">
+            <div className="bg-accent flex aspect-square items-center justify-center overflow-hidden rounded-t-[inherit] relative group">
                 {file.type.startsWith("image/") ? (
                     <CldImage
                         src={file.url}
@@ -355,6 +362,19 @@ export default function FileUploader({
                         height={200}
                         className="size-full rounded-t-[inherit] object-cover"
                     />
+                ) : isPDF ? (
+                    <>
+                        {getFileIcon(file.type, file.name)}
+                        <a
+                            href={file.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/10 transition-colors"
+                            title="Open PDF in new tab"
+                        >
+                            <span className="sr-only">Open PDF</span>
+                        </a>
+                    </>
                 ) : (
                     getFileIcon(file.type, file.name)
                 )}

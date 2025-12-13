@@ -16,12 +16,17 @@ export async function deleteImageFromCloudinary(
             return { success: false, error: 'No public ID provided' }
         }
 
-        // Try to delete as raw resource first (for PDFs and documents)
-        let result = await cloudinary.uploader.destroy(publicId, { resource_type: 'raw' })
+        // Try to delete with auto resource type first
+        let result = await cloudinary.uploader.destroy(publicId, { resource_type: 'auto', invalidate: true })
+
+        // If not found with auto, try as raw (for PDFs and documents)
+        if (result.result !== 'ok') {
+            result = await cloudinary.uploader.destroy(publicId, { resource_type: 'raw', invalidate: true })
+        }
 
         // If not found as raw, try as image
         if (result.result !== 'ok') {
-            result = await cloudinary.uploader.destroy(publicId, { resource_type: 'image' })
+            result = await cloudinary.uploader.destroy(publicId, { resource_type: 'image', invalidate: true })
         }
 
         return {

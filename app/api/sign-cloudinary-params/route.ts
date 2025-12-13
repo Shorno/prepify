@@ -15,7 +15,8 @@ export async function POST(request: Request) {
     const paramsToSign = {
         timestamp,
         folder,
-        upload_preset: undefined, // We're using signed uploads
+        // Note: resource_type is NOT included in signature params
+        // It's only used client-side during upload
     };
 
     const signature = cloudinary.utils.api_sign_request(

@@ -1,10 +1,10 @@
 import Image from "next/image";
-import {FileText, BookOpen, ChevronRight} from 'lucide-react';
-import {Avatar, AvatarImage, AvatarFallback} from "@/components/ui/avatar";
+import { FileText, BookOpen, ChevronRight } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
-import {NotesWithRelations} from "@/db/schema";
+import { NotesWithRelations } from "@/db/schema";
 
-export default function NoteCard({data}: { data: NotesWithRelations }) {
+export default function NoteCard({ data }: { data: NotesWithRelations }) {
     const fileCount = data.files.length;
     const resourceCount = data.resources.length;
     const maxPreviews = 3;
@@ -24,7 +24,7 @@ export default function NoteCard({data}: { data: NotesWithRelations }) {
                 {/* Uploader info */}
                 <div className="flex items-center gap-2 mb-3 pb-3 border-b border-border">
                     <Avatar className="h-8 w-8">
-                        <AvatarImage src={data.user.image || "/placeholder.svg"} alt={data.user.name}/>
+                        <AvatarImage src={data.user.image || "/placeholder.svg"} alt={data.user.name} />
                         <AvatarFallback className="text-xs font-semibold">{uploaderInitials}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
@@ -51,20 +51,33 @@ export default function NoteCard({data}: { data: NotesWithRelations }) {
                 {/* Image preview grid */}
                 {fileCount > 0 && (
                     <div className="flex gap-2 mb-3 flex-wrap">
-                        {previewFiles.map((file) => (
-                            <div
-                                key={file.id}
-                                className="relative w-20 h-20 bg-muted rounded border border-border overflow-hidden flex-shrink-0"
-                            >
-                                <Image
-                                    src={file.url || "/placeholder.svg"}
-                                    alt={`File preview ${file.id}`}
-                                    fill
-                                    sizes="80px"
-                                    className="object-cover"
-                                />
-                            </div>
-                        ))}
+                        {previewFiles.map((file) => {
+                            // Check if file is a PDF
+                            const isPDF = file.url.includes('.pdf') || file.url.includes('f_pdf') || file.url.toLowerCase().endsWith('.pdf')
+
+                            return (
+                                <div
+                                    key={file.id}
+                                    className="relative w-20 h-20 bg-muted rounded border border-border overflow-hidden flex-shrink-0"
+                                >
+                                    {isPDF ? (
+                                        // Show PDF icon for PDF files
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            <FileText className="w-8 h-8 text-muted-foreground" />
+                                        </div>
+                                    ) : (
+                                        // Show image for image files
+                                        <Image
+                                            src={file.url || "/placeholder.svg"}
+                                            alt={`File preview ${file.id}`}
+                                            fill
+                                            sizes="80px"
+                                            className="object-cover"
+                                        />
+                                    )}
+                                </div>
+                            )
+                        })}
                         {additionalFiles > 0 && (
                             <div className="w-20 h-20 bg-muted rounded border border-border flex items-center justify-center flex-shrink-0">
                                 <span className="text-xs font-semibold text-muted-foreground">
@@ -79,17 +92,17 @@ export default function NoteCard({data}: { data: NotesWithRelations }) {
                 <div className="flex items-center justify-between gap-2 mt-auto">
                     <div className="flex items-center gap-3 text-xs">
                         <div className="flex items-center gap-1">
-                            <FileText className="w-3.5 h-3.5 text-muted-foreground"/>
+                            <FileText className="w-3.5 h-3.5 text-muted-foreground" />
                             <span className="text-foreground font-medium">{fileCount}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                            <BookOpen className="w-3.5 h-3.5 text-muted-foreground"/>
+                            <BookOpen className="w-3.5 h-3.5 text-muted-foreground" />
                             <span className="text-foreground font-medium">{resourceCount}</span>
                         </div>
                     </div>
                     <div className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-primary">
                         View
-                        <ChevronRight className="w-3.5 h-3.5"/>
+                        <ChevronRight className="w-3.5 h-3.5" />
                     </div>
                 </div>
             </div>
