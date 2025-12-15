@@ -2,11 +2,12 @@ import getNoteById from "@/actions/notes/get-note-by-id";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, FileText, BookOpen, Edit, Trash2 } from "lucide-react";
+import { CalendarIcon, FileText, BookOpen } from "lucide-react";
 import NoteImageGallery from "@/components/note-image-gallery";
 import ReferenceLinks from "@/components/reference-links-sidebar";
+import NoteActions from "@/app/(app)/my-notes/[id]/_components/note-actions";
 import { notFound, redirect } from "next/navigation";
-import {checkAuth} from "@/app/actions/user/checkAuth";
+import { checkAuth } from "@/app/actions/user/checkAuth";
 
 interface MyNotePageProps {
     params: Promise<{ id: string }>;
@@ -79,16 +80,7 @@ export default async function MyNotePage({ params }: MyNotePageProps) {
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="flex items-center gap-2">
-                                <Button variant="outline" size="sm">
-                                    <Edit className="w-4 h-4 mr-2" />
-                                    Edit
-                                </Button>
-                                <Button variant="outline" size="sm" className="text-destructive hover:text-destructive">
-                                    <Trash2 className="w-4 h-4 mr-2" />
-                                    Delete
-                                </Button>
-                            </div>
+                            <NoteActions noteId={note.id} />
                         </div>
 
                         {/* Course and Department Badges */}
