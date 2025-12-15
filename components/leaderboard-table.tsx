@@ -3,8 +3,9 @@
 import type { ColumnDef } from "@tanstack/react-table"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Trophy, Medal, Flame } from "lucide-react"
-import {DataTable} from "@/components/data-table";
-import {LeaderboardEntry} from "@/db/schema";
+import { DataTable } from "@/components/data-table";
+import { LeaderboardEntry } from "@/db/schema";
+import Link from "next/link";
 
 
 interface LeaderboardTableProps {
@@ -55,7 +56,10 @@ export function LeaderboardTable({ data }: LeaderboardTableProps) {
             cell: ({ row }) => {
                 const user = row.getValue("user") as LeaderboardEntry["user"]
                 return (
-                    <div className="flex items-center gap-3">
+                    <Link
+                        href={`/profile/${user.id}`}
+                        className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                    >
                         <Avatar className="h-8 w-8 ring-2 ring-border">
                             <AvatarImage src={user.image || "/placeholder.svg"} alt={user.name} />
                             <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-xs font-semibold">
@@ -63,9 +67,9 @@ export function LeaderboardTable({ data }: LeaderboardTableProps) {
                             </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
-                            <p className="font-semibold text-sm">{user.name}</p>
+                            <p className="font-semibold text-sm hover:underline">{user.name}</p>
                         </div>
-                    </div>
+                    </Link>
                 )
             },
         },
