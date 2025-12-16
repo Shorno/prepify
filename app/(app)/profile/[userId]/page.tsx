@@ -5,14 +5,13 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trophy, FileText, Calendar, GraduationCap, Building2 } from "lucide-react";
 import NoteCard from "@/components/note-card";
-import { Suspense } from "react";
-import ProfileSkeleton from "./loading";
 
 interface ProfilePageProps {
     params: Promise<{ userId: string }>;
 }
 
-async function ProfileContent({ userId }: { userId: string }) {
+export default async function ProfilePage({ params }: ProfilePageProps) {
+    const { userId } = await params;
     const result = await getUserProfile(userId);
 
     if (!result.success) {
@@ -166,17 +165,8 @@ async function ProfileContent({ userId }: { userId: string }) {
                     </Card>
                 )}
             </div>
-        </div>
+            </div>
         </div>
     );
 }
 
-export default async function ProfilePage({ params }: ProfilePageProps) {
-    const { userId } = await params;
-
-    return (
-        <Suspense fallback={<ProfileSkeleton />}>
-            <ProfileContent userId={userId} />
-        </Suspense>
-    );
-}
