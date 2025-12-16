@@ -29,7 +29,8 @@ async function ProfileContent({ userId }: { userId: string }) {
         .toUpperCase();
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8">
+        <div className="main-container py-8">
+            <div className="max-w-6xl mx-auto space-y-8">
             {/* Profile Header */}
             <Card>
                 <CardContent className="pt-6">
@@ -166,6 +167,7 @@ async function ProfileContent({ userId }: { userId: string }) {
                 )}
             </div>
         </div>
+        </div>
     );
 }
 
@@ -173,10 +175,8 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     const { userId } = await params;
 
     return (
-        <div className="main-container py-8">
-            <Suspense fallback={<ProfileSkeleton />}>
-                <ProfileContent userId={userId} />
-            </Suspense>
-        </div>
+        <Suspense fallback={<ProfileSkeleton />}>
+            <ProfileContent userId={userId} />
+        </Suspense>
     );
 }

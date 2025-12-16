@@ -3,7 +3,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ProfileSkeleton() {
     return (
-        <div className="max-w-6xl mx-auto space-y-8">
+        <div className="main-container py-8">
+            <div className="max-w-6xl mx-auto space-y-8">
             {/* Profile Header Skeleton */}
             <Card>
                 <CardContent className="pt-6">
@@ -99,6 +100,7 @@ export default function ProfileSkeleton() {
                     ))}
                 </div>
             </div>
+        </div>
         </div>
     );
 }
