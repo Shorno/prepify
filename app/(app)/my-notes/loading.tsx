@@ -8,7 +8,7 @@ export default function MyNotesLoading() {
                 <Skeleton className="h-10 w-28" />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                {[1, 2, 3, 4].map((i) => (
                     <div key={i} className="bg-card border border-border rounded-sm p-3 shadow-sm h-full flex flex-col">
                         {/* Uploader info skeleton */}
                         <div className="flex items-center gap-2 mb-3 pb-3 border-b border-border">
