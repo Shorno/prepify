@@ -15,19 +15,27 @@ type UserProfile = {
     notesCount: number;
 };
 
-export default async function getUserByUsername(username: string): Promise<ActionResult<UserProfile>> {
-    if (!username) {
+export default async function getUserByUsername(usernameOrId: string): Promise<ActionResult<UserProfile>> {
+    if (!usernameOrId) {
         return {
             success: false,
             status: 400,
-            error: "Username is required",
+            error: "Username or ID is required",
         };
     }
 
     try {
-        const foundUser = await db.query.user.findFirst({
-            where: eq(user.username, username),
+        // First try to find by username
+        let foundUser = await db.query.user.findFirst({
+            where: eq(user.username, usernameOrId),
         });
+
+        // If not found by username, try by user ID
+        if (!foundUser) {
+            foundUser = await db.query.user.findFirst({
+                where: eq(user.id, usernameOrId),
+            });
+        }
 
         if (!foundUser) {
             return {

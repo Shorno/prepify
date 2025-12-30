@@ -9,6 +9,9 @@ import NoteEngagement from "@/components/note-engagement";
 import CommentsSection from "@/components/comments-section";
 import incrementView from "@/actions/notes/increment-view";
 import { checkAuth } from "@/app/actions/user/checkAuth";
+import FollowButton from "@/components/follow-button";
+import getFollowStatus from "@/actions/follow/get-follow-status";
+import Link from "next/link";
 
 interface NotePageProps {
     params: Promise<{ id: string }>;
@@ -53,6 +56,14 @@ export default async function NotePage({ params }: NotePageProps) {
     // Check if current user has liked this note
     const isLiked = session?.user ? note.likes.some(like => like.userId === session.user.id) : false;
 
+    // Get follow status for the note author
+    const isOwnNote = session?.user?.id === note.user.id;
+    let isFollowing = false;
+    if (session?.user && !isOwnNote) {
+        const followStatusResult = await getFollowStatus(note.user.id);
+        isFollowing = followStatusResult.success ? followStatusResult.data.isFollowing : false;
+    }
+
     return (
         <div className="main-container py-8">
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
@@ -62,14 +73,29 @@ export default async function NotePage({ params }: NotePageProps) {
                     <div className="space-y-4">
                         {/* Uploader Info */}
                         <div className="flex items-center gap-3">
-                            <Avatar className="h-12 w-12">
-                                <AvatarImage src={note.user.image || "/placeholder.svg"} alt={note.user.name} />
-                                <AvatarFallback className="text-sm font-semibold">{uploaderInitials}</AvatarFallback>
-                            </Avatar>
+                            <Link href={`/user/${note.user.username || note.user.id}`}>
+                                <Avatar className="h-12 w-12 hover:opacity-80 transition-opacity">
+                                    <AvatarImage src={note.user.image || "/placeholder.svg"} alt={note.user.name} />
+                                    <AvatarFallback className="text-sm font-semibold">{uploaderInitials}</AvatarFallback>
+                                </Avatar>
+                            </Link>
                             <div className="flex-1">
-                                <p className="font-semibold text-foreground">{note.user.name}</p>
+                                <Link
+                                    href={`/user/${note.user.username || note.user.id}`}
+                                    className="font-semibold text-foreground hover:underline"
+                                >
+                                    {note.user.name}
+                                </Link>
                                 <p className="text-sm text-muted-foreground">{note.user.batch || 'Student'}</p>
                             </div>
+                            {/* Follow Button */}
+                            {session?.user && !isOwnNote && (
+                                <FollowButton
+                                    userId={note.user.id}
+                                    initialIsFollowing={isFollowing}
+                                    size="sm"
+                                />
+                            )}
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <CalendarIcon className="w-4 h-4" />
                                 <span>{formattedDate}</span>
