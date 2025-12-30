@@ -1,8 +1,8 @@
 "use server"
 
-import {ActionResult} from "@/types/action-response";
-import {NotesWithRelations} from "@/db/schema/note";
-import {db} from "@/db/config";
+import { ActionResult } from "@/types/action-response";
+import { NotesWithRelations } from "@/db/schema/note";
+import { db } from "@/db/config";
 
 export default async function getPublicNotes(): Promise<ActionResult<NotesWithRelations[]>> {
 
@@ -10,12 +10,18 @@ export default async function getPublicNotes(): Promise<ActionResult<NotesWithRe
     try {
         const notes = await db.query.note.findMany({
             with: {
-                user : true,
+                user: true,
                 course: true,
                 department: true,
                 faculty: true,
                 resources: true,
-                files: true
+                files: true,
+                likes: true,
+                comments: {
+                    with: {
+                        user: true,
+                    },
+                },
             }
         });
 

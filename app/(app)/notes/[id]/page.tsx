@@ -5,6 +5,10 @@ import { CalendarIcon, FileText, BookOpen } from "lucide-react";
 import NoteImageGallery from "@/components/note-image-gallery";
 import ReferenceLinks from "@/components/reference-links-sidebar";
 import { notFound } from "next/navigation";
+import NoteEngagement from "@/components/note-engagement";
+import CommentsSection from "@/components/comments-section";
+import incrementView from "@/actions/notes/increment-view";
+import { checkAuth } from "@/app/actions/user/checkAuth";
 
 interface NotePageProps {
     params: Promise<{ id: string }>;
@@ -39,6 +43,15 @@ export default async function NotePage({ params }: NotePageProps) {
         month: 'long',
         day: 'numeric'
     });
+
+    // Get current user session (optional for public page)
+    const session = await checkAuth();
+
+    // Increment view count
+    await incrementView(noteId);
+
+    // Check if current user has liked this note
+    const isLiked = session?.user ? note.likes.some(like => like.userId === session.user.id) : false;
 
     return (
         <div className="main-container py-8">
@@ -92,6 +105,15 @@ export default async function NotePage({ params }: NotePageProps) {
                                 <span className="font-medium">{note.resources.length} {note.resources.length === 1 ? 'Reference' : 'References'}</span>
                             </div>
                         </div>
+
+                        {/* Engagement */}
+                        <NoteEngagement
+                            noteId={note.id}
+                            initialLikesCount={note.likes.length}
+                            initialIsLiked={isLiked}
+                            viewsCount={note.viewsCount + 1}
+                            currentUserId={session?.user?.id}
+                        />
                     </div>
 
                     {/* Divider */}
@@ -102,6 +124,16 @@ export default async function NotePage({ params }: NotePageProps) {
                         <h2 className="text-xl font-semibold mb-4">Files</h2>
                         <NoteImageGallery files={note.files} />
                     </div>
+
+                    {/* Divider */}
+                    <hr className="border-border" />
+
+                    {/* Comments Section */}
+                    <CommentsSection
+                        noteId={note.id}
+                        initialComments={note.comments}
+                        currentUserId={session?.user?.id}
+                    />
 
                     {/* Reference Links for Mobile (shown below content) */}
                     <div className="lg:hidden">

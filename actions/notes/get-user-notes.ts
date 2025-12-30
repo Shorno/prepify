@@ -1,9 +1,9 @@
 "use server"
 
-import {checkAuth} from "@/app/actions/user/checkAuth";
-import {ActionResult} from "@/types/action-response";
-import {NotesWithRelations} from "@/db/schema/note";
-import {db} from "@/db/config";
+import { checkAuth } from "@/app/actions/user/checkAuth";
+import { ActionResult } from "@/types/action-response";
+import { NotesWithRelations } from "@/db/schema/note";
+import { db } from "@/db/config";
 
 export default async function getUserNotes(): Promise<ActionResult<NotesWithRelations[]>> {
     const session = await checkAuth();
@@ -18,14 +18,20 @@ export default async function getUserNotes(): Promise<ActionResult<NotesWithRela
 
     try {
         const notes = await db.query.note.findMany({
-            where: (note, {eq}) => eq(note.userId, session.user.id),
+            where: (note, { eq }) => eq(note.userId, session.user.id),
             with: {
                 user: true,
                 course: true,
                 department: true,
                 faculty: true,
                 resources: true,
-                files: true
+                files: true,
+                likes: true,
+                comments: {
+                    with: {
+                        user: true,
+                    },
+                },
             }
         });
 

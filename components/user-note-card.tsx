@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { FileText, BookOpen, ChevronRight } from 'lucide-react';
+import { FileText, BookOpen, ChevronRight, Heart, Eye } from 'lucide-react';
 import { NotesWithRelations } from "@/db/schema";
 import Link from "next/link";
 
@@ -71,6 +71,14 @@ export function UserNoteCard({ data }: { data: NotesWithRelations }) {
                 {/* Stats and view details button */}
                 <div className="flex items-center justify-between gap-2 mt-auto">
                     <div className="flex items-center gap-3 text-xs">
+                        <div className="flex items-center gap-1">
+                            <Heart className="w-3.5 h-3.5 text-muted-foreground" />
+                            <span className="text-foreground font-medium">{data.likes.length}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                            <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                            <span className="text-foreground font-medium">{data.viewsCount}</span>
+                        </div>
                         <div className="flex items-center gap-1">
                             <FileText className="w-3.5 h-3.5 text-muted-foreground" />
                             <span className="text-foreground font-medium">{fileCount}</span>
