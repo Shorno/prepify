@@ -1,20 +1,26 @@
 "use server"
 
-import {ActionResult} from "@/types/action-response";
-import {NotesWithRelations} from "@/db/schema/note";
-import {db} from "@/db/config";
+import { ActionResult } from "@/types/action-response";
+import { NotesWithRelations } from "@/db/schema/note";
+import { db } from "@/db/config";
 
 export default async function getNoteById(noteId: number): Promise<ActionResult<NotesWithRelations>> {
     try {
         const note = await db.query.note.findFirst({
-            where: (n, {eq}) => eq(n.id, noteId),
+            where: (n, { eq }) => eq(n.id, noteId),
             with: {
                 user: true,
                 course: true,
                 department: true,
                 faculty: true,
                 resources: true,
-                files: true
+                files: true,
+                likes: true,
+                comments: {
+                    with: {
+                        user: true,
+                    },
+                },
             }
         });
 

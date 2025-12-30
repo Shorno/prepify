@@ -8,6 +8,9 @@ import ReferenceLinks from "@/components/reference-links-sidebar";
 import NoteActions from "@/app/(app)/my-notes/[id]/_components/note-actions";
 import { notFound, redirect } from "next/navigation";
 import { checkAuth } from "@/app/actions/user/checkAuth";
+import NoteEngagement from "@/components/note-engagement";
+import CommentsSection from "@/components/comments-section";
+import incrementView from "@/actions/notes/increment-view";
 
 interface MyNotePageProps {
     params: Promise<{ id: string }>;
@@ -54,6 +57,12 @@ export default async function MyNotePage({ params }: MyNotePageProps) {
         month: 'long',
         day: 'numeric'
     });
+
+    // Increment view count
+    await incrementView(noteId);
+
+    // Check if current user has liked this note
+    const isLiked = note.likes.some(like => like.userId === session.user.id);
 
     return (
         <div className="main-container py-8">
@@ -112,6 +121,15 @@ export default async function MyNotePage({ params }: MyNotePageProps) {
                                 <span className="font-medium">{note.resources.length} {note.resources.length === 1 ? 'Reference' : 'References'}</span>
                             </div>
                         </div>
+
+                        {/* Engagement */}
+                        <NoteEngagement
+                            noteId={note.id}
+                            initialLikesCount={note.likes.length}
+                            initialIsLiked={isLiked}
+                            viewsCount={note.viewsCount + 1}
+                            currentUserId={session.user.id}
+                        />
                     </div>
 
                     {/* Divider */}
@@ -122,6 +140,16 @@ export default async function MyNotePage({ params }: MyNotePageProps) {
                         <h2 className="text-xl font-semibold mb-4">Files</h2>
                         <NoteImageGallery files={note.files} />
                     </div>
+
+                    {/* Divider */}
+                    <hr className="border-border" />
+
+                    {/* Comments Section */}
+                    <CommentsSection
+                        noteId={note.id}
+                        initialComments={note.comments}
+                        currentUserId={session.user.id}
+                    />
 
                     {/* Reference Links for Mobile (shown below content) */}
                     <div className="lg:hidden">
