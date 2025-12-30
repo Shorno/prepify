@@ -4,7 +4,7 @@ import { NoteFormData, noteSchema } from "@/zodSchema/noteSchema";
 import { checkAuth } from "@/app/actions/user/checkAuth";
 import { ActionResult } from "@/types/action-response";
 import { note, file, resource } from "@/db/schema/note";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db } from "@/db/config";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";

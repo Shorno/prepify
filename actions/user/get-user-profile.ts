@@ -80,6 +80,12 @@ export async function getUserProfile(userId: string): Promise<ActionResult<UserP
                 faculty: true,
                 resources: true,
                 files: true,
+                likes: true,
+                comments: {
+                    with: {
+                        user: true,
+                    },
+                },
             },
         });
 

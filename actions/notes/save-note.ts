@@ -1,22 +1,24 @@
 "use server"
 
-import {NoteFormData, noteSchema} from "@/zodSchema/noteSchema";
-import {checkAuth} from "@/app/actions/user/checkAuth";
-import {ActionResult} from "@/types/action-response";
-import {note, file, resource} from "@/db/schema/note";
-import {calculateNotePoints, POINTS_CONFIG} from "@/lib/points-config";
-import {eq} from "drizzle-orm";
-import {db} from "@/db/config";
-import {pointsTransaction, userPoints} from "@/db/schema/leaderboard";
-import {z} from "zod";
-import {sendPointsEmail} from "@/actions/email/send-points-email";
-import {revalidatePath} from "next/cache";
+import { NoteFormData, noteSchema } from "@/zodSchema/noteSchema";
+import { checkAuth } from "@/app/actions/user/checkAuth";
+import { ActionResult } from "@/types/action-response";
+import { note, file, resource } from "@/db/schema/note";
+import { calculateNotePoints, POINTS_CONFIG } from "@/lib/points-config";
+import { eq } from "drizzle-orm";
+import { db } from "@/db/config";
+import { pointsTransaction, userPoints } from "@/db/schema/leaderboard";
+import { z } from "zod";
+import { sendPointsEmail } from "@/actions/email/send-points-email";
+import { revalidatePath } from "next/cache";
+import { follow } from "@/db/schema/follow";
+import { createBulkNotifications } from "@/actions/notifications/create-notification";
 
 export default async function saveNote(data: NoteFormData): Promise<ActionResult<{
     noteId: number;
     pointsEarned: number;
     totalPoints: number;
-    nextMilestone?: {count: number; points: number; remaining: number};
+    nextMilestone?: { count: number; points: number; remaining: number };
 }>> {
 
     const session = await checkAuth()
@@ -43,10 +45,10 @@ export default async function saveNote(data: NoteFormData): Promise<ActionResult
 
         const validData = result.data;
 
-        const {savedNote, pointsEarned, totalPoints, nextMilestone} = await db.transaction(async (tx) => {
+        const { savedNote, pointsEarned, totalPoints, nextMilestone } = await db.transaction(async (tx) => {
             // Check if this is user's first note (check actual notes, not points record)
             const existingNotes = await tx.query.note.findMany({
-                where: (note, {eq}) => eq(note.userId, session.user.id),
+                where: (note, { eq }) => eq(note.userId, session.user.id),
             });
             const isFirstNote = existingNotes.length === 0;
             const newNoteCount = existingNotes.length + 1;
@@ -116,7 +118,7 @@ export default async function saveNote(data: NoteFormData): Promise<ActionResult
             // Get or create user points record
             // Get or create user points record
             const existingUserPoints = await tx.query.userPoints.findFirst({
-                where: (up, {eq}) => eq(up.userId, session.user.id),
+                where: (up, { eq }) => eq(up.userId, session.user.id),
             });
             let newTotalPoints: number;
 
@@ -157,6 +159,22 @@ export default async function saveNote(data: NoteFormData): Promise<ActionResult
 
             revalidatePath("/leaderboard");
             revalidatePath("/notes");
+
+            // Notify followers about the new note
+            const followers = await tx.query.follow.findMany({
+                where: (f, { eq }) => eq(f.followingId, session.user.id),
+            });
+
+            if (followers.length > 0) {
+                const followerIds = followers.map((f) => f.followerId);
+                // Don't await - fire and forget to not slow down the response
+                createBulkNotifications(followerIds, {
+                    type: "new_note",
+                    message: `${session.user.name} uploaded a new note: "${validData.title}"`,
+                    actorId: session.user.id,
+                    noteId: newNote.id,
+                }).catch(console.error);
+            }
 
             return {
                 savedNote: newNote,
@@ -218,7 +236,7 @@ function checkMilestone(noteCount: number): number {
     return milestones[noteCount] || 0;
 }
 
-function getNextMilestone(currentNoteCount: number): {count: number; points: number; remaining: number} | undefined {
+function getNextMilestone(currentNoteCount: number): { count: number; points: number; remaining: number } | undefined {
     const milestones = [
         { count: 5, points: POINTS_CONFIG.MILESTONE_5_NOTES },
         { count: 10, points: POINTS_CONFIG.MILESTONE_10_NOTES },
