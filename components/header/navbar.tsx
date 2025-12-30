@@ -1,10 +1,11 @@
 "use client"
 import UserProfile from "@/components/header/user-profile";
-import {authClient} from "@/lib/auth-client";
+import NotificationDropdown from "@/components/notifications/notification-dropdown";
+import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
-import {Button} from "@/components/ui/button";
-import {usePathname} from "next/navigation";
-import {MenuIcon} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { usePathname } from "next/navigation";
+import { MenuIcon } from "lucide-react";
 import {
     Sheet,
     SheetContent,
@@ -13,16 +14,16 @@ import {
     SheetTrigger,
     SheetClose
 } from "@/components/ui/sheet";
-import {useState} from "react";
+import { useState } from "react";
 
 const navLinks = [
-    {name: "Notes", href: "/notes"},
-    {name: "My Notes", href: "/my-notes"},
-    {name: "Leaderboard", href: "/leaderboard"},
+    { name: "Notes", href: "/notes" },
+    { name: "My Notes", href: "/my-notes" },
+    { name: "Leaderboard", href: "/leaderboard" },
 ]
 
 export default function Navbar() {
-    const {data} = authClient.useSession();
+    const { data } = authClient.useSession();
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
 
@@ -64,9 +65,8 @@ export default function Navbar() {
                                                 <SheetClose asChild key={link.href}>
                                                     <Link
                                                         href={link.href}
-                                                        className={`px-4 py-2 rounded-sm text-left hover:bg-accent transition-colors ${
-                                                            isActive ? "bg-accent font-medium" : "font-normal"
-                                                        }`}
+                                                        className={`px-4 py-2 rounded-sm text-left hover:bg-accent transition-colors ${isActive ? "bg-accent font-medium" : "font-normal"
+                                                            }`}
                                                         onClick={() => setIsOpen(false)}
                                                     >
                                                         {link.name}
@@ -103,7 +103,7 @@ export default function Navbar() {
                             const isActive = pathname === link.href;
                             return (
                                 <Link key={link.href} href={link.href}
-                                      className={`hover:underline ${isActive ? "underline font-medium" : "font-normal"}`}>
+                                    className={`hover:underline ${isActive ? "underline font-medium" : "font-normal"}`}>
                                     {link.name}
                                 </Link>
                             )
@@ -115,7 +115,10 @@ export default function Navbar() {
                         className={"flex gap-2 justify-center items-center justify-self-end md:justify-self-end col-start-2 md:col-start-3"}>
                         {data?.user ? (
                             // Show user profile on both mobile and desktop when logged in
-                            <UserProfile user={data.user}/>
+                            <>
+                                <NotificationDropdown />
+                                <UserProfile user={data.user} />
+                            </>
                         ) : (
                             // Show auth buttons only on desktop when not logged in
                             <div className={"hidden sm:flex gap-2"}>
