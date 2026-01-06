@@ -1,4 +1,4 @@
-import {pgTable, text, timestamp, boolean} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
 
 
 export const user = pgTable("user", {
@@ -12,14 +12,18 @@ export const user = pgTable("user", {
         .defaultNow()
         .$onUpdate(() => /* @__PURE__ */ new Date())
         .notNull(),
-    role: text("role").default("STUDENT").notNull(),
+    role: text("role").default("student").notNull(),
     departmentId: text("department_id"),
     facultyId: text("faculty_id"),
     batch: text("batch"),
-    username : text("username").unique(),
+    username: text("username").unique(),
     hasCompletedOnboarding: boolean("has_completed_onboarding")
         .default(false)
         .notNull(),
+    // Admin plugin fields
+    banned: boolean("banned").default(false),
+    banReason: text("ban_reason"),
+    banExpires: timestamp("ban_expires"),
 });
 
 
@@ -35,7 +39,9 @@ export const session = pgTable("session", {
     userAgent: text("user_agent"),
     userId: text("user_id")
         .notNull()
-        .references(() => user.id, {onDelete: "cascade"}),
+        .references(() => user.id, { onDelete: "cascade" }),
+    // Admin plugin field for impersonation
+    impersonatedBy: text("impersonated_by"),
 });
 
 export const account = pgTable("account", {
@@ -44,7 +50,7 @@ export const account = pgTable("account", {
     providerId: text("provider_id").notNull(),
     userId: text("user_id")
         .notNull()
-        .references(() => user.id, {onDelete: "cascade"}),
+        .references(() => user.id, { onDelete: "cascade" }),
     accessToken: text("access_token"),
     refreshToken: text("refresh_token"),
     idToken: text("id_token"),
