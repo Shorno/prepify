@@ -1,6 +1,6 @@
 "use client"
-import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar"
-import {Button} from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -9,17 +9,19 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {LogOut, Settings, UserIcon} from "lucide-react"
-import {authClient} from "@/lib/auth-client"
-import {User} from "better-auth/types";
-import {useRouter} from "next/navigation";
+import { LogOut, Settings, UserIcon, ShieldCheck } from "lucide-react"
+import { authClient } from "@/lib/auth-client"
+import { User } from "better-auth/types";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface UserProfileProps {
-    user: User
+    user: User & { role?: string | null }
 }
 
-export default function UserProfile({user}: UserProfileProps) {
+export default function UserProfile({ user }: UserProfileProps) {
     const router = useRouter();
+    const showModeratorLink = user.role === "student" || user.role === "teacher";
 
     const handleLogout = async () => {
         await authClient.signOut({
@@ -36,7 +38,7 @@ export default function UserProfile({user}: UserProfileProps) {
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.image || ""} alt={user.name || ""}/>
+                        <AvatarImage src={user.image || ""} alt={user.name || ""} />
                         <AvatarFallback>
                             {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || "U"}
                         </AvatarFallback>
@@ -52,21 +54,30 @@ export default function UserProfile({user}: UserProfileProps) {
                         </p>
                     </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator/>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                    <UserIcon className="mr-2 h-4 w-4"/>
+                    <UserIcon className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4"/>
+                    <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator/>
+                {showModeratorLink && (
+                    <DropdownMenuItem asChild>
+                        <Link href="/become-moderator" className="cursor-pointer">
+                            <ShieldCheck className="mr-2 h-4 w-4" />
+                            <span>Become a Moderator</span>
+                        </Link>
+                    </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className={"bg-destructive text-white"}>
-                    <LogOut className="mr-2 h-4 w-4 text-white"/>
+                    <LogOut className="mr-2 h-4 w-4 text-white" />
                     <span>Log out</span>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )
 }
+

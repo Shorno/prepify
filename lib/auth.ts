@@ -75,4 +75,5 @@ export const auth = betterAuth({
     ]
 });
 
-
+// Export Session type for use in components
+export type Session = typeof auth.$Infer.Session;
