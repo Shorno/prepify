@@ -1,5 +1,5 @@
 import {checkAuth} from "@/app/actions/user/checkAuth";
-import {unauthorized} from "next/navigation";
+import {redirect} from "next/navigation";
 import Link from "next/link";
 import {Button} from "@/components/ui/button";
 import MyNotesList from "@/app/(app)/my-notes/_components/my-notes-list";
@@ -10,10 +10,9 @@ export default async function MyNotesPage() {
     const user = await checkAuth();
 
     if (!user) {
-        unauthorized();
+        return redirect("/login?redirect=my-notes");
     }
 
-    // Prefetch data on the server
     const queryClient = new QueryClient();
     await queryClient.prefetchQuery({
         queryKey: ['user-notes'],

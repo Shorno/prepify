@@ -1,11 +1,11 @@
 "use server"
-import {onBoardFormData, onBoardSchema} from "@/zodSchema/onBoardSchema";
-import {checkAuth} from "@/app/actions/user/checkAuth";
-import {db} from "@/db/config";
-import {user} from "@/db/schema";
-import {eq} from "drizzle-orm";
-import {auth} from "@/lib/auth";
-import {headers} from "next/headers";
+import { onBoardFormData, onBoardSchema } from "@/zodSchema/onBoardSchema";
+import { checkAuth } from "@/app/actions/user/checkAuth";
+import { db } from "@/db/config";
+import { user } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
 
 interface OnBoardingResponse {
@@ -37,7 +37,7 @@ export default async function updateUserOnboarding(data: onBoardFormData): Promi
         await db
             .update(user)
             .set({
-                role: result.data.role.toUpperCase(),
+                role: result.data.role,
                 departmentId: result.data.departmentId,
                 facultyId: result.data.facultyId,
                 batch: result.data.role === "student" ? result.data.batch || null : null,
