@@ -1,9 +1,58 @@
 import Image from "next/image";
-import { FileText, BookOpen, ChevronRight, Heart, Eye } from 'lucide-react';
+import { FileText, BookOpen, ChevronRight, Heart, Eye, Clock, CheckCircle2, XCircle } from 'lucide-react';
 import { NotesWithRelations } from "@/db/schema";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-export function UserNoteCard({ data }: { data: NotesWithRelations }) {
+function NoteStatusBadge({ status, rejectionReason }: { status: string; rejectionReason?: string | null }) {
+    if (status === "pending") {
+        return (
+            <Badge variant="secondary" className="gap-1 text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                <Clock className="w-3 h-3" />
+                Pending Review
+            </Badge>
+        );
+    }
+    if (status === "approved") {
+        return (
+            <Badge variant="secondary" className="gap-1 text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                <CheckCircle2 className="w-3 h-3" />
+                Published
+            </Badge>
+        );
+    }
+    if (status === "rejected") {
+        return (
+            <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Badge variant="destructive" className="gap-1 text-xs cursor-help">
+                            <XCircle className="w-3 h-3" />
+                            Rejected
+                        </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>{rejectionReason || "No reason provided"}</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+        );
+    }
+    return null;
+}
+
+type NoteWithStatus = NotesWithRelations & {
+    status?: string;
+    rejectionReason?: string | null;
+};
+
+export function UserNoteCard({ data }: { data: NoteWithStatus }) {
     const fileCount = data.files.length;
     const resourceCount = data.resources.length;
     const maxPreviews = 3; // match NoteCard
@@ -13,6 +62,13 @@ export function UserNoteCard({ data }: { data: NotesWithRelations }) {
     return (
         <Link href={`/my-notes/${data.id}`}>
             <div className="bg-card border border-border rounded-sm p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col">
+                {/* Status badge */}
+                {data.status && (
+                    <div className="mb-2">
+                        <NoteStatusBadge status={data.status} rejectionReason={data.rejectionReason} />
+                    </div>
+                )}
+
                 {/* Course name and department badges */}
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <span className="inline-flex items-center px-2 py-0.5 bg-primary/10 text-primary text-xs font-medium rounded">
@@ -97,3 +153,4 @@ export function UserNoteCard({ data }: { data: NotesWithRelations }) {
         </Link>
     );
 }
+

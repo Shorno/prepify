@@ -1,10 +1,10 @@
 "use client";
 
 import {
-    LayoutDashboardIcon, UserIcon,
+    LayoutDashboardIcon, FileText,
 } from "lucide-react";
-import {BaseSidebar, type NavItem} from "@/components/dashboard/base-sidebar";
-import type {Sidebar} from "@/components/ui/sidebar";
+import { BaseSidebar, type NavItem } from "@/components/dashboard/base-sidebar";
+import type { Sidebar } from "@/components/ui/sidebar";
 
 const moderatorNavLinks: NavItem[] = [
     {
@@ -13,12 +13,13 @@ const moderatorNavLinks: NavItem[] = [
         icon: LayoutDashboardIcon,
     },
     {
-        title: "Users",
-        url: `/dashboard/moderator/pending-notes`,
-        icon: UserIcon,
+        title: "Notes Review",
+        url: `/dashboard/moderator/notes`,
+        icon: FileText,
     },
 ];
 
 export function ModeratorSidebar(props: React.ComponentProps<typeof Sidebar>) {
     return <BaseSidebar navItems={moderatorNavLinks} {...props} />;
 }
+
