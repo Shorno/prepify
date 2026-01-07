@@ -1,10 +1,16 @@
 
-import { integer, pgTable, serial, varchar, timestamp, text, unique } from "drizzle-orm/pg-core";
+import { integer, pgTable, serial, varchar, timestamp, text, unique, pgEnum } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { Course, course } from "@/db/schema/course";
 import { Faculty, faculty } from "@/db/schema/faculty";
 import { Department, department } from "@/db/schema/department";
 import { User, user } from "@/db/schema/auth-schema";
+
+export const noteStatusEnum = pgEnum("note_status", [
+    "pending",
+    "approved",
+    "rejected"
+]);
 
 export const note = pgTable("note", {
     id: serial("id").primaryKey(),
@@ -16,6 +22,11 @@ export const note = pgTable("note", {
     viewsCount: integer("views_count").default(0).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    // Moderation fields
+    status: noteStatusEnum("status").default("pending").notNull(),
+    moderatedAt: timestamp("moderated_at"),
+    moderatedBy: text("moderated_by").references(() => user.id),
+    rejectionReason: text("rejection_reason"),
 });
 
 export const resource = pgTable("resource", {

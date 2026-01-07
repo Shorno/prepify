@@ -9,6 +9,7 @@ export default async function getPublicNotes(): Promise<ActionResult<NotesWithRe
 
     try {
         const notes = await db.query.note.findMany({
+            where: (note, { eq }) => eq(note.status, "approved"),
             with: {
                 user: true,
                 course: true,
