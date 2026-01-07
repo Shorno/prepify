@@ -5,7 +5,7 @@ import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
-import { MenuIcon } from "lucide-react";
+import { MenuIcon, X } from "lucide-react";
 import {
     Sheet,
     SheetContent,
@@ -14,7 +14,9 @@ import {
     SheetTrigger,
     SheetClose
 } from "@/components/ui/sheet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { cn } from "@/lib/utils";
 
 const navLinks = [
     { name: "Notes", href: "/notes" },
@@ -26,47 +28,118 @@ export default function Navbar() {
     const { data } = authClient.useSession();
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
+
+    // Handle scroll effect
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     return (
-        <div
-            className={"h-16 border fixed top-4 right-0 left-0 z-10 mx-4 lg:container lg:mx-auto rounded-lg md:px-8 shadow-xs dark:shadow-none backdrop-blur-sm"}
+        <header
+            className={cn(
+                "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b",
+                scrolled
+                    ? "bg-background/80 backdrop-blur-md border-border shadow-sm py-3"
+                    : "bg-transparent border-transparent py-5"
+            )}
         >
-            <div className={"container mx-auto h-full px-4 xl:px-0"}>
-                <div className={"grid grid-cols-2 md:grid-cols-3 items-center h-full"}>
-                    {/* Left side */}
-                    <div className={"justify-self-start flex items-center"}>
-                        {/* Mobile Sheet Menu */}
+            <div className="container mx-auto px-4 xl:px-0">
+                <nav className="flex items-center justify-between">
+                    {/* Logo */}
+                    <Link href="/" className="flex items-center gap-2 group">
+                        <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-serif font-bold text-lg group-hover:scale-105 transition-transform">
+                            P
+                        </div>
+                        <span className="font-bold text-xl tracking-tight">Prepify</span>
+                    </Link>
+
+                    {/* Desktop Navigation */}
+                    <div className="hidden md:flex items-center gap-1">
+                        {navLinks.map((link) => {
+                            const isActive = pathname === link.href;
+                            return (
+                                <Link
+                                    key={link.href}
+                                    href={link.href}
+                                    className={cn(
+                                        "relative px-4 py-2 text-sm font-medium transition-colors rounded-full hover:text-primary",
+                                        isActive ? "text-primary" : "text-muted-foreground"
+                                    )}
+                                >
+                                    {isActive && (
+                                        <motion.div
+                                            layoutId="navbar-indicator"
+                                            className="absolute inset-0 bg-primary/10 rounded-full"
+                                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                                        />
+                                    )}
+                                    <span className="relative z-10">{link.name}</span>
+                                </Link>
+                            )
+                        })}
+                    </div>
+
+                    {/* Right Side Actions */}
+                    <div className="flex items-center gap-3">
+                        {data?.user ? (
+                            <>
+                                <NotificationDropdown />
+                                <UserProfile user={data.user} />
+                            </>
+                        ) : (
+                            <div className="hidden sm:flex items-center gap-2">
+                                <Button asChild variant="ghost" className="rounded-full font-medium">
+                                    <Link href="/login">Log in</Link>
+                                </Button>
+                                <Button asChild className="rounded-full px-6 font-medium shadow-none">
+                                    <Link href="/sign-up">Sign up</Link>
+                                </Button>
+                            </div>
+                        )}
+
+                        {/* Mobile Menu Trigger */}
                         <Sheet open={isOpen} onOpenChange={setIsOpen}>
                             <SheetTrigger asChild>
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="block sm:hidden"
+                                    className="md:hidden rounded-full"
                                 >
-                                    <MenuIcon className="h-6 w-6" />
-                                    <span className="sr-only">Toggle navigation menu</span>
+                                    <MenuIcon className="h-5 w-5" />
+                                    <span className="sr-only">Toggle menu</span>
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="left" className="w-72">
-                                <SheetHeader>
-                                    <SheetTitle className="text-left">
-                                        <Link href="/" className="font-semibold text-2xl">
-                                            Perpify
+                            <SheetContent side="right" className="w-[300px] border-l border-border/50 sm:w-[400px]">
+                                <SheetHeader className="text-left pb-6 border-b border-border/50">
+                                    <SheetTitle>
+                                        <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center gap-2">
+                                            <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-serif font-bold text-lg">
+                                                P
+                                            </div>
+                                            <span className="font-bold text-xl">Prepify</span>
                                         </Link>
                                     </SheetTitle>
                                 </SheetHeader>
 
-                                <div className="flex flex-col gap-4 mt-6">
-                                    {/* Navigation Links */}
-                                    <div className="flex flex-col gap-2 px-2">
+                                <div className="flex flex-col gap-6 mt-8">
+                                    <div className="flex flex-col gap-2">
                                         {navLinks.map((link) => {
                                             const isActive = pathname === link.href;
                                             return (
                                                 <SheetClose asChild key={link.href}>
                                                     <Link
                                                         href={link.href}
-                                                        className={`px-4 py-2 rounded-sm text-left hover:bg-accent transition-colors ${isActive ? "bg-accent font-medium" : "font-normal"
-                                                            }`}
+                                                        className={cn(
+                                                            "px-4 py-3 rounded-lg text-base transition-colors",
+                                                            isActive
+                                                                ? "bg-primary/10 text-primary font-medium"
+                                                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                        )}
                                                         onClick={() => setIsOpen(false)}
                                                     >
                                                         {link.name}
@@ -77,14 +150,14 @@ export default function Navbar() {
                                     </div>
 
                                     {!data?.user && (
-                                        <div className="flex flex-col gap-2 pt-4 border-t px-2">
+                                        <div className="flex flex-col gap-3 pt-6 border-t border-border/50">
                                             <SheetClose asChild>
-                                                <Button asChild variant="outline" className={"rounded-sm"}>
+                                                <Button asChild variant="outline" className="w-full rounded-full h-11">
                                                     <Link href="/login">Log in</Link>
                                                 </Button>
                                             </SheetClose>
                                             <SheetClose asChild>
-                                                <Button asChild className={"rounded-sm"}>
+                                                <Button asChild className="w-full rounded-full h-11 shadow-none">
                                                     <Link href="/sign-up">Sign up</Link>
                                                 </Button>
                                             </SheetClose>
@@ -93,46 +166,9 @@ export default function Navbar() {
                                 </div>
                             </SheetContent>
                         </Sheet>
-
-                        <Link href={"/"} className={"font-semibold text-2xl"}>Perpify</Link>
                     </div>
-
-                    {/* Center navigation - only visible on md+ screens */}
-                    <div className={"hidden md:flex gap-4 justify-self-center"}>
-                        {navLinks.map((link) => {
-                            const isActive = pathname === link.href;
-                            return (
-                                <Link key={link.href} href={link.href}
-                                    className={`hover:underline ${isActive ? "underline font-medium" : "font-normal"}`}>
-                                    {link.name}
-                                </Link>
-                            )
-                        })}
-                    </div>
-
-                    {/* Right side - shows user profile on mobile when logged in, auth buttons on desktop */}
-                    <div
-                        className={"flex gap-2 justify-center items-center justify-self-end md:justify-self-end col-start-2 md:col-start-3"}>
-                        {data?.user ? (
-                            // Show user profile on both mobile and desktop when logged in
-                            <>
-                                <NotificationDropdown />
-                                <UserProfile user={data.user} />
-                            </>
-                        ) : (
-                            // Show auth buttons only on desktop when not logged in
-                            <div className={"hidden sm:flex gap-2"}>
-                                <Button asChild variant={"outline"} className={""}>
-                                    <Link href={"/login"}>Log in</Link>
-                                </Button>
-                                <Button asChild>
-                                    <Link href={"/sign-up"}>Sign up</Link>
-                                </Button>
-                            </div>
-                        )}
-                    </div>
-                </div>
+                </nav>
             </div>
-        </div>
+        </header>
     )
 }
