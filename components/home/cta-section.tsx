@@ -42,8 +42,8 @@ export default function CTASection() {
                         className="flex flex-col sm:flex-row gap-4 justify-center pt-4"
                     >
                         <Button size="lg" className="h-14 px-8 text-lg rounded-full shadow-xl hover:shadow-primary/25 transition-all duration-300" asChild>
-                            <Link href="/sign-up">
-                                Get Started for Free
+                            <Link href="/login">
+                                Get Started
                                 <ArrowRight className="ml-2 h-5 w-5" />
                             </Link>
                         </Button>
