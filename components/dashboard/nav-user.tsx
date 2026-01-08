@@ -1,8 +1,9 @@
 "use client";
 
-import { IconDotsVertical, IconLogout } from "@tabler/icons-react";
+import { IconDotsVertical, IconLogout, IconSettings, IconUser } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -78,6 +79,19 @@ export function NavUser({ session }: { session: Session | null }) {
                 </div>
               </div>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href={`/profile/${user.id}`}>
+                <IconUser className="mr-2 h-4 w-4" />
+                Profile
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/settings">
+                <IconSettings className="mr-2 h-4 w-4" />
+                Settings
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogOut}>
               <IconLogout />

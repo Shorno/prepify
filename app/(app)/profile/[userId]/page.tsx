@@ -1,9 +1,11 @@
 import { getUserProfile } from "@/actions/user/get-user-profile";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trophy, FileText, Calendar, GraduationCap, Building2, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Trophy, FileText, Calendar, GraduationCap, Building2, Users, Settings } from "lucide-react";
 import NoteCard from "@/components/note-card";
 import FollowButton from "@/components/follow-button";
 import getFollowStatus from "@/actions/follow/get-follow-status";
@@ -41,10 +43,10 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         .toUpperCase();
 
     return (
-        <div className="main-container py-8">
+        <div className="main-container my-20">
             <div className="max-w-6xl mx-auto space-y-8">
                 {/* Profile Header */}
-                <Card>
+                <Card className="rounded-2xl shadow-warm-lg border border-border/60">
                     <CardContent className="pt-6">
                         <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
                             {/* Avatar */}
@@ -93,12 +95,20 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                     </div>
                                 </div>
 
-                                {/* Follow Button */}
+                                {/* Follow/Edit Buttons */}
                                 {session?.user && !isOwnProfile && (
                                     <FollowButton
                                         userId={user.id}
                                         initialIsFollowing={followStatus.isFollowing}
                                     />
+                                )}
+                                {isOwnProfile && (
+                                    <Button asChild variant="outline" className="gap-2 rounded-full">
+                                        <Link href="/settings">
+                                            <Settings className="w-4 h-4" />
+                                            Edit Profile
+                                        </Link>
+                                    </Button>
                                 )}
                             </div>
 
@@ -122,7 +132,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 {/* Statistics */}
                 {stats && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <Card>
+                        <Card className="rounded-2xl shadow-warm border border-border/60">
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-sm font-medium text-muted-foreground">
                                     Total Points
@@ -136,7 +146,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                             </CardContent>
                         </Card>
 
-                        <Card>
+                        <Card className="rounded-2xl shadow-warm border border-border/60">
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                                     <FileText className="w-4 h-4" />
@@ -151,7 +161,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                             </CardContent>
                         </Card>
 
-                        <Card>
+                        <Card className="rounded-2xl shadow-warm border border-border/60">
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                                     <Calendar className="w-4 h-4" />
@@ -189,7 +199,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                             ))}
                         </div>
                     ) : (
-                        <Card>
+                        <Card className="rounded-2xl shadow-warm border border-border/60">
                             <CardContent className="py-12 text-center">
                                 <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
                                 <p className="text-muted-foreground">
