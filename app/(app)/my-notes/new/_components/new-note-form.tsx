@@ -1,31 +1,31 @@
 "use client"
-import {Card, CardContent} from "@/components/ui/card";
-import {ChevronsUpDown, Loader, Plus, X} from "lucide-react";
-import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover";
-import {Button} from "@/components/ui/button";
-import {cn} from "@/lib/utils";
+import { Card, CardContent } from "@/components/ui/card";
+import { ChevronsUpDown, Loader, Plus, X } from "lucide-react";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import DepartmentList from "@/components/shared/department-list";
-import {Drawer, DrawerContent, DrawerTrigger} from "@/components/ui/drawer";
-import {DialogTitle} from "@/components/ui/dialog";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { DialogTitle } from "@/components/ui/dialog";
 import * as React from "react";
-import {useState, useTransition, useEffect} from "react";
-import {useRouter} from "next/navigation";
-import {useIsMobile} from "@/hooks/use-mobile";
-import {useFieldArray, useForm} from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {toast} from "sonner";
-import {NoteFormData, noteSchema} from "@/zodSchema/noteSchema";
-import {Input} from "@/components/ui/input";
+import { useState, useTransition, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useFieldArray, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { NoteFormData, noteSchema } from "@/zodSchema/noteSchema";
+import { Input } from "@/components/ui/input";
 import FileUploader from "@/components/file-uploader";
-import {useQuery} from "@tanstack/react-query";
-import {getCoursesByDepartment, getFacultiesWithDepartments} from "@/actions/university-info";
+import { useQuery } from "@tanstack/react-query";
+import { getCoursesByDepartment, getFacultiesWithDepartments } from "@/actions/university-info";
 import CourseList from "@/components/shared/course-list";
-import {authClient} from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
 import saveNote from "@/actions/notes/save-note";
 
 export default function NewNoteForm() {
-    const {data: session} = authClient.useSession()
+    const { data: session } = authClient.useSession()
 
     const [open, setOpen] = useState(false);
     const [openCourse, setOpenCourse] = useState(false);
@@ -34,7 +34,7 @@ export default function NewNoteForm() {
     const router = useRouter();
     const isMobile = useIsMobile();
 
-    const {data} = useQuery({
+    const { data } = useQuery({
         queryKey: ["faculties-departments"],
         queryFn: getFacultiesWithDepartments
     })
@@ -58,7 +58,7 @@ export default function NewNoteForm() {
         }
     }, [form, session]);
 
-    const {fields, append, remove} = useFieldArray({
+    const { fields, append, remove } = useFieldArray({
         control: form.control,
         name: "resources"
     })
@@ -83,7 +83,7 @@ export default function NewNoteForm() {
         }
     }, [selectedDepartmentId, data, form]);
 
-    const {data: courses, isLoading} = useQuery({
+    const { data: courses, isLoading } = useQuery({
         queryKey: ["department-courses", selectedDepartmentId],
         queryFn: () => getCoursesByDepartment(Number(selectedDepartmentId)),
         enabled: !!selectedDepartmentId,
@@ -117,8 +117,8 @@ export default function NewNoteForm() {
     return (
         <>
             <Card
-                className="w-full max-w-2xl rounded-md mx-auto shadow-md border-0 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-                <CardContent className="space-y-6">
+                className="w-full max-w-2xl rounded-2xl mx-auto shadow-warm-lg border border-border/60 bg-card">
+                <CardContent className="space-y-6 p-6 sm:p-8">
 
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -129,7 +129,7 @@ export default function NewNoteForm() {
                                 <FormField
                                     control={form.control}
                                     name="departmentId"
-                                    render={({field}) => (
+                                    render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="text-base font-medium">Department</FormLabel>
 
@@ -145,21 +145,21 @@ export default function NewNoteForm() {
                                                                     !field.value && "text-muted-foreground"
                                                                 )}
                                                             >
-                                            <span className="line-clamp-1 text-left flex-1">
-                                                {field.value
-                                                    ? selectedDepartment?.name
-                                                    : "Select department"
-                                                }
-                                            </span>
+                                                                <span className="line-clamp-1 text-left flex-1">
+                                                                    {field.value
+                                                                        ? selectedDepartment?.name
+                                                                        : "Select department"
+                                                                    }
+                                                                </span>
                                                                 <ChevronsUpDown
-                                                                    className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                                                                    className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                             </Button>
                                                         </FormControl>
                                                     </PopoverTrigger>
                                                     <PopoverContent
                                                         className="w-full p-0"
                                                         align="start"
-                                                        style={{width: 'var(--radix-popover-trigger-width)'}}
+                                                        style={{ width: 'var(--radix-popover-trigger-width)' }}
                                                     >
                                                         <DepartmentList
                                                             setOpen={setOpen}
@@ -183,18 +183,18 @@ export default function NewNoteForm() {
                                                                     !field.value && "text-muted-foreground"
                                                                 )}
                                                             >
-                                            <span className="line-clamp-1 text-left flex-1">
-                                                {field.value
-                                                    ? selectedDepartment?.name
-                                                    : "Select department"
-                                                }
-                                            </span>
+                                                                <span className="line-clamp-1 text-left flex-1">
+                                                                    {field.value
+                                                                        ? selectedDepartment?.name
+                                                                        : "Select department"
+                                                                    }
+                                                                </span>
                                                                 <ChevronsUpDown
-                                                                    className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                                                                    className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                             </Button>
                                                         </FormControl>
                                                     </DrawerTrigger>
-                                                    <DialogTitle/>
+                                                    <DialogTitle />
                                                     <DrawerContent>
                                                         <div className="mt-4 border-t">
                                                             <DepartmentList
@@ -213,7 +213,7 @@ export default function NewNoteForm() {
                                             <FormDescription className="text-xs">
                                                 Select your department
                                             </FormDescription>
-                                            <FormMessage/>
+                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
@@ -222,7 +222,7 @@ export default function NewNoteForm() {
                                 <FormField
                                     control={form.control}
                                     name="courseId"
-                                    render={({field}) => (
+                                    render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="text-base font-medium">Course</FormLabel>
 
@@ -239,21 +239,21 @@ export default function NewNoteForm() {
                                                                     !field.value && "text-muted-foreground"
                                                                 )}
                                                             >
-                                                    <span className="line-clamp-1 text-left flex-1">
-                                                        {field.value
-                                                            ? courses?.find((c) => c.id.toString() === field.value)?.name
-                                                            : "Select course"
-                                                        }
-                                                    </span>
+                                                                <span className="line-clamp-1 text-left flex-1">
+                                                                    {field.value
+                                                                        ? courses?.find((c) => c.id.toString() === field.value)?.name
+                                                                        : "Select course"
+                                                                    }
+                                                                </span>
                                                                 <ChevronsUpDown
-                                                                    className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                                                                    className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                             </Button>
                                                         </FormControl>
                                                     </PopoverTrigger>
                                                     <PopoverContent
                                                         className="w-full p-0"
                                                         align="start"
-                                                        style={{width: 'var(--radix-popover-trigger-width)'}}
+                                                        style={{ width: 'var(--radix-popover-trigger-width)' }}
                                                     >
                                                         <CourseList
                                                             courses={courses}
@@ -279,25 +279,25 @@ export default function NewNoteForm() {
                                                             >
                                                                 {isLoading ? (
                                                                     <>
-                                                                        <Loader className="h-4 w-4 animate-spin mr-2"/>
+                                                                        <Loader className="h-4 w-4 animate-spin mr-2" />
                                                                         Loading...
                                                                     </>
                                                                 ) : (
                                                                     <>
-                                                    <span className="line-clamp-1 text-left flex-1">
-                                                        {field.value
-                                                            ? courses?.find((c) => c.id.toString() === field.value)?.name
-                                                            : "Select course"
-                                                        }
-                                                    </span>
+                                                                        <span className="line-clamp-1 text-left flex-1">
+                                                                            {field.value
+                                                                                ? courses?.find((c) => c.id.toString() === field.value)?.name
+                                                                                : "Select course"
+                                                                            }
+                                                                        </span>
                                                                         <ChevronsUpDown
-                                                                            className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
+                                                                            className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                                                     </>
                                                                 )}
                                                             </Button>
                                                         </FormControl>
                                                     </DrawerTrigger>
-                                                    <DialogTitle/>
+                                                    <DialogTitle />
                                                     <DrawerContent>
                                                         <div className="mt-4 border-t">
                                                             <CourseList
@@ -318,7 +318,7 @@ export default function NewNoteForm() {
                                                     : "Select the course"
                                                 }
                                             </FormDescription>
-                                            <FormMessage/>
+                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
@@ -327,13 +327,13 @@ export default function NewNoteForm() {
                             <FormField
                                 control={form.control}
                                 name={"title"}
-                                render={({field}) => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Title</FormLabel>
                                         <FormControl>
                                             <Input placeholder="Binary sorting steps..." {...field} />
                                         </FormControl>
-                                        <FormMessage/>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
@@ -341,7 +341,7 @@ export default function NewNoteForm() {
                             <FormField
                                 control={form.control}
                                 name="files"
-                                render={({field}) => (
+                                render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Files</FormLabel>
                                         <FormControl>
@@ -356,7 +356,7 @@ export default function NewNoteForm() {
                                         <FormDescription>
                                             Upload your note files (PDF, images, documents, etc.)
                                         </FormDescription>
-                                        <FormMessage/>
+                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
@@ -373,10 +373,10 @@ export default function NewNoteForm() {
                                         type="button"
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => append({url: ""})}
-                                        className="gap-2"
+                                        onClick={() => append({ url: "" })}
+                                        className="gap-2 rounded-full"
                                     >
-                                        <Plus className="h-4 w-4"/>
+                                        <Plus className="h-4 w-4" />
                                         Add Link
                                     </Button>
                                 </div>
@@ -388,7 +388,7 @@ export default function NewNoteForm() {
                                                 key={field.id}
                                                 control={form.control}
                                                 name={`resources.${index}.url`}
-                                                render={({field}) => (
+                                                render={({ field }) => (
                                                     <FormItem>
                                                         <div className="flex gap-2">
                                                             <FormControl>
@@ -405,10 +405,10 @@ export default function NewNoteForm() {
                                                                 onClick={() => remove(index)}
                                                                 className="shrink-0"
                                                             >
-                                                                <X className="h-4 w-4"/>
+                                                                <X className="h-4 w-4" />
                                                             </Button>
                                                         </div>
-                                                        <FormMessage/>
+                                                        <FormMessage />
                                                     </FormItem>
                                                 )}
                                             />
@@ -421,10 +421,10 @@ export default function NewNoteForm() {
                                 <Button
                                     type="submit"
                                     size={"lg"}
-                                    className={"w-full"}
+                                    className="w-full rounded-full shadow-warm hover:shadow-warm-lg"
                                     disabled={isPending}
                                 >
-                                    {isPending ? <Loader className="animate-spin"/> : "Share Note"}
+                                    {isPending ? <Loader className="animate-spin" /> : "Share Note"}
                                 </Button>
                             </div>
                         </form>

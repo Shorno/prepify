@@ -111,8 +111,8 @@ export default function EditNoteForm({ note }: EditNoteFormProps) {
     return (
         <>
             <Card
-                className="w-full rounded-md shadow-md border-0 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-                <CardContent className="space-y-6">
+                className="w-full max-w-2xl rounded-2xl mx-auto shadow-warm-lg border border-border/60 bg-card">
+                <CardContent className="space-y-6 p-6 sm:p-8">
 
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -368,7 +368,7 @@ export default function EditNoteForm({ note }: EditNoteFormProps) {
                                         variant="outline"
                                         size="sm"
                                         onClick={() => append({ url: "" })}
-                                        className="gap-2"
+                                        className="gap-2 rounded-full"
                                     >
                                         <Plus className="h-4 w-4" />
                                         Add Link
@@ -416,7 +416,7 @@ export default function EditNoteForm({ note }: EditNoteFormProps) {
                                     type="button"
                                     variant="outline"
                                     size="lg"
-                                    className="flex-1"
+                                    className="flex-1 rounded-full"
                                     onClick={() => router.push(`/my-notes/${note.id}`)}
                                     disabled={isPending}
                                 >
@@ -425,7 +425,7 @@ export default function EditNoteForm({ note }: EditNoteFormProps) {
                                 <Button
                                     type="submit"
                                     size="lg"
-                                    className="flex-1"
+                                    className="flex-1 rounded-full shadow-warm hover:shadow-warm-lg"
                                     disabled={isPending}
                                 >
                                     {isPending ? <Loader className="animate-spin" /> : "Update Note"}
