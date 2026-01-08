@@ -20,18 +20,9 @@ import { DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import DepartmentList from "@/components/shared/department-list";
-import { getBatches } from "@/actions/university-info";
+import { getBatches, getFacultiesWithDepartments } from "@/actions/university-info";
 import { userSettingsSchema, UserSettingsFormData } from "@/zodSchema/userSettingsSchema";
 import { updateUserSettings } from "@/actions/user/update-user-settings";
-
-interface Faculty {
-    id: number;
-    name: string;
-    departments: {
-        id: number;
-        name: string;
-    }[];
-}
 
 interface UserData {
     id: string;
@@ -47,16 +38,21 @@ interface UserData {
 
 interface SettingsFormProps {
     user: UserData;
-    faculties: Faculty[];
 }
 
-export default function SettingsForm({ user, faculties }: SettingsFormProps) {
+export default function SettingsForm({ user }: SettingsFormProps) {
     const [isPending, startTransition] = useTransition();
     const [openDepartment, setOpenDepartment] = useState(false);
     const [openBatch, setOpenBatch] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const router = useRouter();
     const isMobile = useIsMobile();
     const { theme, setTheme } = useTheme();
+
+    // Prevent hydration mismatch for theme
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const form = useForm<UserSettingsFormData>({
         resolver: zodResolver(userSettingsSchema),
@@ -65,13 +61,18 @@ export default function SettingsForm({ user, faculties }: SettingsFormProps) {
             departmentId: user.departmentId || "",
             facultyId: user.facultyId || "",
             batch: user.batch || "",
-            role: user.role,
         },
     });
 
     const selectedDepartmentId = form.watch("departmentId");
 
-    // Get batches
+    // Fetch faculties with TanStack Query
+    const { data: faculties } = useQuery({
+        queryKey: ["faculties-departments"],
+        queryFn: getFacultiesWithDepartments,
+    });
+
+    // Fetch batches with TanStack Query
     const { data: batches } = useQuery({
         queryKey: ["batches"],
         queryFn: getBatches,
@@ -94,6 +95,7 @@ export default function SettingsForm({ user, faculties }: SettingsFormProps) {
         .find((dept) => dept.id.toString() === selectedDepartmentId);
 
     const selectedBatch = batches?.find(
+        // eslint-disable-next-line react-hooks/incompatible-library
         (b) => b.batchCode === form.watch("batch")
     );
 
@@ -104,8 +106,10 @@ export default function SettingsForm({ user, faculties }: SettingsFormProps) {
         .toUpperCase();
 
     function onSubmit(values: UserSettingsFormData) {
+        console.log("Form values being submitted:", values);
         startTransition(async () => {
             const result = await updateUserSettings(values);
+            console.log("Update result:", result);
 
             if (result.success) {
                 toast.success(result.message);
@@ -391,35 +395,43 @@ export default function SettingsForm({ user, faculties }: SettingsFormProps) {
                     <CardContent>
                         <div className="space-y-2">
                             <label className="text-sm font-medium">Theme</label>
-                            <div className="flex gap-2">
-                                <Button
-                                    type="button"
-                                    variant={theme === "light" ? "default" : "outline"}
-                                    className="flex-1 gap-2 rounded-lg"
-                                    onClick={() => setTheme("light")}
-                                >
-                                    <Sun className="w-4 h-4" />
-                                    Light
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant={theme === "dark" ? "default" : "outline"}
-                                    className="flex-1 gap-2 rounded-lg"
-                                    onClick={() => setTheme("dark")}
-                                >
-                                    <Moon className="w-4 h-4" />
-                                    Dark
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant={theme === "system" ? "default" : "outline"}
-                                    className="flex-1 gap-2 rounded-lg"
-                                    onClick={() => setTheme("system")}
-                                >
-                                    <Monitor className="w-4 h-4" />
-                                    System
-                                </Button>
-                            </div>
+                            {!mounted ? (
+                                <div className="flex gap-2">
+                                    <div className="flex-1 h-10 bg-muted animate-pulse rounded-lg" />
+                                    <div className="flex-1 h-10 bg-muted animate-pulse rounded-lg" />
+                                    <div className="flex-1 h-10 bg-muted animate-pulse rounded-lg" />
+                                </div>
+                            ) : (
+                                <div className="flex gap-2">
+                                    <Button
+                                        type="button"
+                                        variant={theme === "light" ? "default" : "outline"}
+                                        className="flex-1 gap-2 rounded-lg"
+                                        onClick={() => setTheme("light")}
+                                    >
+                                        <Sun className="w-4 h-4" />
+                                        Light
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant={theme === "dark" ? "default" : "outline"}
+                                        className="flex-1 gap-2 rounded-lg"
+                                        onClick={() => setTheme("dark")}
+                                    >
+                                        <Moon className="w-4 h-4" />
+                                        Dark
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant={theme === "system" ? "default" : "outline"}
+                                        className="flex-1 gap-2 rounded-lg"
+                                        onClick={() => setTheme("system")}
+                                    >
+                                        <Monitor className="w-4 h-4" />
+                                        System
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </CardContent>
                 </Card>

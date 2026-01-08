@@ -58,7 +58,7 @@ export async function updateUserSettings(
                 username: result.data.username,
                 departmentId: result.data.departmentId,
                 facultyId: result.data.facultyId,
-                batch: result.data.role === "student" ? result.data.batch || null : null,
+                batch: result.data.batch || null,
             })
             .where(eq(user.id, session.user.id));
 
