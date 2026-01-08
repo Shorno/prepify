@@ -55,28 +55,33 @@ export default function NoteEngagement({
     };
 
     return (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
             {/* Like Button */}
             <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleLike}
                 disabled={isPending || !currentUserId}
-                className="flex items-center gap-2 hover:text-red-500 transition-colors"
+                className={cn(
+                    "flex items-center gap-2 rounded-full px-4 transition-all hover:scale-105",
+                    isLiked
+                        ? "bg-red-50 text-red-500 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20"
+                        : "hover:bg-muted hover:text-red-500"
+                )}
             >
                 <Heart
                     className={cn(
                         "w-5 h-5 transition-all",
-                        isLiked ? "fill-red-500 text-red-500" : "text-muted-foreground"
+                        isLiked ? "fill-red-500 text-red-500 scale-110" : "text-muted-foreground"
                     )}
                 />
-                <span className="text-sm font-medium">{likesCount}</span>
+                <span className="text-sm font-semibold">{likesCount}</span>
             </Button>
 
             {/* Views Display */}
-            <div className="flex items-center gap-2 text-muted-foreground">
+            <div className="flex items-center gap-2 text-muted-foreground bg-muted/50 px-4 py-2 rounded-full">
                 <Eye className="w-5 h-5" />
-                <span className="text-sm font-medium">{viewsCount}</span>
+                <span className="text-sm font-semibold">{viewsCount}</span>
             </div>
         </div>
     );

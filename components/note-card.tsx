@@ -33,7 +33,7 @@ export default function NoteCard({ data }: { data: NotesWithRelations }) {
     return (
         <div
             onClick={handleCardClick}
-            className="bg-card border border-border rounded-sm p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col"
+            className="group relative bg-card border border-border/60 rounded-2xl p-4 shadow-warm-sm hover:shadow-warm-lg transition-all duration-300 cursor-pointer h-full flex flex-col hover:-translate-y-1 overflow-hidden"
         >
             {/* Uploader info */}
             <div className="flex items-center gap-2 mb-3 pb-3 border-b border-border">
@@ -54,10 +54,10 @@ export default function NoteCard({ data }: { data: NotesWithRelations }) {
 
             {/* Course and department badges */}
             <div className="flex items-center gap-2 mb-2 flex-wrap">
-                <span className="inline-flex items-center px-2 py-0.5 bg-primary/10 text-primary text-xs font-medium rounded">
+                <span className="inline-flex items-center px-2.5 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full">
                     {data.course.name}
                 </span>
-                <span className="inline-flex items-center px-2 py-0.5 bg-muted text-muted-foreground text-xs font-medium rounded">
+                <span className="inline-flex items-center px-2.5 py-1 bg-muted text-muted-foreground text-xs font-medium rounded-full">
                     {data.department.departmentCode.toUpperCase()}
                 </span>
             </div>
@@ -108,28 +108,28 @@ export default function NoteCard({ data }: { data: NotesWithRelations }) {
             )}
 
             {/* Stats and view details button */}
-            <div className="flex items-center justify-between gap-2 mt-auto">
-                <div className="flex items-center gap-3 text-xs">
-                    <div className="flex items-center gap-1">
-                        <Heart className="w-3.5 h-3.5 text-muted-foreground" />
+            <div className="flex items-center justify-between gap-2 mt-auto pt-3 border-t border-border/40">
+                <div className="flex items-center gap-4 text-xs">
+                    <div className="flex items-center gap-1.5 group/stat">
+                        <Heart className="w-3.5 h-3.5 text-muted-foreground group-hover/stat:text-primary transition-colors" />
                         <span className="text-foreground font-medium">{data.likes.length}</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                        <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                    <div className="flex items-center gap-1.5 group/stat">
+                        <Eye className="w-3.5 h-3.5 text-muted-foreground group-hover/stat:text-primary transition-colors" />
                         <span className="text-foreground font-medium">{data.viewsCount}</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                        <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                    <div className="flex items-center gap-1.5 group/stat">
+                        <FileText className="w-3.5 h-3.5 text-muted-foreground group-hover/stat:text-primary transition-colors" />
                         <span className="text-foreground font-medium">{fileCount}</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                        <BookOpen className="w-3.5 h-3.5 text-muted-foreground" />
+                    <div className="flex items-center gap-1.5 group/stat">
+                        <BookOpen className="w-3.5 h-3.5 text-muted-foreground group-hover/stat:text-primary transition-colors" />
                         <span className="text-foreground font-medium">{resourceCount}</span>
                     </div>
                 </div>
-                <div className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-primary">
+                <div className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-primary bg-primary/5 rounded-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-200">
                     View
-                    <ChevronRight className="w-3.5 h-3.5" />
+                    <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </div>
             </div>
         </div>

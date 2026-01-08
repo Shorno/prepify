@@ -13,7 +13,7 @@ import {
 function NoteStatusBadge({ status, rejectionReason }: { status: string; rejectionReason?: string | null }) {
     if (status === "pending") {
         return (
-            <Badge variant="secondary" className="gap-1 text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+            <Badge variant="secondary" className="gap-1.5 text-xs px-2.5 py-1 rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200">
                 <Clock className="w-3 h-3" />
                 Pending Review
             </Badge>
@@ -21,7 +21,7 @@ function NoteStatusBadge({ status, rejectionReason }: { status: string; rejectio
     }
     if (status === "approved") {
         return (
-            <Badge variant="secondary" className="gap-1 text-xs bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+            <Badge variant="secondary" className="gap-1.5 text-xs px-2.5 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200">
                 <CheckCircle2 className="w-3 h-3" />
                 Published
             </Badge>
@@ -32,7 +32,7 @@ function NoteStatusBadge({ status, rejectionReason }: { status: string; rejectio
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <Badge variant="destructive" className="gap-1 text-xs cursor-help">
+                        <Badge variant="destructive" className="gap-1.5 text-xs px-2.5 py-1 rounded-full cursor-help">
                             <XCircle className="w-3 h-3" />
                             Rejected
                         </Badge>
@@ -61,32 +61,32 @@ export function UserNoteCard({ data }: { data: NoteWithStatus }) {
 
     return (
         <Link href={`/my-notes/${data.id}`}>
-            <div className="bg-card border border-border rounded-sm p-3 shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col">
+            <div className="group bg-card border border-border/60 rounded-2xl p-4 shadow-warm-sm hover:shadow-warm-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer h-full flex flex-col">
                 {/* Status badge */}
                 {data.status && (
-                    <div className="mb-2">
+                    <div className="mb-3">
                         <NoteStatusBadge status={data.status} rejectionReason={data.rejectionReason} />
                     </div>
                 )}
 
                 {/* Course name and department badges */}
-                <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    <span className="inline-flex items-center px-2 py-0.5 bg-primary/10 text-primary text-xs font-medium rounded">
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
+                    <span className="inline-flex items-center px-2.5 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full">
                         {data.course.name}
                     </span>
-                    <span className="inline-flex items-center px-2 py-0.5 bg-muted text-muted-foreground text-xs font-medium rounded">
+                    <span className="inline-flex items-center px-2.5 py-1 bg-muted text-muted-foreground text-xs font-medium rounded-full">
                         {data.department.departmentCode.toUpperCase()}
                     </span>
                 </div>
 
                 {/* Title */}
-                <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-3 min-w-0">
+                <h3 className="text-sm font-semibold text-foreground line-clamp-2 mb-3 min-w-0 group-hover:text-primary transition-colors">
                     {data.title}
                 </h3>
 
                 {/* Image preview grid */}
                 {fileCount > 0 && (
-                    <div className="flex gap-2 mb-3 flex-wrap">
+                    <div className="flex gap-2 mb-4 flex-wrap">
                         {previewFiles.map((file) => {
                             // Check if file is a PDF
                             const isPDF = file.url.includes('.pdf') || file.url.includes('f_pdf') || file.url.toLowerCase().endsWith('.pdf')
@@ -94,7 +94,7 @@ export function UserNoteCard({ data }: { data: NoteWithStatus }) {
                             return (
                                 <div
                                     key={file.id}
-                                    className="relative w-20 h-20 bg-muted rounded border border-border overflow-hidden flex-shrink-0"
+                                    className="relative w-20 h-20 bg-muted/50 rounded-xl border border-border/60 overflow-hidden flex-shrink-0"
                                 >
                                     {isPDF ? (
                                         // Show PDF icon for PDF files
@@ -115,7 +115,7 @@ export function UserNoteCard({ data }: { data: NoteWithStatus }) {
                             )
                         })}
                         {additionalFiles > 0 && (
-                            <div className="w-20 h-20 bg-muted rounded border border-border flex items-center justify-center flex-shrink-0">
+                            <div className="w-20 h-20 bg-muted/50 rounded-xl border border-border/60 flex items-center justify-center flex-shrink-0">
                                 <span className="text-xs font-semibold text-muted-foreground">
                                     +{additionalFiles}
                                 </span>
@@ -125,28 +125,28 @@ export function UserNoteCard({ data }: { data: NoteWithStatus }) {
                 )}
 
                 {/* Stats and view details button */}
-                <div className="flex items-center justify-between gap-2 mt-auto">
-                    <div className="flex items-center gap-3 text-xs">
-                        <div className="flex items-center gap-1">
-                            <Heart className="w-3.5 h-3.5 text-muted-foreground" />
+                <div className="flex items-center justify-between gap-2 mt-auto pt-3 border-t border-border/40">
+                    <div className="flex items-center gap-4 text-xs">
+                        <div className="flex items-center gap-1.5 group/stat">
+                            <Heart className="w-3.5 h-3.5 text-muted-foreground group-hover/stat:text-primary transition-colors" />
                             <span className="text-foreground font-medium">{data.likes.length}</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                            <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                        <div className="flex items-center gap-1.5 group/stat">
+                            <Eye className="w-3.5 h-3.5 text-muted-foreground group-hover/stat:text-primary transition-colors" />
                             <span className="text-foreground font-medium">{data.viewsCount}</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                            <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                        <div className="flex items-center gap-1.5 group/stat">
+                            <FileText className="w-3.5 h-3.5 text-muted-foreground group-hover/stat:text-primary transition-colors" />
                             <span className="text-foreground font-medium">{fileCount}</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                            <BookOpen className="w-3.5 h-3.5 text-muted-foreground" />
+                        <div className="flex items-center gap-1.5 group/stat">
+                            <BookOpen className="w-3.5 h-3.5 text-muted-foreground group-hover/stat:text-primary transition-colors" />
                             <span className="text-foreground font-medium">{resourceCount}</span>
                         </div>
                     </div>
-                    <div className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-primary">
+                    <div className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-primary bg-primary/5 rounded-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-200">
                         Details
-                        <ChevronRight className="w-3.5 h-3.5" />
+                        <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                     </div>
                 </div>
             </div>
