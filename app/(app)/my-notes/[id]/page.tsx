@@ -72,19 +72,20 @@ export default async function MyNotePage({ params }: MyNotePageProps) {
                     {/* Note Header */}
                     <div className="space-y-4">
                         {/* Uploader Info and Actions */}
-                        <div className="flex items-start justify-between gap-4">
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                             <div className="flex items-center gap-3">
-                                <Avatar className="h-12 w-12">
+                                <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
                                     <AvatarImage src={note.user.image || "/placeholder.svg"} alt={note.user.name} />
                                     <AvatarFallback className="text-sm font-semibold">{uploaderInitials}</AvatarFallback>
                                 </Avatar>
-                                <div className="flex-1">
-                                    <p className="font-semibold text-foreground">{note.user.name}</p>
+                                <div className="min-w-0">
+                                    <p className="font-semibold text-foreground truncate">{note.user.name}</p>
                                     <p className="text-sm text-muted-foreground">{note.user.batch || 'Student'}</p>
                                 </div>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <CalendarIcon className="w-4 h-4" />
-                                    <span>{formattedDate}</span>
+                                {/* Date - desktop only */}
+                                <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground ml-2">
+                                    <CalendarIcon className="w-4 h-4 flex-shrink-0" />
+                                    <span className="whitespace-nowrap">{formattedDate}</span>
                                 </div>
                             </div>
 
@@ -92,15 +93,21 @@ export default async function MyNotePage({ params }: MyNotePageProps) {
                             <NoteActions noteId={note.id} />
                         </div>
 
+                        {/* Date - mobile only */}
+                        <div className="sm:hidden flex items-center gap-2 text-sm text-muted-foreground">
+                            <CalendarIcon className="w-4 h-4" />
+                            <span>{formattedDate}</span>
+                        </div>
+
                         {/* Course and Department Badges */}
-                        <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-start gap-2 flex-wrap">
                             <Badge variant="default" className="text-sm">
                                 {note.course.name}
                             </Badge>
                             <Badge variant="secondary" className="text-sm">
                                 {note.department.departmentCode.toUpperCase()}
                             </Badge>
-                            <Badge variant="outline" className="text-sm">
+                            <Badge variant="outline" className="text-sm whitespace-normal text-left -ml-2">
                                 {note.faculty.name}
                             </Badge>
                         </div>
@@ -165,6 +172,6 @@ export default async function MyNotePage({ params }: MyNotePageProps) {
                     </div>
                 </aside>
             </div>
-        </div>
+        </div >
     );
 }

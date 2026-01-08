@@ -55,13 +55,17 @@ export default function UserProfile({ user }: UserProfileProps) {
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                    <UserIcon className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
+                <DropdownMenuItem asChild>
+                    <Link href={`/profile/${user.id}`} className="cursor-pointer">
+                        <UserIcon className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                    </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
+                <DropdownMenuItem asChild>
+                    <Link href="/settings" className="cursor-pointer">
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Settings</span>
+                    </Link>
                 </DropdownMenuItem>
                 {showModeratorLink && (
                     <DropdownMenuItem asChild>
