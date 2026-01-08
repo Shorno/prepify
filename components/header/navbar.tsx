@@ -51,11 +51,11 @@ export default function Navbar() {
             <div className="container mx-auto px-4 xl:px-0">
                 <nav className="flex items-center justify-between">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-2 group">
-                        <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-serif font-bold text-lg group-hover:scale-105 transition-transform">
+                    <Link href="/" className="flex items-center gap-2.5 group">
+                        <div className="w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-serif font-bold text-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-warm-sm">
                             P
                         </div>
-                        <span className="font-bold text-xl tracking-tight">Prepify</span>
+                        <span className="font-bold text-xl tracking-tight group-hover:text-primary transition-colors">Prepify</span>
                     </Link>
 
                     {/* Desktop Navigation */}
@@ -92,11 +92,11 @@ export default function Navbar() {
                                 <UserProfile user={data.user} />
                             </>
                         ) : (
-                            <div className="hidden sm:flex items-center gap-2">
-                                <Button asChild variant="ghost" className="rounded-full font-medium">
+                            <div className="hidden sm:flex items-center gap-3">
+                                <Button asChild variant="ghost" className="rounded-full font-medium px-5 hover:bg-primary/5">
                                     <Link href="/login">Log in</Link>
                                 </Button>
-                                <Button asChild className="rounded-full px-6 font-medium shadow-none">
+                                <Button asChild className="rounded-full px-6 font-semibold shadow-warm hover:shadow-warm-lg hover:-translate-y-0.5 transition-all duration-200">
                                     <Link href="/sign-up">Sign up</Link>
                                 </Button>
                             </div>
