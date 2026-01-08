@@ -17,7 +17,7 @@ export default async function Home() {
     ]);
 
     return (
-        <div className="flex flex-col w-full overflow-x-hidden">
+        <div className="flex flex-col w-full overflow-x-hidden mt-20 md:mt-10">
             <HeroSection />
             <FeaturedNotesSection notes={featuredNotes} />
             <HowItWorksSection />

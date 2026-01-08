@@ -72,63 +72,73 @@ export default async function NotePage({ params }: NotePageProps) {
                     {/* Note Header */}
                     <div className="space-y-4">
                         {/* Uploader Info */}
-                        <div className="flex items-center gap-3">
-                            <Link href={`/user/${note.user.username || note.user.id}`}>
-                                <Avatar className="h-12 w-12 hover:opacity-80 transition-opacity">
+                        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                            <Link href={`/user/${note.user.username || note.user.id}`} className="flex-shrink-0">
+                                <Avatar className="h-12 w-12 sm:h-14 sm:w-14 hover:scale-105 transition-transform ring-2 ring-primary/10">
                                     <AvatarImage src={note.user.image || "/placeholder.svg"} alt={note.user.name} />
-                                    <AvatarFallback className="text-sm font-semibold">{uploaderInitials}</AvatarFallback>
+                                    <AvatarFallback className="text-sm sm:text-base font-semibold bg-primary/10 text-primary">{uploaderInitials}</AvatarFallback>
                                 </Avatar>
                             </Link>
-                            <div className="flex-1">
+                            <div className="flex-1 min-w-0">
                                 <Link
                                     href={`/user/${note.user.username || note.user.id}`}
-                                    className="font-semibold text-foreground hover:underline"
+                                    className="font-semibold text-base sm:text-lg text-foreground hover:text-primary transition-colors block truncate"
                                 >
                                     {note.user.name}
                                 </Link>
-                                <p className="text-sm text-muted-foreground">{note.user.batch || 'Student'}</p>
+                                <p className="text-sm text-muted-foreground truncate">{note.user.batch || 'Student'}</p>
                             </div>
-                            {/* Follow Button */}
-                            {session?.user && !isOwnNote && (
-                                <FollowButton
-                                    userId={note.user.id}
-                                    initialIsFollowing={isFollowing}
-                                    size="sm"
-                                />
-                            )}
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <CalendarIcon className="w-4 h-4" />
-                                <span>{formattedDate}</span>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                                {/* Follow Button */}
+                                {session?.user && !isOwnNote && (
+                                    <FollowButton
+                                        userId={note.user.id}
+                                        initialIsFollowing={isFollowing}
+                                        size="sm"
+                                    />
+                                )}
+                                <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">
+                                    <CalendarIcon className="w-4 h-4" />
+                                    <span>{formattedDate}</span>
+                                </div>
                             </div>
+                        </div>
+
+                        {/* Date on mobile - separate row */}
+                        <div className="sm:hidden flex items-center gap-2 text-sm text-muted-foreground">
+                            <CalendarIcon className="w-4 h-4" />
+                            <span>{formattedDate}</span>
                         </div>
 
                         {/* Course and Department Badges */}
                         <div className="flex items-center gap-2 flex-wrap">
-                            <Badge variant="default" className="text-sm">
+                            <Badge variant="default" className="text-xs sm:text-sm px-2.5 sm:px-3 py-1 rounded-full">
                                 {note.course.name}
                             </Badge>
-                            <Badge variant="secondary" className="text-sm">
+                            <Badge variant="secondary" className="text-xs sm:text-sm px-2.5 sm:px-3 py-1 rounded-full">
                                 {note.department.departmentCode.toUpperCase()}
                             </Badge>
-                            <Badge variant="outline" className="text-sm">
+                            <Badge variant="outline" className="text-xs sm:text-sm px-2.5 sm:px-3 py-1 rounded-full">
                                 {note.faculty.name}
                             </Badge>
                         </div>
 
                         {/* Title */}
-                        <h1 className="text-3xl font-bold text-foreground">
+                        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground break-words">
                             {note.title}
                         </h1>
 
                         {/* Stats */}
-                        <div className="flex items-center gap-6 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-2">
-                                <FileText className="w-5 h-5" />
-                                <span className="font-medium">{note.files.length} {note.files.length === 1 ? 'File' : 'Files'}</span>
+                        <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+                            <div className="flex items-center gap-1.5 sm:gap-2 bg-muted/50 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-sm">
+                                <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
+                                <span className="font-semibold">{note.files.length}</span>
+                                <span className="text-muted-foreground hidden sm:inline">{note.files.length === 1 ? 'File' : 'Files'}</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <BookOpen className="w-5 h-5" />
-                                <span className="font-medium">{note.resources.length} {note.resources.length === 1 ? 'Reference' : 'References'}</span>
+                            <div className="flex items-center gap-1.5 sm:gap-2 bg-muted/50 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-sm">
+                                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
+                                <span className="font-semibold">{note.resources.length}</span>
+                                <span className="text-muted-foreground hidden sm:inline">{note.resources.length === 1 ? 'Reference' : 'References'}</span>
                             </div>
                         </div>
 
@@ -143,11 +153,14 @@ export default async function NotePage({ params }: NotePageProps) {
                     </div>
 
                     {/* Divider */}
-                    <hr className="border-border" />
+                    <hr className="border-border/40" />
 
                     {/* Files Gallery */}
                     <div>
-                        <h2 className="text-xl font-semibold mb-4">Files</h2>
+                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                            <FileText className="w-5 h-5 text-primary" />
+                            Files
+                        </h2>
                         <NoteImageGallery files={note.files} />
                     </div>
 

@@ -24,13 +24,29 @@ export function LeaderboardTable({ data }: LeaderboardTableProps) {
     const getRankIcon = (rank: number) => {
         switch (rank) {
             case 1:
-                return <Trophy className="w-5 h-5 text-amber-500" />
+                return (
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
+                        <Trophy className="w-4 h-4 text-white" />
+                    </div>
+                )
             case 2:
-                return <Medal className="w-5 h-5 text-slate-400" />
+                return (
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-500 dark:to-slate-600 flex items-center justify-center">
+                        <Medal className="w-4 h-4 text-white" />
+                    </div>
+                )
             case 3:
-                return <Medal className="w-5 h-5 text-amber-700" />
+                return (
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
+                        <Medal className="w-4 h-4 text-white" />
+                    </div>
+                )
             default:
-                return <Flame className="w-5 h-5 text-slate-300 dark:text-slate-600" />
+                return (
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                        <span className="text-sm font-semibold text-muted-foreground">{rank}</span>
+                    </div>
+                )
         }
     }
 
@@ -43,7 +59,6 @@ export function LeaderboardTable({ data }: LeaderboardTableProps) {
                 return (
                     <div className="flex gap-2 items-center">
                         {getRankIcon(rank)}
-                        <span className="font-bold text-lg w-6 text-center">{rank}</span>
                     </div>
                 )
             },
@@ -58,16 +73,16 @@ export function LeaderboardTable({ data }: LeaderboardTableProps) {
                 return (
                     <Link
                         href={`/profile/${user.id}`}
-                        className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                        className="flex items-center gap-3 group"
                     >
-                        <Avatar className="h-8 w-8 ring-2 ring-border">
+                        <Avatar className="h-10 w-10 ring-2 ring-primary/10 group-hover:ring-primary/30 transition-all">
                             <AvatarImage src={user.image || "/placeholder.svg"} alt={user.name} />
-                            <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-xs font-semibold">
+                            <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
                                 {getInitials(user.name)}
                             </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
-                            <p className="font-semibold text-sm hover:underline">{user.name}</p>
+                            <p className="font-semibold text-sm group-hover:text-primary transition-colors">{user.name}</p>
                         </div>
                     </Link>
                 )
