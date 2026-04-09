@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .form-container {
+            background: #fff;
+            padding: 32px;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 420px;
+        }
+
+        h1 { text-align: center; margin-bottom: 24px; font-size: 22px; }
+
+        .form-group { margin-bottom: 16px; }
+
+        label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 14px; }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus { outline: 2px solid #4f46e5; border-color: transparent; }
+
+        .error-msg {
+            color: red;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #4f46e5;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        button:hover { background: #4338ca; }
+
+        .success { display: none; background: #e6ffed; color: #22543d; padding: 12px; border-radius: 6px; text-align: center; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Contact Form</h1>
+        <div class="success" id="success">✅ Submitted successfully!</div>
+
+        <form id="form" novalidate>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" placeholder="Your name">
+                <div class="error-msg" id="nameErr"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="you@example.com">
+                <div class="error-msg" id="emailErr"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" placeholder="01XXXXXXXXX">
+                <div class="error-msg" id="phoneErr"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="subject">Subject</label>
+                <select id="subject">
+                    <option value="">-- Select --</option>
+                    <option value="general">General Inquiry</option>
+                    <option value="support">Support</option>
+                    <option value="feedback">Feedback</option>
+                </select>
+                <div class="error-msg" id="subjectErr"></div>
+            </div>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('form');
+
+        function showErr(id, msg) {
+            const el = document.getElementById(id + 'Err');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('.error-msg').forEach(el => {
+                el.textContent = '';
+                el.style.display = 'none';
+            });
+        }
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            clearErrors();
+            let valid = true;
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const subject = document.getElementById('subject').value;
+
+            if (!name) { showErr('name', 'Name is required.'); valid = false; }
+            else if (name.length < 2) { showErr('name', 'Name must be at least 2 characters.'); valid = false; }
+
+            if (!email) { showErr('email', 'Email is required.'); valid = false; }
+            else if (!email.includes('@') || !email.includes('.') || email.indexOf('@') < 1 || email.indexOf('.') < email.indexOf('@') + 2) { showErr('email', 'Enter a valid email.'); valid = false; }
+
+            if (!phone) { showErr('phone', 'Phone is required.'); valid = false; }
+            else if (phone.length < 10 || phone.length > 15 || isNaN(phone)) { showErr('phone', 'Enter a valid phone number (10-15 digits).'); valid = false; }
+
+            if (!subject) { showErr('subject', 'Please select a subject.'); valid = false; }
+
+            if (valid) {
+                document.getElementById('success').style.display = 'block';
+                form.reset();
+                setTimeout(() => { document.getElementById('success').style.display = 'none'; }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

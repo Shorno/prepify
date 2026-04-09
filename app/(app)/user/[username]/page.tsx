@@ -10,6 +10,10 @@ import { FileText, Users } from "lucide-react";
 import FollowButton from "@/components/follow-button";
 import Link from "next/link";
 import Image from "next/image";
+import { getStreak } from "@/actions/streaks/get-streak";
+import { getUserBadges } from "@/actions/badges/get-user-badges";
+import StreakDisplay from "@/components/streak-display";
+import BadgeShowcase from "@/components/badge-showcase";
 
 interface UserProfilePageProps {
     params: Promise<{ username: string }>;
@@ -38,6 +42,14 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
     // Get user's public notes
     const notesResult = await getUserPublicNotes(user.id);
     const notes = notesResult.success ? notesResult.data : [];
+
+    // Get streak and badges
+    const [streakResult, badgesResult] = await Promise.all([
+        getStreak(user.id),
+        getUserBadges(user.id),
+    ]);
+    const streak = streakResult.success ? streakResult.data : null;
+    const badges = badgesResult.success ? badgesResult.data : { earned: [], all: [] };
 
     const isOwnProfile = session?.user?.id === user.id;
 
@@ -95,7 +107,31 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
                             initialIsFollowing={followStatus.isFollowing}
                         />
                     )}
+
+                    {/* Badges (compact) */}
+                    {badges.earned.length > 0 && (
+                        <BadgeShowcase earned={badges.earned} all={badges.all} compact />
+                    )}
                 </div>
+            </div>
+
+            {/* Streak + Badges Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {/* Streak */}
+                {streak && streak.currentStreak > 0 && (
+                    <StreakDisplay
+                        currentStreak={streak.currentStreak}
+                        longestStreak={streak.longestStreak}
+                        variant="full"
+                    />
+                )}
+
+                {/* Full Badge Showcase */}
+                {badges.all.length > 0 && (
+                    <div className="p-4 rounded-2xl border border-border bg-card">
+                        <BadgeShowcase earned={badges.earned} all={badges.all} />
+                    </div>
+                )}
             </div>
 
             {/* Notes Section */}

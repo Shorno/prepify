@@ -13,6 +13,8 @@ import { sendPointsEmail } from "@/actions/email/send-points-email";
 import { revalidatePath } from "next/cache";
 import { follow } from "@/db/schema/follow";
 import { createBulkNotifications } from "@/actions/notifications/create-notification";
+import { updateStreak } from "@/actions/streaks/update-streak";
+import { checkAndAwardBadges } from "@/actions/badges/check-and-award-badges";
 
 export default async function saveNote(data: NoteFormData): Promise<ActionResult<{
     noteId: number;
@@ -175,6 +177,10 @@ export default async function saveNote(data: NoteFormData): Promise<ActionResult
                     noteId: newNote.id,
                 }).catch(console.error);
             }
+
+            // Update streak and check badges (fire and forget)
+            updateStreak(session.user.id).catch(console.error);
+            checkAndAwardBadges(session.user.id).catch(console.error);
 
             return {
                 savedNote: newNote,

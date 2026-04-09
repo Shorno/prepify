@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button";
 import likeNote from "@/actions/notes/like-note";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import BookmarkButton from "@/components/bookmark-button";
 
 interface NoteEngagementProps {
     noteId: number;
     initialLikesCount: number;
     initialIsLiked: boolean;
+    initialIsBookmarked: boolean;
     viewsCount: number;
     currentUserId?: string;
 }
@@ -19,6 +21,7 @@ export default function NoteEngagement({
     noteId,
     initialLikesCount,
     initialIsLiked,
+    initialIsBookmarked,
     viewsCount,
     currentUserId
 }: NoteEngagementProps) {
@@ -77,6 +80,13 @@ export default function NoteEngagement({
                 />
                 <span className="text-sm font-semibold">{likesCount}</span>
             </Button>
+
+            {/* Bookmark Button */}
+            <BookmarkButton
+                noteId={noteId}
+                initialIsBookmarked={initialIsBookmarked}
+                currentUserId={currentUserId}
+            />
 
             {/* Views Display */}
             <div className="flex items-center gap-2 text-muted-foreground bg-muted/50 px-4 py-2 rounded-full">

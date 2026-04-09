@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { FileText, BookOpen, ChevronRight, Heart, Eye } from 'lucide-react';
+import { FileText, BookOpen, ChevronRight, Heart, Eye, Bookmark } from 'lucide-react';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 import { NotesWithRelations } from "@/db/schema";
@@ -125,6 +125,9 @@ export default function NoteCard({ data }: { data: NotesWithRelations }) {
                     <div className="flex items-center gap-1.5 group/stat">
                         <BookOpen className="w-3.5 h-3.5 text-muted-foreground group-hover/stat:text-primary transition-colors" />
                         <span className="text-foreground font-medium">{resourceCount}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 group/stat">
+                        <Bookmark className="w-3.5 h-3.5 text-muted-foreground group-hover/stat:text-amber-500 transition-colors" />
                     </div>
                 </div>
                 <div className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold text-primary bg-primary/5 rounded-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-200">

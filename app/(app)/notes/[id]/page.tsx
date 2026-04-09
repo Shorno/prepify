@@ -11,6 +11,7 @@ import incrementView from "@/actions/notes/increment-view";
 import { checkAuth } from "@/app/actions/user/checkAuth";
 import FollowButton from "@/components/follow-button";
 import getFollowStatus from "@/actions/follow/get-follow-status";
+import { getBookmarkStatus } from "@/actions/bookmarks/get-bookmark-status";
 import Link from "next/link";
 
 interface NotePageProps {
@@ -55,6 +56,10 @@ export default async function NotePage({ params }: NotePageProps) {
 
     // Check if current user has liked this note
     const isLiked = session?.user ? note.likes.some(like => like.userId === session.user.id) : false;
+
+    // Check bookmark status
+    const bookmarkResult = await getBookmarkStatus(noteId);
+    const isBookmarked = bookmarkResult.success ? bookmarkResult.data.isBookmarked : false;
 
     // Get follow status for the note author
     const isOwnNote = session?.user?.id === note.user.id;
@@ -147,6 +152,7 @@ export default async function NotePage({ params }: NotePageProps) {
                             noteId={note.id}
                             initialLikesCount={note.likes.length}
                             initialIsLiked={isLiked}
+                            initialIsBookmarked={isBookmarked}
                             viewsCount={note.viewsCount + 1}
                             currentUserId={session?.user?.id}
                         />

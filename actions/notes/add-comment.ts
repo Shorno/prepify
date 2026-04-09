@@ -5,6 +5,8 @@ import { db } from "@/db/config";
 import { noteComment, NoteCommentWithUser } from "@/db/schema/note";
 import { checkAuth } from "@/app/actions/user/checkAuth";
 import { commentSchema } from "@/zodSchema/commentSchema";
+import { updateStreak } from "@/actions/streaks/update-streak";
+import { checkAndAwardBadges } from "@/actions/badges/check-and-award-badges";
 
 export default async function addComment(noteId: number, content: string): Promise<ActionResult<NoteCommentWithUser>> {
     try {
@@ -53,6 +55,10 @@ export default async function addComment(noteId: number, content: string): Promi
                 error: "Failed to retrieve comment",
             };
         }
+
+        // Update streak and check badges
+        updateStreak(userId).catch(console.error);
+        checkAndAwardBadges(userId).catch(console.error);
 
         return {
             status: 200,
