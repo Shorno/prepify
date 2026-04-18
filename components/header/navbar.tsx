@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 const navLinks = [
     { name: "Notes", href: "/notes" },
     { name: "My Notes", href: "/my-notes" },
+    { name: "Bookmarks", href: "/bookmarks" },
     { name: "Leaderboard", href: "/leaderboard" },
 ]
 

@@ -11,6 +11,7 @@ import { checkAuth } from "@/app/actions/user/checkAuth";
 import NoteEngagement from "@/components/note-engagement";
 import CommentsSection from "@/components/comments-section";
 import incrementView from "@/actions/notes/increment-view";
+import { getBookmarkStatus } from "@/actions/bookmarks/get-bookmark-status";
 
 interface MyNotePageProps {
     params: Promise<{ id: string }>;
@@ -63,6 +64,10 @@ export default async function MyNotePage({ params }: MyNotePageProps) {
 
     // Check if current user has liked this note
     const isLiked = note.likes.some(like => like.userId === session.user.id);
+
+    // Check bookmark status
+    const bookmarkResult = await getBookmarkStatus(noteId);
+    const isBookmarked = bookmarkResult.success ? bookmarkResult.data.isBookmarked : false;
 
     return (
         <div className="main-container py-8">
@@ -134,6 +139,7 @@ export default async function MyNotePage({ params }: MyNotePageProps) {
                             noteId={note.id}
                             initialLikesCount={note.likes.length}
                             initialIsLiked={isLiked}
+                            initialIsBookmarked={isBookmarked}
                             viewsCount={note.viewsCount + 1}
                             currentUserId={session.user.id}
                         />

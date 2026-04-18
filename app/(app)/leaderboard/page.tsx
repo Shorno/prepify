@@ -1,6 +1,7 @@
 import { getPublicLeaderboard } from "@/actions/leaderboard/get-leader-board";
 import { LeaderboardTable } from "@/components/leaderboard-table";
 import { Trophy, Star, Award } from "lucide-react";
+import Link from "next/link";
 
 export default async function LeaderboardPage() {
     const result = await getPublicLeaderboard()
@@ -50,7 +51,7 @@ export default async function LeaderboardPage() {
             {result.data.length >= 3 && (
                 <div className="hidden lg:grid grid-cols-3 gap-4 mb-8 max-w-3xl mx-auto">
                     {/* Second Place */}
-                    <div className="order-1 flex flex-col items-center p-6 bg-gradient-to-b from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-warm-sm mt-8">
+                    <Link href={`/user/${result.data[1].user.username || result.data[1].user.id}`} className="order-1 flex flex-col items-center p-6 bg-gradient-to-b from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-warm-sm mt-8 hover:shadow-warm-lg transition-all">
                         <div className="w-12 h-12 rounded-full bg-slate-300 dark:bg-slate-600 flex items-center justify-center mb-3 ring-4 ring-slate-200 dark:ring-slate-700">
                             <span className="text-xl font-bold text-slate-600 dark:text-slate-300">2</span>
                         </div>
@@ -63,10 +64,10 @@ export default async function LeaderboardPage() {
                         </div>
                         <p className="font-semibold text-sm text-center truncate w-full">{result.data[1].user.name}</p>
                         <p className="text-lg font-bold text-slate-600 dark:text-slate-400">{result.data[1].totalPoints} pts</p>
-                    </div>
+                    </Link>
 
                     {/* First Place */}
-                    <div className="order-2 flex flex-col items-center p-6 bg-gradient-to-b from-amber-100 to-amber-50 dark:from-amber-900/40 dark:to-amber-900/20 rounded-2xl border border-amber-200 dark:border-amber-800 shadow-warm-lg relative">
+                    <Link href={`/user/${result.data[0].user.username || result.data[0].user.id}`} className="order-2 flex flex-col items-center p-6 bg-gradient-to-b from-amber-100 to-amber-50 dark:from-amber-900/40 dark:to-amber-900/20 rounded-2xl border border-amber-200 dark:border-amber-800 shadow-warm-lg relative hover:shadow-warm-xl transition-all">
                         <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                             <Trophy className="w-8 h-8 text-amber-500" />
                         </div>
@@ -82,10 +83,10 @@ export default async function LeaderboardPage() {
                         </div>
                         <p className="font-bold text-center truncate w-full">{result.data[0].user.name}</p>
                         <p className="text-xl font-bold text-amber-600 dark:text-amber-400">{result.data[0].totalPoints} pts</p>
-                    </div>
+                    </Link>
 
                     {/* Third Place */}
-                    <div className="order-3 flex flex-col items-center p-6 bg-gradient-to-b from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-900/10 rounded-2xl border border-orange-200 dark:border-orange-800 shadow-warm-sm mt-8">
+                    <Link href={`/user/${result.data[2].user.username || result.data[2].user.id}`} className="order-3 flex flex-col items-center p-6 bg-gradient-to-b from-orange-100 to-orange-50 dark:from-orange-900/30 dark:to-orange-900/10 rounded-2xl border border-orange-200 dark:border-orange-800 shadow-warm-sm mt-8 hover:shadow-warm-lg transition-all">
                         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center mb-3 ring-4 ring-orange-200 dark:ring-orange-700">
                             <span className="text-xl font-bold text-white">3</span>
                         </div>
@@ -98,7 +99,7 @@ export default async function LeaderboardPage() {
                         </div>
                         <p className="font-semibold text-sm text-center truncate w-full">{result.data[2].user.name}</p>
                         <p className="text-lg font-bold text-orange-600 dark:text-orange-400">{result.data[2].totalPoints} pts</p>
-                    </div>
+                    </Link>
                 </div>
             )}
 

@@ -2,9 +2,11 @@
 
 import { ActionResult } from "@/types/action-response";
 import { db } from "@/db/config";
-import { noteLike } from "@/db/schema/note";
+import { noteLike, note } from "@/db/schema/note";
 import { checkAuth } from "@/app/actions/user/checkAuth";
 import { eq, and } from "drizzle-orm";
+import { updateStreak } from "@/actions/streaks/update-streak";
+import { checkAndAwardBadges } from "@/actions/badges/check-and-award-badges";
 
 export default async function likeNote(noteId: number): Promise<ActionResult<{ isLiked: boolean; likesCount: number }>> {
     try {
@@ -28,6 +30,8 @@ export default async function likeNote(noteId: number): Promise<ActionResult<{ i
             ),
         });
 
+        let result: ActionResult<{ isLiked: boolean; likesCount: number }>;
+
         if (existingLike) {
             // Unlike: delete the like
             await db.delete(noteLike).where(
@@ -42,7 +46,7 @@ export default async function likeNote(noteId: number): Promise<ActionResult<{ i
                 where: eq(noteLike.noteId, noteId),
             });
 
-            return {
+            result = {
                 status: 200,
                 success: true,
                 data: {
@@ -63,7 +67,7 @@ export default async function likeNote(noteId: number): Promise<ActionResult<{ i
                 where: eq(noteLike.noteId, noteId),
             });
 
-            return {
+            result = {
                 status: 200,
                 success: true,
                 data: {
@@ -73,6 +77,21 @@ export default async function likeNote(noteId: number): Promise<ActionResult<{ i
                 message: "Note liked successfully",
             };
         }
+
+        // Update streak and check badges for the liker
+        updateStreak(userId).catch(console.error);
+        checkAndAwardBadges(userId).catch(console.error);
+
+        // Also check badges for the note author (they may have earned engagement badges)
+        const likedNote = await db.query.note.findFirst({
+            where: eq(note.id, noteId),
+            columns: { userId: true },
+        });
+        if (likedNote && likedNote.userId !== userId) {
+            checkAndAwardBadges(likedNote.userId).catch(console.error);
+        }
+
+        return result;
     } catch (error) {
         console.error("Error toggling like:", error);
 
@@ -83,3 +102,4 @@ export default async function likeNote(noteId: number): Promise<ActionResult<{ i
         };
     }
 }
+

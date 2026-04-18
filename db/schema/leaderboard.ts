@@ -51,6 +51,7 @@ export type LeaderboardEntry = UserPoints & {
         id: string;
         name: string;
         image: string | null;
+        username: string | null;
     }
 }
 
