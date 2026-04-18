@@ -15,6 +15,7 @@ export async function getPublicLeaderboard(limit: number = 50): Promise<ActionRe
                         id: true,
                         name: true,
                         image: true,
+                        username: true,
                     },
                 },
             },

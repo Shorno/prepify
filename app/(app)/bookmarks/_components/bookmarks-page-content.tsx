@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Bookmark, FolderPlus, Folder, BookmarkX, Trash2, Plus, Library } from "lucide-react";
 import { cn } from "@/lib/utils";
+import AddToCollectionMenu from "./add-to-collection-menu";
 import {
     Dialog,
     DialogContent,
@@ -207,7 +208,17 @@ export default function BookmarksPageContent() {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                         {filteredBookmarks.map((b) => (
-                            <NoteCard key={b.id} data={b.note} />
+                            <div key={b.id} className="flex flex-col">
+                                <NoteCard data={b.note} />
+                                <div className="mt-1.5 px-1">
+                                    <AddToCollectionMenu
+                                        noteId={b.noteId}
+                                        currentCollectionId={b.collectionId}
+                                        collections={collections}
+                                        onUpdate={loadData}
+                                    />
+                                </div>
+                            </div>
                         ))}
                     </div>
                 )}

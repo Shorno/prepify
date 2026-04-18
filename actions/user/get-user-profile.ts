@@ -13,6 +13,7 @@ export interface UserProfile {
         batch: string | null;
         departmentId: string | null;
         facultyId: string | null;
+        createdAt: Date;
     };
     stats: {
         totalPoints: number;
@@ -110,6 +111,7 @@ export async function getUserProfile(userId: string): Promise<ActionResult<UserP
                     batch: userData.batch,
                     departmentId: userData.departmentId,
                     facultyId: userData.facultyId,
+                    createdAt: userData.createdAt,
                 },
                 stats: userStats ? {
                     totalPoints: userStats.totalPoints,

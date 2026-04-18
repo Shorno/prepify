@@ -5,11 +5,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trophy, FileText, Calendar, GraduationCap, Building2, Users, Settings } from "lucide-react";
-import NoteCard from "@/components/note-card";
+import { Trophy, FileText, Calendar, GraduationCap, Building2, Users, Settings, ArrowRight } from "lucide-react";
 import FollowButton from "@/components/follow-button";
 import getFollowStatus from "@/actions/follow/get-follow-status";
 import { checkAuth } from "@/app/actions/user/checkAuth";
+import { getStreak } from "@/actions/streaks/get-streak";
+import { getUserBadges } from "@/actions/badges/get-user-badges";
+import StreakDisplay from "@/components/streak-display";
+import BadgeShowcase from "@/components/badge-showcase";
 
 interface ProfilePageProps {
     params: Promise<{ userId: string }>;
@@ -34,6 +37,16 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         followersCount: 0,
         followingCount: 0,
     };
+
+    // Get streak and badges
+    const [streakResult, badgesResult] = await Promise.all([
+        getStreak(user.id),
+        getUserBadges(user.id),
+    ]);
+    const streak = streakResult.success && streakResult.data
+        ? streakResult.data
+        : { currentStreak: 0, longestStreak: 0 };
+    const badges = badgesResult.success ? badgesResult.data : { earned: [], all: [] };
 
     // Get user initials
     const userInitials = user.name
@@ -94,6 +107,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                                         <span className="text-muted-foreground">Following</span>
                                     </div>
                                 </div>
+
+                                {/* Compact earned badges */}
+                                {badges.earned.length > 0 && (
+                                    <BadgeShowcase earned={badges.earned} all={badges.all} compact />
+                                )}
 
                                 {/* Follow/Edit Buttons */}
                                 {session?.user && !isOwnProfile && (
@@ -170,10 +188,16 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-xl font-bold">
-                                    {new Date(notes[0]?.createdAt).toLocaleDateString('en-US', {
-                                        month: 'short',
-                                        year: 'numeric'
-                                    })}
+                                    {notes.length > 0
+                                        ? new Date(notes[0]?.createdAt).toLocaleDateString('en-US', {
+                                            month: 'short',
+                                            year: 'numeric'
+                                        })
+                                        : new Date(user.createdAt).toLocaleDateString('en-US', {
+                                            month: 'short',
+                                            year: 'numeric'
+                                        })
+                                    }
                                 </div>
                                 <p className="text-xs text-muted-foreground mt-1">
                                     Active contributor
@@ -183,34 +207,37 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                     </div>
                 )}
 
-                {/* Notes Section */}
-                <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-bold">Notes</h2>
-                        <Badge variant="secondary" className="text-sm">
-                            {notes.length} {notes.length === 1 ? 'note' : 'notes'}
-                        </Badge>
-                    </div>
+                {/* Streak + Badges Section */}
+                <div className="space-y-6">
+                    {/* Streak */}
+                    <StreakDisplay
+                        currentStreak={streak.currentStreak}
+                        longestStreak={streak.longestStreak}
+                        variant="full"
+                    />
 
-                    {notes.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {notes.map((note) => (
-                                <NoteCard key={note.id} data={note} />
-                            ))}
-                        </div>
-                    ) : (
-                        <Card className="rounded-2xl shadow-warm border border-border/60">
-                            <CardContent className="py-12 text-center">
-                                <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                                <p className="text-muted-foreground">
-                                    This user hasn&#39;t shared any notes yet.
-                                </p>
-                            </CardContent>
-                        </Card>
-                    )}
+                    {/* Full Badge Showcase */}
+                    <div className="p-5 rounded-2xl border border-border bg-card">
+                        <BadgeShowcase earned={badges.earned} all={badges.all} />
+                    </div>
+                </div>
+
+                {/* My Notes Link */}
+                <div className="flex items-center justify-between p-5 rounded-2xl border border-border bg-card">
+                    <div>
+                        <h2 className="text-lg font-semibold">My Notes</h2>
+                        <p className="text-sm text-muted-foreground">
+                            {notes.length} {notes.length === 1 ? 'note' : 'notes'} shared with the community
+                        </p>
+                    </div>
+                    <Button asChild variant="outline" className="gap-2 rounded-full">
+                        <Link href="/my-notes">
+                            View My Notes
+                            <ArrowRight className="w-4 h-4" />
+                        </Link>
+                    </Button>
                 </div>
             </div>
         </div>
     );
 }
-

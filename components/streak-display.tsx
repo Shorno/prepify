@@ -69,7 +69,7 @@ export default function StreakDisplay({
     return (
         <div className={cn(
             "flex items-center gap-4 p-4 rounded-2xl border",
-            getStreakBg(currentStreak)
+            currentStreak > 0 ? getStreakBg(currentStreak) : "bg-muted/30 border-border"
         )}>
             <div className={cn(
                 "flex items-center justify-center w-14 h-14 rounded-xl",
@@ -82,15 +82,26 @@ export default function StreakDisplay({
                 )} />
             </div>
             <div className="flex-1">
-                <div className="flex items-baseline gap-2">
-                    <span className={cn("text-2xl font-bold", getStreakColor(currentStreak))}>
-                        {currentStreak}
-                    </span>
-                    <span className="text-sm text-muted-foreground">day streak</span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                    Best streak: <span className="font-semibold text-foreground">{longestStreak} days</span>
-                </p>
+                {currentStreak > 0 ? (
+                    <>
+                        <div className="flex items-baseline gap-2">
+                            <span className={cn("text-2xl font-bold", getStreakColor(currentStreak))}>
+                                {currentStreak}
+                            </span>
+                            <span className="text-sm text-muted-foreground">day streak</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                            Best streak: <span className="font-semibold text-foreground">{longestStreak} days</span>
+                        </p>
+                    </>
+                ) : (
+                    <>
+                        <p className="text-sm font-semibold text-foreground">Start your streak!</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                            Upload, like, or comment to begin your daily streak 🔥
+                        </p>
+                    </>
+                )}
             </div>
         </div>
     );

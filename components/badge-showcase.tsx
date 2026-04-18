@@ -63,72 +63,66 @@ export default function BadgeShowcase({ earned, all, compact = false }: BadgeSho
     }
 
     // Full showcase: grouped by category with progress
-    return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
+    if (all.length === 0) {
+        return (
+            <div className="space-y-3">
                 <h3 className="text-lg font-bold">Badges</h3>
-                <span className="text-sm text-muted-foreground">
-                    {earned.length} / {all.length} earned
+                <p className="text-sm text-muted-foreground">
+                    Badges will appear here as you engage with the community — upload notes, maintain streaks, and more! 🏅
+                </p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-3">
+            <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold">Badges</h3>
+                <span className="text-xs text-muted-foreground">
+                    {earned.length} / {all.length}
                 </span>
             </div>
 
-            {Object.entries(grouped).map(([category, badges]) => (
-                <div key={category}>
-                    <h4 className="text-sm font-semibold text-muted-foreground mb-3">
-                        {CATEGORY_LABELS[category] || category}
-                    </h4>
-                    <TooltipProvider>
-                        <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-                            {badges.map((b) => {
-                                const isEarned = earnedBadgeIds.has(b.id);
-                                const earnedData = earned.find((ub) => ub.badgeId === b.id);
+            <TooltipProvider>
+                <div className="flex flex-wrap gap-2">
+                    {all.map((b) => {
+                        const isEarned = earnedBadgeIds.has(b.id);
+                        const earnedData = earned.find((ub) => ub.badgeId === b.id);
 
-                                return (
-                                    <Tooltip key={b.id}>
-                                        <TooltipTrigger asChild>
-                                            <div
-                                                className={cn(
-                                                    "flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all cursor-default",
-                                                    isEarned
-                                                        ? "bg-card border-primary/20 shadow-warm-sm hover:shadow-warm"
-                                                        : "bg-muted/30 border-border/40 opacity-40 grayscale"
-                                                )}
-                                            >
-                                                <span className={cn(
-                                                    "text-2xl",
-                                                    isEarned && "animate-in zoom-in"
-                                                )}>
-                                                    {b.icon}
-                                                </span>
-                                                <span className={cn(
-                                                    "text-[10px] font-semibold text-center leading-tight",
-                                                    isEarned ? "text-foreground" : "text-muted-foreground"
-                                                )}>
-                                                    {b.name}
-                                                </span>
-                                            </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent className="max-w-[200px]">
-                                            <p className="font-semibold">{b.name}</p>
-                                            <p className="text-xs text-muted-foreground">{b.description}</p>
-                                            {isEarned && earnedData && (
-                                                <p className="text-xs text-primary mt-1">
-                                                    Earned {new Date(earnedData.earnedAt).toLocaleDateString()}
-                                                </p>
-                                            )}
-                                            {!isEarned && (
-                                                <p className="text-xs text-muted-foreground mt-1 italic">
-                                                    Not yet earned
-                                                </p>
-                                            )}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                );
-                            })}
-                        </div>
-                    </TooltipProvider>
+                        return (
+                            <Tooltip key={b.id}>
+                                <TooltipTrigger asChild>
+                                    <div
+                                        className={cn(
+                                            "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition-all cursor-default",
+                                            isEarned
+                                                ? "bg-card border-primary/20 shadow-warm-sm hover:shadow-warm text-foreground"
+                                                : "bg-muted/20 border-border/30 opacity-40 grayscale text-muted-foreground"
+                                        )}
+                                    >
+                                        <span className="text-sm">{b.icon}</span>
+                                        <span>{b.name}</span>
+                                    </div>
+                                </TooltipTrigger>
+                                <TooltipContent className="max-w-[200px]">
+                                    <p className="font-semibold">{b.name}</p>
+                                    <p className="text-xs text-muted-foreground">{b.description}</p>
+                                    {isEarned && earnedData && (
+                                        <p className="text-xs text-primary mt-1">
+                                            Earned {new Date(earnedData.earnedAt).toLocaleDateString()}
+                                        </p>
+                                    )}
+                                    {!isEarned && (
+                                        <p className="text-xs text-muted-foreground mt-1 italic">
+                                            Not yet earned
+                                        </p>
+                                    )}
+                                </TooltipContent>
+                            </Tooltip>
+                        );
+                    })}
                 </div>
-            ))}
+            </TooltipProvider>
         </div>
     );
 }

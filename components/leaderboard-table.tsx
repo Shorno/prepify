@@ -85,7 +85,7 @@ export function LeaderboardTable({ data }: LeaderboardTableProps) {
                 const user = row.getValue("user") as LeaderboardEntry["user"]
                 return (
                     <Link
-                        href={`/profile/${user.id}`}
+                        href={`/user/${user.username || user.id}`}
                         className="flex items-center gap-3 group"
                     >
                         <Avatar className="h-10 w-10 ring-2 ring-primary/10 group-hover:ring-primary/30 transition-all">
@@ -152,7 +152,7 @@ export function LeaderboardTable({ data }: LeaderboardTableProps) {
                 {data.map((entry) => (
                     <Link
                         key={entry.userId}
-                        href={`/profile/${entry.user.id}`}
+                        href={`/user/${entry.user.username || entry.user.id}`}
                         className={`block p-4 rounded-2xl border transition-all hover:shadow-warm-sm ${getRankBgClass(entry.rank ?? 0)}`}
                     >
                         <div className="flex items-center gap-3">
