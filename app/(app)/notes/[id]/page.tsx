@@ -12,6 +12,8 @@ import { checkAuth } from "@/app/actions/user/checkAuth";
 import FollowButton from "@/components/follow-button";
 import getFollowStatus from "@/actions/follow/get-follow-status";
 import { getBookmarkStatus } from "@/actions/bookmarks/get-bookmark-status";
+import { getExplanation } from "@/actions/ai/get-explanation";
+import AiExplanationPanel from "@/components/ai-explanation-panel";
 import Link from "next/link";
 
 interface NotePageProps {
@@ -68,6 +70,10 @@ export default async function NotePage({ params }: NotePageProps) {
         const followStatusResult = await getFollowStatus(note.user.id);
         isFollowing = followStatusResult.success ? followStatusResult.data.isFollowing : false;
     }
+
+    // Get AI explanation (cached)
+    const explanationResult = await getExplanation(noteId);
+    const explanation = explanationResult.success ? explanationResult.data : null;
 
     return (
         <div className="main-container py-8">
@@ -133,6 +139,13 @@ export default async function NotePage({ params }: NotePageProps) {
                             {note.title}
                         </h1>
 
+                        {/* Description */}
+                        {note.description && (
+                            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                                {note.description}
+                            </p>
+                        )}
+
                         {/* Stats */}
                         <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
                             <div className="flex items-center gap-1.5 sm:gap-2 bg-muted/50 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-sm">
@@ -169,6 +182,19 @@ export default async function NotePage({ params }: NotePageProps) {
                         </h2>
                         <NoteImageGallery files={note.files} />
                     </div>
+
+                    {/* Divider */}
+                    <hr className="border-border" />
+
+                    {/* AI Explanation */}
+                    {note.status === "approved" && (
+                        <AiExplanationPanel
+                            noteId={note.id}
+                            isUploader={isOwnNote}
+                            initialExplanation={explanation}
+                            courseName={note.course.name}
+                        />
+                    )}
 
                     {/* Divider */}
                     <hr className="border-border" />

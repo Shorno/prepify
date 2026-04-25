@@ -58,6 +58,7 @@ export default async function saveNote(data: NoteFormData): Promise<ActionResult
             // Insert the note
             const [newNote] = await tx.insert(note).values({
                 title: validData.title,
+                description: validData.description || null,
                 courseId: parseInt(validData.courseId),
                 departmentId: parseInt(validData.departmentId),
                 facultyId: parseInt(validData.facultyId),

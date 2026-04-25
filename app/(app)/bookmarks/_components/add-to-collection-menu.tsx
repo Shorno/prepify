@@ -68,7 +68,7 @@ export default function AddToCollectionMenu({
                     toast.error(assignResult.error);
                 }
             } else {
-                toast.error(createResult.error || "Failed to create collection");
+                toast.error(!createResult.success ? createResult.error : "Failed to create collection");
             }
         });
     };

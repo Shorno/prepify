@@ -12,6 +12,8 @@ import NoteEngagement from "@/components/note-engagement";
 import CommentsSection from "@/components/comments-section";
 import incrementView from "@/actions/notes/increment-view";
 import { getBookmarkStatus } from "@/actions/bookmarks/get-bookmark-status";
+import { getExplanation } from "@/actions/ai/get-explanation";
+import AiExplanationPanel from "@/components/ai-explanation-panel";
 
 interface MyNotePageProps {
     params: Promise<{ id: string }>;
@@ -69,6 +71,10 @@ export default async function MyNotePage({ params }: MyNotePageProps) {
     const bookmarkResult = await getBookmarkStatus(noteId);
     const isBookmarked = bookmarkResult.success ? bookmarkResult.data.isBookmarked : false;
 
+    // Get AI explanation (cached)
+    const explanationResult = await getExplanation(noteId);
+    const explanation = explanationResult.success ? explanationResult.data : null;
+
     return (
         <div className="main-container py-8">
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
@@ -122,6 +128,13 @@ export default async function MyNotePage({ params }: MyNotePageProps) {
                             {note.title}
                         </h1>
 
+                        {/* Description */}
+                        {note.description && (
+                            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                                {note.description}
+                            </p>
+                        )}
+
                         {/* Stats */}
                         <div className="flex items-center gap-6 text-sm text-muted-foreground">
                             <div className="flex items-center gap-2">
@@ -157,6 +170,19 @@ export default async function MyNotePage({ params }: MyNotePageProps) {
                     {/* Divider */}
                     <hr className="border-border" />
 
+                    {/* AI Explanation */}
+                    {note.status === "approved" && (
+                        <AiExplanationPanel
+                            noteId={note.id}
+                            isUploader={true}
+                            initialExplanation={explanation}
+                            courseName={note.course.name}
+                        />
+                    )}
+
+                    {/* Divider */}
+                    <hr className="border-border" />
+
                     {/* Comments Section */}
                     <CommentsSection
                         noteId={note.id}
@@ -178,6 +204,6 @@ export default async function MyNotePage({ params }: MyNotePageProps) {
                     </div>
                 </aside>
             </div>
-        </div >
+        </div>
     );
 }

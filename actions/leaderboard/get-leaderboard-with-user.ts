@@ -24,6 +24,7 @@ export async function getLeaderboardWithUserHighlight(
                         id: true,
                         name: true,
                         image: true,
+                        username: true,
                     },
                 },
             },

@@ -16,6 +16,7 @@ export const note = pgTable("note", {
     id: serial("id").primaryKey(),
     userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
     title: varchar("title", { length: 255 }).notNull(),
+    description: text("description"),
     courseId: integer("course_id").notNull().references(() => course.id, { onDelete: "cascade" }),
     departmentId: integer("department_id").notNull().references(() => department.id, { onDelete: "cascade" }),
     facultyId: integer("faculty_id").notNull().references(() => faculty.id, { onDelete: "cascade" }),
