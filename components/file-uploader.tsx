@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useTransition, useCallback, useEffect } from "react"
-import { AlertCircleIcon, FileArchiveIcon, FileIcon, FileSpreadsheetIcon, FileTextIcon, HeadphonesIcon, ImageIcon, Trash2Icon, UploadIcon, VideoIcon, XIcon, Loader2 } from "lucide-react"
+import { AlertCircleIcon, FileTextIcon, ImageIcon, Trash2Icon, UploadIcon, XIcon, Loader2, CloudUpload, FileIcon, CheckCircle2 } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { CldImage } from "next-cloudinary"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getPublicIdFromUrl } from "@/utils/getPublicIdFromUrl"
 import { deleteImageFromCloudinary } from "@/actions/cloudinary"
+import { cn } from "@/lib/utils"
 
 interface UploadedFile {
     id: string
@@ -36,48 +37,17 @@ const formatBytes = (bytes: number, decimals = 2) => {
     return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i]
 }
 
-const getFileIcon = (type: string, name: string) => {
-    const iconMap = {
-        pdf: {
-            icon: FileTextIcon,
-            conditions: (type: string, name: string) =>
-                type.includes("pdf") ||
-                name.endsWith(".pdf") ||
-                type.includes("word") ||
-                name.endsWith(".doc") ||
-                name.endsWith(".docx"),
-        },
-        archive: {
-            icon: FileArchiveIcon,
-            conditions: (type: string, name: string) =>
-                type.includes("zip") || type.includes("archive") || name.endsWith(".zip") || name.endsWith(".rar"),
-        },
-        excel: {
-            icon: FileSpreadsheetIcon,
-            conditions: (type: string, name: string) =>
-                type.includes("excel") || name.endsWith(".xls") || name.endsWith(".xlsx"),
-        },
-        video: {
-            icon: VideoIcon,
-            conditions: (type: string) => type.includes("video/"),
-        },
-        audio: {
-            icon: HeadphonesIcon,
-            conditions: (type: string) => type.includes("audio/"),
-        },
-        image: {
-            icon: ImageIcon,
-            conditions: (type: string) => type.startsWith("image/"),
-        },
+const getFileTypeInfo = (type: string, name: string): { label: string; color: string; icon: typeof FileIcon } => {
+    if (type.includes("pdf") || name.endsWith(".pdf")) {
+        return { label: "PDF", color: "bg-red-500/10 text-red-600 dark:text-red-400", icon: FileTextIcon }
     }
-
-    for (const { icon: Icon, conditions } of Object.values(iconMap)) {
-        if (conditions(type, name)) {
-            return <Icon className="size-5 opacity-60" />
-        }
+    if (type.includes("word") || name.endsWith(".doc") || name.endsWith(".docx")) {
+        return { label: "DOC", color: "bg-blue-500/10 text-blue-600 dark:text-blue-400", icon: FileTextIcon }
     }
-
-    return <FileIcon className="size-5 opacity-60" />
+    if (type.startsWith("image/")) {
+        return { label: "IMG", color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400", icon: ImageIcon }
+    }
+    return { label: "FILE", color: "bg-muted text-muted-foreground", icon: FileIcon }
 }
 
 export default function FileUploader({
@@ -94,8 +64,6 @@ export default function FileUploader({
     const [isPending, startTransition] = useTransition()
     const [deletingId, setDeletingId] = useState<string | null>(null)
     const [uploadingCount, setUploadingCount] = useState(0)
-
-    console.log(uploadedFiles)
 
     // Initialize from value prop
     useEffect(() => {
@@ -349,159 +317,211 @@ export default function FileUploader({
         }
     }, [onChange])
 
-    const getFilePreview = (file: UploadedFile) => {
-        const isPDF = file.type.includes("pdf") || file.name.endsWith(".pdf")
-
-        return (
-            <div className="bg-accent flex aspect-square items-center justify-center overflow-hidden rounded-t-[inherit] relative group">
-                {file.type.startsWith("image/") ? (
-                    <CldImage
-                        src={file.url}
-                        alt={file.name}
-                        width={200}
-                        height={200}
-                        className="size-full rounded-t-[inherit] object-cover"
-                    />
-                ) : isPDF ? (
-                    <>
-                        {getFileIcon(file.type, file.name)}
-                        <a
-                            href={file.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="absolute inset-0 flex items-center justify-center bg-black/0 hover:bg-black/10 transition-colors"
-                            title="Open PDF in new tab"
-                        >
-                            <span className="sr-only">Open PDF</span>
-                        </a>
-                    </>
-                ) : (
-                    getFileIcon(file.type, file.name)
-                )}
-            </div>
-        )
-    }
+    const hasFiles = uploadedFiles.length > 0 || uploadingCount > 0
 
     return (
         <div className="flex flex-col gap-2">
+            {/* Drop zone container */}
             <div
                 onDragEnter={handleDragEnter}
                 onDragLeave={handleDragLeave}
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
-                data-dragging={isDragging || undefined}
-                data-files={uploadedFiles.length > 0 || uploadingCount > 0 || undefined}
-            // className="border-input relative flex min-h-52 flex-col items-center overflow-hidden rounded-xl border border-dashed p-4 transition-colors not-data-[files]:justify-center data-[dragging=true]:bg-accent/50"
+                className={cn(
+                    "relative rounded-xl border-2 border-dashed transition-all duration-200",
+                    isDragging
+                        ? "border-primary bg-primary/[0.04] scale-[1.01]"
+                        : "border-border/60 hover:border-border",
+                    hasFiles ? "p-4" : "p-6",
+                    disabled && "opacity-50 pointer-events-none"
+                )}
             >
-                {uploadedFiles.length > 0 || uploadingCount > 0 ? (
-                    <div className="flex w-full flex-col gap-3">
-                        <div className="flex items-center justify-between gap-2 pb-3">
-                            <h3 className="truncate text-sm font-medium">Files ({uploadedFiles.length}/{maxFiles})</h3>
-                            <div className="flex gap-2">
+                {hasFiles ? (
+                    <div className="space-y-3">
+                        {/* Header row */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                                    <span>
+                                        {uploadedFiles.length} of {maxFiles} files
+                                    </span>
+                                </div>
+                                {/* File count progress bar */}
+                                <div className="hidden sm:block w-16 h-1.5 bg-muted rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
+                                        style={{ width: `${(uploadedFiles.length / maxFiles) * 100}%` }}
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-1.5">
                                 <Button
                                     type="button"
-                                    variant="outline"
+                                    variant="ghost"
                                     size="sm"
                                     onClick={openFileDialog}
                                     disabled={uploadedFiles.length >= maxFiles || disabled || isPending}
+                                    className="h-7 text-xs gap-1 px-2.5 text-muted-foreground hover:text-foreground"
                                 >
-                                    <UploadIcon className="-ms-0.5 size-3.5 opacity-60" aria-hidden="true" />
-                                    Add files
+                                    <UploadIcon className="size-3" />
+                                    Add
                                 </Button>
                                 <Button
                                     type="button"
-                                    variant="outline"
+                                    variant="ghost"
                                     size="sm"
                                     onClick={clearFiles}
                                     disabled={disabled || isPending}
+                                    className="h-7 text-xs gap-1 px-2.5 text-muted-foreground hover:text-destructive"
                                 >
-                                    <Trash2Icon className="-ms-0.5 size-3.5 opacity-60" aria-hidden="true" />
-                                    Remove all
+                                    <Trash2Icon className="size-3" />
+                                    Clear
                                 </Button>
                             </div>
                         </div>
 
-                        <div className="max-h-96 overflow-y-auto overflow-x-hidden">
-                            <div className="grid grid-cols-2 p-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                                {uploadedFiles.map((file) => (
-                                    <div key={file.id} className="bg-background relative flex flex-col rounded-md border">
-                                        {getFilePreview(file)}
-                                        <Button
-                                            type="button"
-                                            onClick={() => removeFile(file.id)}
-                                            size="icon"
-                                            disabled={deletingId === file.id || disabled}
-                                            className="border-background focus-visible:border-background absolute -top-2 -right-2 size-6 rounded-full border-2 shadow-none"
-                                            aria-label="Remove file"
-                                        >
-                                            {deletingId === file.id ? (
-                                                <Loader2 className="size-3.5 animate-spin" />
-                                            ) : (
-                                                <XIcon className="size-3.5" />
-                                            )}
-                                        </Button>
-                                        <div className="flex min-w-0 flex-col gap-0.5 border-t p-3">
-                                            <p className="truncate text-[13px] font-medium">{file.name}</p>
-                                            <p className="text-[11px] text-muted-foreground">{formatBytes(file.size)}</p>
-                                        </div>
-                                    </div>
-                                ))}
+                        {/* File list — horizontal rows, not a grid */}
+                        <div className="space-y-1.5 max-h-72 overflow-y-auto">
+                            {uploadedFiles.map((file, index) => {
+                                const typeInfo = getFileTypeInfo(file.type, file.name)
+                                const TypeIcon = typeInfo.icon
+                                const isImage = file.type.startsWith("image/")
+                                const isDeleting = deletingId === file.id
 
-                                {/* Loading skeletons */}
-                                {Array.from({ length: uploadingCount }).map((_, index) => (
+                                return (
                                     <div
-                                        key={`skeleton-${index}`}
-                                        className="bg-background relative flex flex-col rounded-md border"
+                                        key={file.id}
+                                        className={cn(
+                                            "group flex items-center gap-3 rounded-lg border border-border/40 bg-background p-2 pr-3 transition-all duration-200",
+                                            isDeleting ? "opacity-50" : "hover:border-border hover:shadow-warm-sm"
+                                        )}
                                     >
-                                        {/* Preview area skeleton */}
-                                        <div className="bg-accent flex aspect-square items-center justify-center overflow-hidden rounded-t-[inherit] relative">
-                                            <Skeleton className="h-full w-full" />
-                                            <div className="absolute inset-0 flex items-center justify-center bg-background/10">
-                                                <Loader2 className="size-8 opacity-60 animate-spin" />
+                                        {/* Thumbnail / Icon */}
+                                        <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-muted flex-shrink-0 flex items-center justify-center">
+                                            {isImage ? (
+                                                <CldImage
+                                                    src={file.url}
+                                                    alt={file.name}
+                                                    width={40}
+                                                    height={40}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <TypeIcon className="w-4 h-4 text-muted-foreground" />
+                                            )}
+                                        </div>
+
+                                        {/* File info */}
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium truncate text-foreground">
+                                                {file.name}
+                                            </p>
+                                            <div className="flex items-center gap-2 mt-0.5">
+                                                <span className={cn(
+                                                    "text-[10px] font-semibold px-1.5 py-0.5 rounded",
+                                                    typeInfo.color
+                                                )}>
+                                                    {typeInfo.label}
+                                                </span>
+                                                {file.size > 0 && (
+                                                    <span className="text-[11px] text-muted-foreground">
+                                                        {formatBytes(file.size)}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
-                                        {/* File info skeleton */}
-                                        <div className="flex min-w-0 flex-col gap-0.5 border-t p-3">
-                                            <Skeleton className="h-[13px] w-3/4 mb-1" />
-                                            <Skeleton className="h-[11px] w-1/2" />
-                                        </div>
+
+                                        {/* File number */}
+                                        <span className="text-[10px] text-muted-foreground/60 font-medium tabular-nums hidden sm:block">
+                                            #{index + 1}
+                                        </span>
+
+                                        {/* Remove button */}
+                                        <button
+                                            type="button"
+                                            onClick={() => removeFile(file.id)}
+                                            disabled={isDeleting || disabled}
+                                            className="flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                            aria-label="Remove file"
+                                        >
+                                            {isDeleting ? (
+                                                <Loader2 className="w-3 h-3 animate-spin" />
+                                            ) : (
+                                                <XIcon className="w-3 h-3" />
+                                            )}
+                                        </button>
                                     </div>
-                                ))}
-                            </div>
+                                )
+                            })}
+
+                            {/* Uploading skeleton rows */}
+                            {Array.from({ length: uploadingCount }).map((_, index) => (
+                                <div
+                                    key={`skeleton-${index}`}
+                                    className="flex items-center gap-3 rounded-lg border border-border/40 bg-background p-2 pr-3"
+                                >
+                                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted flex-shrink-0 flex items-center justify-center">
+                                        <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                                    </div>
+                                    <div className="flex-1 min-w-0 space-y-1.5">
+                                        <Skeleton className="h-3.5 w-2/3" />
+                                        <Skeleton className="h-2.5 w-1/4" />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
+
+                        {/* Add more — inline drop hint */}
+                        {uploadedFiles.length < maxFiles && (
+                            <button
+                                type="button"
+                                onClick={openFileDialog}
+                                disabled={disabled || isPending}
+                                className="w-full flex items-center justify-center gap-2 rounded-lg border border-dashed border-border/50 py-2 text-xs text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/[0.02] transition-colors"
+                            >
+                                <UploadIcon className="w-3 h-3" />
+                                <span>Drop or click to add more files</span>
+                            </button>
+                        )}
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center px-4 py-3 text-center">
-                        <div
-                            className="bg-background mb-2 flex size-11 shrink-0 items-center justify-center rounded-full border"
-                            aria-hidden="true"
-                        >
-                            <ImageIcon className="size-4 opacity-60" />
+                    /* Empty state */
+                    <div
+                        onClick={openFileDialog}
+                        className="flex flex-col items-center justify-center py-6 text-center cursor-pointer group"
+                    >
+                        <div className="relative mb-4">
+                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center transition-transform group-hover:scale-105 duration-200">
+                                <CloudUpload className="w-6 h-6 text-primary" />
+                            </div>
+                            {/* Decorative ring */}
+                            <div className="absolute inset-0 -m-1 rounded-2xl border-2 border-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                         </div>
-                        <p className="mb-1.5 text-sm font-medium">Drop your files here</p>
-                        <p className="text-muted-foreground text-xs">
-                            Max {maxFiles} files ∙ Up to {maxSizeMB}MB each
+
+                        <p className="text-sm font-medium text-foreground mb-1">
+                            Drop your files here, or <span className="text-primary">browse</span>
                         </p>
-                        <Button
-                            type="button"
-                            variant="outline"
-                            className="mt-4 bg-transparent"
-                            onClick={openFileDialog}
-                            disabled={disabled || isPending}
-                        >
-                            {isPending ? (
-                                <Loader2 className="-ms-1 size-4 animate-spin opacity-60" aria-hidden="true" />
-                            ) : (
-                                <UploadIcon className="-ms-1 opacity-60" aria-hidden="true" />
-                            )}
-                            Select files
-                        </Button>
+                        <p className="text-xs text-muted-foreground">
+                            Images & PDFs · Up to {maxFiles} files · {maxSizeMB}MB each
+                        </p>
+                    </div>
+                )}
+
+                {/* Drag overlay */}
+                {isDragging && (
+                    <div className="absolute inset-0 rounded-xl bg-primary/[0.06] border-2 border-primary flex items-center justify-center z-10 backdrop-blur-[1px]">
+                        <div className="flex flex-col items-center gap-2 text-primary">
+                            <CloudUpload className="w-8 h-8 animate-bounce-soft" />
+                            <p className="text-sm font-medium">Drop files here</p>
+                        </div>
                     </div>
                 )}
             </div>
 
+            {/* Error */}
             {errors.length > 0 && (
-                <div className="text-destructive flex items-center gap-1 text-xs" role="alert">
+                <div className="text-destructive flex items-center gap-1.5 text-xs" role="alert">
                     <AlertCircleIcon className="size-3 shrink-0" />
                     <span>{errors[0]}</span>
                 </div>
