@@ -139,6 +139,13 @@ export default async function NotePage({ params }: NotePageProps) {
                             {note.title}
                         </h1>
 
+                        {/* Description */}
+                        {note.description && (
+                            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                                {note.description}
+                            </p>
+                        )}
+
                         {/* Stats */}
                         <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
                             <div className="flex items-center gap-1.5 sm:gap-2 bg-muted/50 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-sm">
