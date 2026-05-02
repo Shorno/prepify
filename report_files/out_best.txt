@@ -1,0 +1,1084 @@
+Question Generation in Bangla Using Large Language Models: Evaluating Transformer Based Approaches for Low-Resource Languages
+By
+
+Washik Wali Faieaz 212-15-14763
+
+Sayma Jannat 212-15-14710
+FINAL YEAR DESIGN PROJECT REPORT
+This Report Presented in Partial Fulfillment of the Requirements for the Degree of Bachelor of Science in Computer Science and Engineering
+
+Supervised by
+Md. Sazzadur Ahamed Assistant Professor
+Department of Computer Science and Engineering Daffodil International University
+
+Co-Supervised by
+Md. Sadekur Rahman Assistant Professor
+Department of Computer Science and Engineering Daffodil International University
+
+
+DAFFODIL INTERNATIONAL UNIVERSITY
+Dhaka, Bangladesh
+May 14, 2025
+
+
+
+
+
+
+## [Heading 1] ACKNOWLEDGEMENTS
+
+
+This work would not have been possible without the support and contributions of many individuals over the past two semesters. We are deeply grateful to everyone who has assisted us in one way or another.
+
+First, we express our heartfelt thanks and gratefulness to the almighty for His divine blessing making it possible for us to complete the Final Year Design Project (FYDP) successfully.
+
+We are grateful and wish our profound indebtedness to Md. Sazzadur Ahamed, Assistant Professor, Department of Computer Science and Engineering, Daffodil International University, Dhaka, Bangladesh. Deep knowledge and keen interest of our supervisor in the field of Natural Language Processing to carry out this project. His endless patience, scholarly guidance, continual encouragement, constant and energetic supervision, constructive criticism, valuable advice, reading many inferior drafts, and correcting themat all stages have made it possible to complete this project.
+
+We would like to express our heartfelt gratitude to the Head of the Department of Computer Science and Engineering, for his kind help in finishing our project and also to other faculty members and the staff of the Department of Computer Science and Engineering, Daffodil International University.
+
+We would like to thank our entire course mates at Daffodil International University, who took part in this discussion while completing the coursework.
+
+Finally, we must acknowledge with due respect the constant support and patience of our parents.
+
+
+## [Heading 1] ABSTRACT
+
+This research explores automatic question generation in Bangla using two state-of-the- art transformer-based language models: multilingualT5 and BanglaT5. As Bangla is a low-resource language in the field of Natural Language Processing, this study aims to bridge the resource gap by developing a system capable of generating grammatically correct and contextually relevant factoid questions from Bangla paragraphs. For the purpose of facilitating this, we have developed a manually constructed dataset of 3,000 paragraph-level question pairs from various sources to ensure topically and linguistically diverse information. We fine-tuned both the models using the same dataset and preprocessing routine using the Hugging Face library for model training and optimization. Automatic as well as manual evaluation was performed. Automatically, the models were graded using the Exact Match and ROUGE-L F1 criteria. The MultilingualT5 model obtained EM of 25.55% and ROUGE-L F1 of 63.56%. On the other hand, BanglaT5 surpassed it to obtain EM of 28.65% and ROUGE-L F1 of 70.77%. This shows the benefit of language-specific pretraining in BanglaT5 to better represent the grammatical and semantic nuances of the Bangla language than the multilingual MultilingualT5. By targeting factoid-style questions, this work makes the notable contribution to Bangla NLP. We have developed a demo application to demonstrate how our model works. The application takes a text input, processes it as required, and generates a question as output to reveal the capabilities of the model. A foundation for further work in question generation and education technology for Bangla is provided by the constructed model and dataset. Overall, the results confirm the value of language-specific model construction and fine-tuning for under-resourced languages and provide a scalable, tangible guideline for constructing QG systems in low-resourced linguistic environments similar to Bangla.
+
+Table of Contents
+
+Approval	i
+
+
+List of Figures
+
+Methodology pipeline diagram	15
+Home Page of Bangla Question Generator	18
+Output Section of the Bangla Text-to-Question System	19
+Word Cloud for Paragraph	20
+Word Cloud for Question	21
+Text Length Distribution of Training Our dataset	22
+Text Length Distribution of Our Test dataset	23
+Text Length Distribution of Our Validation dataset	23
+Architecture of T5 model	24
+
+Training vs Validation loss for bT5 model	33
+Training vs Validation loss for mT5 model	34
+
+List  of  Tables
+Summary of Literature Reviewed	9
+Gap Analysis Table	12
+Dataset Sample	20
+Task Allocation Table	28
+Model Training Configuration and Achieved Performance	31
+Comparative Model Performance	32
+Performance Analysis of BanglaT5	34
+Performance Analysis of MultilingualT5	35
+Output of Generated Question using BanglaT5	36
+Output of Generated Question using MultilingualT5	37
+Estimated Cost and Financial Analysis	42
+Mapping with complex problem solving	42
+Mapping with knowledge Profile	43
+Mapping with complex engineering activities	44
+
+Chapter  1
+Introduction
+This chapter introduces an overview of the work on question generation in Bangla with an emphasis on its importance in low-resource language processing. It describes the goals of the study, the reasons for employing Multilingual T5 and Bangla T5 models, and the techniques used for efficient question generation.
+
+
+## [Heading 2] Introduction
+
+
+The dramatic progress in Natural Language Processing has greatly enhanced the functionalities of computers in producing human-like text. Of these functionalities, Question Generation has come out as an important subset, wherein the work is to create grammatically correct, semantically valid, and contextually appropriate questions from an input textual passage. Though much work has been done in rich- resource languages like English, languages like Bangla are far from being well- represented in the absence of resources, corpora, and language-specific models.
+
+Although it is the sixth most widely spoken language in the world, Bangla has not had much success in the task of question generation. The majority of work so far either is in heavy reliance on translated corpora or asks for preset answers, restricting the quality, applicability, and adaptability of the generated questions. Moreover, the syntactic nature of Bangla and its complexity in structure pose specific challenges which are not adequately covered even by universal multilingual models.
+
+To bridge the gap, in this work, an automatic Bangla Question Generation system is presented based on two strong transformer-based models MultilingualT5 and BanglaT5. The system is tailored specifically for generating factoid-type questions, i.e., questions asking specific factual answers from input passages. Through fine- tuning these models on readymade Bangla datasets and fine-tuning them for relevance of generated questions, grammatical correctness, and linguistic variation, the work is designed to provide an accurate solution for directly generating Bangla questions from text without relying on pre-knowledge of answer strings.
+
+Not only does this project meet the requirement of having automated educational resources, but it also makes an important contribution towards developing NLP abilities for low-resource languages such as Bangla. With its emphasis on factoid questions, the system is of great use for applications in educational tests, quizzes, reading comprehension systems, as well as e-learning systems. It thereby lays the
+
+foundation for further advancement of the Bangla language technologies for supporting students, teachers, researchers, as well as the entire community.
+
+
+## [Heading 2] Motivation
+
+The inspiration for the project is based on the palpable shortage of Bangla Question Generation resources and systems. While English can boast an enormous repertoire of datasets, models, and benchmarks, nothing of that sort for Bangla can be found, despite its enormous speaker count. The majority of the Bangla QG tasks either use plain translations of English or are plagued with inconsistencies in the available data, grammatical distortions, and loss of meaning because of the lack of proper training resources.
+
+Manual question generation for educational tests, quizzes, and reading comprehension tests is time-consuming, labour-intensive, and not always standardized. Automating the generation of questions would bring numerous benefits to various fields such as education, healthcare, business, and language learning systems.
+
+A key driving force for this effort is improving fact-based learning in Bangla. Factoid questions are especially important for tests, since they ensure the ability of learners to remember factual detail correctly. Having a strong Bangla QG system will enable the development of better learning materials by educational institutions as well as make practice for the learners in an interactive, efficient way. Lastly, having successfully deployed a Bangla QG system with recent transformer models such as MultilingualT5 and BanglaT5, the project sets out to introduce scalable solutions for Bangla NLP, relating that even low-resource languages could make use of current AI advancements when presented with careful methodology as well as strategic fine-tuning.
+
+
+## [Heading 2] Objectives
+
+The primary objectives of this project are:
+
+To design and implement an Automatic Bangla Question Generation system that generates factoid questions from input text passages without requiring predefined answers.
+
+To fine-tune transformer-based models MultilingualT5 and BanglaT5 specifically for the Bangla language, enhancing their ability to understand Bangla syntax, semantics, and contextual cues.
+
+To evaluate the generated questions based on quantitative metrics (BLEU,
+
+ROUGE) for grammatical correctness, contextual relevance, and diversity.
+To compare the performance of MultilingualT5 and BanglaT5 in terms of their effectiveness for Bangla Question Generation tasks.
+
+To contribute to the development of educational technology tools and resources for Bangla, aiding the broader NLP community and promoting digital inclusivity.
+
+## [Heading 2] Methodology
+
+The system proposed is based on an ordered methodology for ensuring the formulation of well-constructed, contextually appropriate factoid questions in Bangla. The process starts with collecting and preprocessing the data, in which educational sources, online articles, and available public datasets provide the input of Bangla text passages. The texts are processed through tokenization, normalization for compatibility with transformer-based architectures. The subsequent step is the model selection and fine-tuning, in which two strong transformer models are used: MultilingualT5, which is pre trained on the giant multilingual corpus, and BanglaT5, which is fine-tuned for the Bangla language. Both the models are trained on an optimized set of paragraph question pairs complying with the factoid question structure so that they can capture syntactic as well as semantic patterns for question generation.
+
+The outputs of the models are then analyzed through an automated methods. Common NLP measurements like BLEU, ROUGE is utilized in order to gauge similarity as well as relevance between generated questions as well as reference questions Lastly, MultilingualT5 as well as BanglaT5 performance is compared with each other so that their strengths as well as weaknesses in performing the task of the Bangla QG are researched.
+
+## [Heading 2] Project Outcome
+
+The anticipated results of this project include wider implications for the field of natural language processing in Bangla. Firstly, the system should provide an end-to-end automatic question generation system for Bangla that can generate grammatically correct and contextually accurate factoid questions from straight-forwardly parsed input text passages in Bangla. The system should provide an efficiency proof of concept for leveraging large language models for low-resourced languages. Second, the performance comparison of MultilingualT5 versus the equivalent BanglaT5 model should provide insightful results regarding their relative quality for use with Bangla NLP applications, serving as input towards future model selection and design. The project also yields the development of a curated set of Bangla paragraph-question pairs as a test set for future work and as input towards future model optimization. The system, aside from technical contributions, also presents practical potential for
+
+applications in educational testing, e-learning systems, smart chatbots, and language learning systems optimized for the target audience of speakers of Bangla. The project contributes broadly to the developing ecosystem of natural language processing resources in Bangla as well as the foundational work leading towards more advanced AI-based educational systems for low-resourced languages.
+
+## [Heading 2] Organization of the Report
+
+This report is organized into six comprehensive chapters:
+
+Chapter 1 Introduction: Introduces the background, motivation, objectives, methodology, and expected outcomes of the project.
+
+Chapter 2 Background: Discusses the history of Question Generation in NLP, existing approaches for Bangla, previous research efforts, and identifies the gaps addressed by this project.
+
+Chapter 3 Research Methodology: Provides an in-depth description of the system design, data preparation techniques, model architectures, training strategies, and evaluation methods.
+
+Chapter 4 Implementation and Results: Details the environment setup, experimental setup, model training phases, performance evaluations, and a comparative analysis of the results.
+
+Chapter 5 Engineering Standards and Design Challenges: Describes compliance with software and hardware standards, ethical considerations, societal impacts, and sustainability plans associated with the project.
+
+Chapter 6 Conclusion: Summarizes the achievements of the project, highlights the limitations encountered, and outlines future directions for improvement and expansion.
+
+Chapter  2
+Background
+A comprehensive background on Bangla question generation is offered in this chapter, encompassing an overview of the principal challenges in creating NLP systems for low- resource languages, an overview of current methods in question generation for both high- and low-resource environments, and an overview of earlier work in Bangla QG. The chapter emphasizes weaknesses in existing techniques, such as dependence on translated corpora, absence of answer-agnostic systems, and the limited availability of language-specific models. It also outlines the tools, corpora, and models used in the current project in order to overcome these weaknesses and enhance the quality, naturalness, and contextuality of automatically generated questions in Bangla.
+
+
+## [Heading 2] Introduction
+
+Automatic Question Generation is a challenging task within the broader field of Natural Language Processing, focused on generating relevant, grammatically correct, and meaningful questions from a given text. In the context of education, healthcare, business, and conversational agents, QG plays a vital role by enabling intelligent systems to create quizzes, FAQs, and assessment items.
+
+While English and a few other languages have seen major advancements in QG research, low-resource languages such as Bangla remain significantly underexplored. Challenges like the lack of large annotated datasets, domain- specific resources, and specialized language models hinder the development of efficient Bangla QG systems.
+
+Bangla’s unique grammatical structures, rich morphology, and syntactic complexities further complicate direct application of approaches developed for English. Therefore, there is a critical need to design systems tailored specifically for Bangla, capable of understanding its linguistic nuances while generating high- quality, contextually relevant questions.
+
+This chapter delves into the background of Question Generation, reviews related work in Bangla QG, highlights similar applications, discusses related research initiatives, identifies existing gaps, and establishes the foundation upon which this project is built.
+
+
+## [Heading 2] Literature Review
+
+Extensive research has been conducted in automatic Question Generation for high-
+
+resource languages. Several methodologies have been explored, ranging from rule- based systems and syntactic transformations to advanced deep learning models, especially transformer architectures like T5, Multilingual T5, and GPT variants.
+
+For Bangla, however, QG research is relatively recent and limited. Various studies have sought to develop Bangla QG systems by fine-tuning pre-trained models, translating English datasets, or building bilingual models. A few notable works include:
+
+A. R. Fahad et al. [1] design and develop an answer-agnostic question generation model especially tailored for the Bangla language, hence bridging the critical lack of resources available for Bangla in the area of question generation. For this purpose, the authors utilized the SQuAD_bn dataset, dividing it into 118,000 rows for the training set, 2,500 rows for the validation set, and 2,500 rows for the test set, respectively. In their method, the they fine-tuned three transformer models: Bangla T5, mT5-base, and BanglaGPT2. For optimization of the training phase, two unique data formatting methods were utilized, viz. All Questions Per Line (AQL) and One Question Per Line (OQL), resulting in an emergence of six different model variants. Besides, the investigation analyzed six decoding methods for question generation, viz. commonly utilized methods like beam search and greedy decoding. The authors built two in-house classification models to ensure that generated questions were relevant and grammatically credible. These models registered remarkable scores of 88.54% for relevancy and 95.67% for grammaticality, respectively. Out of the models under investigation, the performance of the mT5 model showed the best performance when trained under the technique of OQL formatting and tested with beam decoding. Especially, it reached a score of 77% for relevancy and 96% for grammaticality. Apart from that, the performance of the model was quantitatively tested with benchmark natural language generation metrics, obtaining scores of 36.60 for BLEU-4, 48.98 for METEOR, and 63.38 for ROUGE-L. Overall This work makes an important addition to the body of research aimed at Bangla natural language processing, providing an effective method for generating high-quality questions independent of pre-existing answers.
+
+J. F. Ruma et al. [2] explore the lack of resources accessible for question generation (QG) in Bengali language through the creation of answer-aware question generation models. They especially fine-tuned transformer architectures of the type T5, with special emphasis on models like BanglaT5. Besides, they reformatted available question-answer resources into creating Bengali-specific QG data in order to allow question generation with high similarity to precise contextual passages and respective answers. For comparative experimentation, the SQuAD_bn dataset was utilized, which contained mostly 132,777 samples. Upon preprocessing steps, the dataset was partitioned into 54,150 samples for training and 13,538 samples for validation. This strict preprocessing guaranteed data relevance and cohesion for the task of question
+
+generation. The performance of three models, BanglaT5, mT5-small, and mT5-base, were evaluated with the application of various decoding algorithms, viz., beam search and greedy decoding. BanglaT5 showed the best performance among these models, especially with BLEU-1 and ROUGE-L evaluation criteria, making it the best model for Bengali QG tasks in this work. Secondly, the questions generated showed an excellent grammatical accuracy with an accuracy percentage of 98%. The principal performance parameters shown are ROUGE-L with the value of 35.77 with beam width of 5, ROUGE-1 value of 37.88 with beam width of 5, ROUGE-2 value of 17.52 with beam width of 5, and BLEU-1 value of 38.63 with beam width of 10. Overall, this work makes an essential contribution towards enhancing the application scope of natural language processing in Bengali language, stressing the significance of fine-tuned transformer models in generating grammatically and contextually accurate questions.
+
+S. Sharma et al. [3] introduce an architecture of bilingual Question-Answering (QA), aimed at generating questions and answers from Bengali and English textual inputs. For each language, the proposed architecture utilizes independent processing modules, which draw upon various natural language processing techniques tailored to the unique linguistic features of both English and Bengali. Syntactic operations like subject-auxiliary inversion are utilized by the system to aid question generation for the English module. However, for Bengali text processing, the model deals with unique features such as bivokti (case markers) and postfixes, which prove essential for grammatical correctness and semantic fidelity in generated questions. The bilingual QA model achieved an overall question generation performance of 78.33%, with an accuracy value of 76% in generating grammatical and contextual questions. Evaluations were done with several benchmarking datasets, demonstrating the robustness and flexibility of the system in various linguistic environments. This work highlights the utility of bilingual systems in education technology and multilingual natural language processing systems. What's more, it highlights the ever-present challenge from the sparsity of Bengali language resources, especially the need for further study and resource construction in the field.
+
+W. Morris et al. [4] present an end-to-end natural language processing pipeline for automated question generation and constructed response grading in the iTELL education framework. It supports state-of-the-art language models, with GPT-3.5 being used for question generation and MPNet and BLEURT models being utilized for grading student responses. The pipeline is evaluated using the MultiRC dataset, which contains 456 source passages and more than 5,000 linked questions. At a performance level, the evaluation models had very good levels of accuracy: 85% using LLaMA-2, 81% using MPNet, and 79% using BLEURT. GPT-3.5 was seen to produce a remarkably good ability to generate questions that are understandable, with a 100% rate of coherence according to human evaluation. Additionally, an inter-rater agreement metric of 0.65 reflected a substantial degree of agreement across different evaluators. Nevertheless, the research identified that GPT-3.5 had some limitations
+
+when required to generate the specific or narrowly framed question types. Unlike most other research within the area, the authors did not specifically report ROUGE or Exact Match scores for their tests. Rather, the effectiveness of the system was supplemented with evidence from user feedback, showing a very good rate of satisfaction: 75.4% of the users reported being satisfied with the system, and 81.7% of them concurred that the tasks introduced by the system led to an increase in their learning outcomes. This research highlights the dramatic doemant of big language models (LLMs) for the composition of scalable and domain-specific tools for pedagogies. It also highlights future opportunities for further development of question generation processes to handle a wider spectrum of question types.
+
+Y. Poon et al.'s [5] research examines the use of Large Language Models (LLMs), specifically Stanford Alpaca based on LLaMA architecture, to generate higher-order reading comprehension questions for use within the PIRLS (Progress in International Reading Literacy Study) education model. The research is directed at designing questions that relate to inferencing, integrating, and evaluation tasks, which are key elements of higher-order reading comprehension. The DuReader_robust dataset was used by the authors for their experiments to evaluate the questions on the basis of usability and conformity with PIRLS categorizations. Importantly, no results were reported using traditional text generation metrics like ROUGE-1, ROUGE-2, or ROUGE-L, thus putting a premium on their use within the realm of pedagogic application compared to standard NLP benchmarking. The application of few-shot prompting with LLMs was justified with considerable performance benefits compared to the traditional baseline models, pipeline-based and sequence-to-sequence (seq2seq) based models. Specifically, the LLM-generated questions had 31.5% higher-order questions, much higher than that of pipeline and seq2seq baselines that only yielded 8% and 6.5% higher-order questions, respectively. On questions that did not need post- generation revision the LLM scored a 71% rate of usability. The result highlights the capability of the model to produce pedagogically relevant, fluent, and contextually suitable questions with minimal need for intervention on a human scale. The paper overall highlights the substantial potential for LLMs to transform automated pedagogic technologies, especially within the context of higher-order question generation. It also highlights the lingering issue of the lack of sufficiently diverse, higher-order pedagogic datasets that are also multi-language, calling for further research and dataset production within this area.
+
+M. V. K. RAO et al. [6] provides an Automatic Question and Answer (Q&A) Generation system based on Large Language Models (LLMs) with specific emphasis on applications for educational and legal examinations. The proposed model combines cutting-edge methods with natural language processing (NLP) strategies and multimodal data handling for improving the quality and adaptability of generated content. The proposed model is capable of creating a diversified range of question types, from subjective, objective, to fill-in-the-blank types. The model is designed according
+
+to the cognitive models provided by Bloom’s Taxonomy, ensuring thereby the generation of questions that cover various levels of knowledge and comprehension. The implementation incorporates cutting-edge models like GPT-3, Sequence-to-Sequence (Seq2Seq) transformers, and Long Short-Term Memory (LSTM) networks for achieving solid performance across a range of domains. Pre-training of the model uses massive datasets, which comprises SQuAD 1.1, SciQ, and S2ORC, covering a diverse range from thousands to a million examples. The performance of the model is tested using hard evaluation measures with a result of ROUGE-1 at 85%, ROUGE-2 at 79%, ROUGE-L at 82%, and Exact Match (EM) at 70%. A key contribution of the research is that pre- training within a specific domain highly improves the relevance and quality of the generated questions, making the system highly flexible across a range of highly specific domains. Despite the success of the proposed method, there are several challenges that are yet to be addressed, which are mainly the improvement of the capabilities of the model to maintain a high contextual relevance and optimizing multimodal data sources integration within question generation. Broadly speaking, the research presents a rising potential for LLM-based methods within automated educational and legal evaluations, while flagging areas for future improvements as well.
+
+Table 2.1: Summary of Literature Reviewed
+
+
+
+## [Heading 4] Similar Applications
+
+Several question generation and question answering systems have been developed for English and multilingual contexts, many of which serve as inspiration for similar advancements in Bangla.
+
+F. Sultana et al. [7] respond to the pressing dearth of comprehensive Question- Answering datasets for the low-resource Bengali language with an innovative Question-Answer Generation pipeline. Their proposed methodology consists of three main modules: an answer span extraction model, question generation model, and roundtrip consistency filtering measure meant to filter away inconsistent or poor- quality QA pairs. To model their pipeline, the authors translated popularly utilized English datasets, namely SQuAD 1.1 and SQuAD 2.0, into Bengali with the help of the NLLB (No Language Left Behind) translation model. Admitting the difficulties involved in direct translation, they proposed an innovative embedding-based answer alignment method meant to enhance the precision of answer translations and maintain the semantic accuracy of the QA pairs.Through this, they were able to produce over 170,000 QA pairs, leading to the establishment of BanglaQA, a large synthetic QA dataset obtained from around 16,000 Bengali news articles classified under five broad themes. This newly created resource signifies an enormous improvement in enabling QA research and applications for the Bengali language. The models trained on BanglaQA showed robust performance, with the best model reaching an F1 metric value of 86.14, which, though slightly under the human baseline of 95.72 F1, reflects an excellent degree of accuracy for a synthetic low-resource QA dataset. Overall, this contribution makes an important contribution to the body of work in Bengali natural language processing insofar as it not only presents an extensible QA generation pipeline but also an accessible dataset which can further be utilized for future research and development efforts.
+
+M. Moron et al. [8] explore the performance of language models and large language models for the tasks of Bangla newspaper article summarization, with special emphasis on abstractive summarization and headline generation. Acknowledging the unavailability of resources for Bangla-language summarization, the authors compiled an entirely new and diverse dataset by scraping articles from ten Bangla online newspapers with both topical diversity and recency. In their experiment, the authors fine-tuned two models: BanglaT5 and Small BanglaT5. Their findings indicated that the models delivered higher performance compared to various general-purpose LLMs. BanglaT5, for instance, registered ROUGE-1, ROUGE-2, and ROUGE-L scores of 25.90, 4.10, and 23.83, respectively. These scores were significantly higher than those registered by GPT-3.5, which yielded ROUGE-1: 20.1, ROUGE-2: 2.12, and ROUGE-L:
+17.32. Even models like mT5-multilingualXLSum and mT5-m2m-crossSum lagged behind corresponding performance delivered by the Bangla-specific models. Although GPT-3.5 registered tolerable performance under zero-shot setups, leveraging the
+
+application of Low-Rank Adaptation (LoRA) fine-tuning to models like Llama-2, TinyLlama, and Gemma did not match corresponding performance delivery by the Bangla-optimized methods. These results highlight the need for language-specific fine- tuning methodologies to improve summarization performance on underrepresented languages like Bangla. The research recommends that for Bangla text summarization endeavors, BanglaT5 is the best choice from which to pursue optimal performance, delivering performance that is better across all performance measures evaluated from general-purpose LLMs. This underscores the need to develop and optimize models tailored specifically for low-resource languages to deliver maximum performance on natural language processing applications.
+
+
+## [Heading 4] Related Research
+
+
+E. R. Rhythm et al. [9] investigates the use of deep learning models for Bengali Question-Answering (QA) tasks with a specific focus on mitigating the problem caused by the lack of benchmark datasets and pretrained language models for Bengali. To enable complete evaluation, the scholars translated SQuAD 2.0 into Bengali and further prepared a human-annotated Bengali QA dataset. A zero-shot method based on DistilBERT produced an F1 value of 51.18 and an Exact Match (EM) value of 50.05 during their experimental analyses. Nevertheless, models that were fine-tuned with Bengali-specific data outperformed the zero-shot methods on a consistent basis, showcasing the necessity for domain-specific model adaptations for low-resource languages. The human-annotated evaluation setup gave valuable insights into the current performance difference between machine outputs and human-grade QA generation, highlighting the necessity for further improvements to bridge the performance difference gap. Major contributions of the research include a comparative analysis of a range of Bengali QA models specifically BERT, DistilBERT, and RoBERTa the development of a human-annotated Bengali QA dataset for future benchmarks, and the investigation of the application of transfer learning methods to further improve Bengali natural language processing (NLP) capabilities. Overall, the study contributes to the knowledge of QA system development for Bengali and calls for the benefits brought about by both good datasets and by the application of transfer learning methods for overcoming the intrinsic problem associated with low-resource language NLP tasks.
+
+M. S. Shahriar et al. [10] presents a text-based Question-Answering (QA) system capable of generating and answering questions in various fields. The foremost goal of the proposed system is to aid students, researchers, and instructors by automating part of the learning process, hence making the knowledge acquisition process more efficient. The proposed system exploits deep learning methods and natural language processing models to produce informative and contextual questions and answers. In their experiment, the researchers evaluated the performance of several models, such as BengaliT5 and mT5, in carrying out question-answering tasks. The research made use of the BengaliRQA dataset, which contains 3,000 passages and 14,889 question-answer
+
+pairs. The dataset includes a rich variety of question types, such as factoid, causal, confirmation, and list questions, ensuring the complete assessment of various types of inquiry. Evaluation was carried out using commonly known evaluation metrics such as Exact Match (EM) and F1 values. BengaliT5 showed the best performance with an EM value of 62.42 and an F1 score of 78.11, outscoring other models under evaluation. Overall, this work promotes the development of Bengali-language QA systems and highlights the efficacy of fine-tuned transformer models in producing high-quality educational materials. It also emphasizes the need for domain-specific data and evaluation methods in propelling QA system development in low-resource languages.
+
+## [Heading 2] Gap Analysis
+
+Though remarkable progress has been made in Bangla Question Generation, there are some imperative gaps that restrict the effectiveness, scalability, and pedagogical value of existing systems. A majority of prevailing models either use translated datasets or fall behind when creating contextually and semantically correct questions for Bangla. Also, prevailing methods tend to overlook sophisticated evaluation mechanisms and higher-order question generation capabilities based on natural language interpretation. These limitations are discussed and resolved within the subsequent gap analysis table:
+
+Table 2.2: Gap Analysis Table
+
+
+This structured analysis highlights the key limitations in current Bangla QG approaches and proposes targeted methodologies to bridge these gaps, thereby contributing to the development of more robust and educationally effective question generation systems.
+
+
+## [Heading 2] Summary
+
+In short, although meaningful headway has been made on automated Question Generation for major languages and widely spoken languages, research on Bangla has seen limited and disconnected attempts. Most studies that have so far been carried out either are based on English translated datasets thus compromising linguistic and cultural integrity or cover mostly answer-aware contexts that narrow the generation mechanism by demanding pre-defined answers. These attempts fail to explore the potential to its full extent on answer-agnostic question generation, particularly from source Bangla texts where syntactic and contextual subtleties matter most.
+
+By bridging gaps across dataset integrity, model adjustment, as well as assessment methodology, the research makes a meaningful contribution to the previously underrepresented area of Bangla NLP. By showing that with the right linguistic and technology strategies, question generation systems for low-resource languages like Bangla can be both functional and pedagogically effective.
+
+Chapter  3
+Research	Methodology
+This chapter provides a comprehensive outline of the research methodology adopted for developing an automated Bangla question generation system with MultilingualT5 and BanglaT5 models. It covers the general design of the project, system design, flow of data, requirement specification, and project plan, as per the standards and format of corresponding engineering projects.
+
+
+## [Heading 2] Methodology
+
+
+## [Heading 3] Overview
+
+
+The goal of the present research work is to create a system that is able to generate Bangla factoid-type questions from input Bangla text based on state-of-the-art pre- trained language models namely MultilingualT5 and BanglaT5. The objective is to enable question generation for Bangla automatically, which could be used for various applications like education, testing, and intelligent tutor systems.
+
+The technique used is the fine-tuning of multilingual and Bangla-specific transformer models for the conditional generation of text, where the system is provided with a Bangla context and trained to produce a corresponding factoid-type question.
+
+The general steps are:
+Dataset preparation and cleaning (Bangla text context and questions)
+Input formatting and tokenization
+Fine-tuning MultilingualT5 and BanglaT5 models
+Evaluation of generated questions
+Deployment
+
+## [Heading 3] Proposed Methodology
+
+
+The design for the proposed system is a systematic pipeline that is intended to produce high-quality factoid questions from source Bangla text. The pipeline has several important steps, beginning with the compilation of a large dataset for Bangla context- question pairs. The processing then goes through certain systematic steps, such as data preprocessing, model fine-tuning, evaluation of performance. Every phase of this design is well thought out with an aim to ensure linguistic correctness and model performance optimization for the Bangla language.
+
+
+
+Figure 3.1: Methodology pipeline diagram
+
+The core elements of methodology are as follows:
+
+Data Collection: The data set was obtained from publicly available sources along with manually curated material to make the data diverse and authentic. These texts were accompanied with respective factoid-style questions in order to aid answer-agnostic question generation.
+
+Data Preprocessing: Bangla text data collected was cleaned and normalized to eliminate inconsistencies. Suitable tokenization was carried out with model- specific tokenizers, with compatibility for transformer architectures and maintenance of semantic structure.
+
+Model Selection: Two transformer models were chosen for this research: the multilingual T5 model, mT5, supporting more than 100 languages, and BanglaT5, which is trained on Bangla data. This two-model strategy enables comparative assessment in both multilingual and language-specific environments.
+
+Fine-tuning Strategy: HuggingFace's Transformers library along with PyTorch was utilized to implement custom training pipelines. Training parameters were adapted according to the linguistic sophistication of Bangla, with methods like learning rate scheduling, gradient accumulation, and checkpointing being incorporated for stable training.
+
+Model Evaluation: The generated responses were compared with automated metrics such as BLEU and ROUGE to measure fluency, semantic coherence, and similarity with the reference questions. These metrics furnished quantitative measures of the model generation quality and linguistic cohesion.
+
+Deployment: To illustrate the process of model inference, we developed a setup that employs HTML, CSS, and JavaScript to construct the frontend and Flask as the backend interface to handle the overall logic and integration.
+
+This organized methodology sets the basis for creating an economically scalable, linguistically precise question generation system particularly for Bangla, an under- resourced but rich language.
+
+## [Heading 3] Functional and Nonfunctional Requirements
+
+A clear understanding of the system’s functional and nonfunctional requirements is crucial for guiding the design and development of the Bangla question generation system.
+
+Functional Requirements:
+
+Input Processing: The system must accept Bangla text input and properly tokenize it according to the selected model's requirements (MT5 or BanglaT5 tokenizer).
+
+Model Loading: The system must load the pre-trained fine-tuned MT5 or
+BanglaT5 model dynamically based on the user’s selection.
+
+Question Generation: Upon receiving input, the system must generate an appropriate factoid-type Bangla question.
+
+Result Display: The generated question must be displayed clearly to the user through a simple interface.
+
+Model Switching: The system should allow the user to select between MT5 and BanglaT5 models for generation at runtime.
+
+Evaluation Metrics: Internally, the system must log BLEU, ROUGE scores during model testing phases.
+
+Nonfunctional Requirements:
+
+Performance: The system must produce the question within 2–3 seconds after receiving input text.
+
+Scalability: The system should be capable of adding support for more models (like mBART, BanglaBERT) in the future without major architectural changes.
+
+Reliability: System must handle invalid or empty input gracefully without crashing.
+
+Language Consistency: Output questions must be in Bangla language, following correct syntax and grammar.
+
+
+## [Heading 3] UI Design
+
+
+Although the original scope of this project was primarily focused on developing and testing a backend model for Bangla question generation, significant attention was also given to designing and implementing a user-friendly graphical user interface (GUI). The result is a complete and interactive web-based system that enables teachers, learners, and researchers particularly those without a technical background to easily access and utilize automated Bangla question generation.
+
+The current interface offers an intuitive and responsive platform where users can input Bangla text passages and instantly receive generated questions. Key features of the UI include a streamlined text input field, real-time output visualization of the generated questions, and the ability to reset and try again seamlessly. The frontend has been designed using modern web technologies such as HTML5, CSS3, and JavaScript, and is integrated with the Flask backend through RESTful APIs.
+
+To ensure accessibility and usability across a wide range of devices, the interface follows responsive design principles and prioritizes user experience. While the core functionalities are implemented, the system has also been structured to support future enhancements such as batch uploads, authentication, analytics, and downloadable outputs, making it scalable for classroom, individual, or research use.
+
+Figure 3.2: Home Page of Bangla Question Generator
+
+
+Figure 3.3: Output Section of the Bangla Text-to-Question System
+This UI serves as an essential bridge between advanced AI capabilities and real-world educational applications, enabling broader adoption and impact of the Bangla question generation technology.
+
+## [Heading 2] Detailed Methodology and Design
+
+The construction of the Bangla Question Generation system required careful planning, experimentation, and tuning over several stages. The methodology was created so that high-quality questions can be generated from Bangla text with both the multilingual MT5 as well as the monolingual BanglaT5 models.
+
+Each phase of the methodology was rigorously crafted according to best practice in Natural Language Processing (NLP) research, fine-tuning Transformer models, and handling multilingual texts.
+
+Data Collection and Preparation
+For this study, we created a Bangla dataset to enable the question generation task. The dataset had 3,000 rows with each of them carrying a "Paragraph" and the respective "Question." These paragraphs were sourced from an extremely diverse range of Bangla sources, such as school-level textbooks, Wikipedia pages, and Bangla news portals. This diversity was aimed at ensuring that the dataset covers all possible ranges of Bangla writing styles, vocabularies, and syntactic structures. Each of the paragraphs was thoroughly checked, and respective questions were manually built to stay contextually relevant and factually accurate with the source paragraph. This manual building ensured that the dataset was both semantically and syntactically accurate,
+
+which makes it acceptable for training and testing the performance of transformer- based language models for Bangla question generation tasks.
+Table 3.1: Dataset Sample
+
+
+
+Figure 3.4: Word Cloud for Paragraph
+
+
+
+Figure 3.5: Word Cloud for Question
+
+To compare the word variation among the paragraphs and questions, word clouds were created. In the word cloud for the "Paragraph" column, frequently occurring Bangla words relating to general informative writing stood out, mirroring the narrative character of the texts. However, in the word cloud for the "Question" column, interrogative words and structural terms that are normally employed to structure factual questions stood out, indicating the structural and lexical shift involved in question generation.
+
+Preprocessing
+Preprocessing is essential in transforming raw data into data understandable to deep learning models. Every data point involved a paragraph-question pair, presented as input-output for a sequence generation task. Preprocessing started with text normalization, where punctuation marks and special characters were normalized, additional whitespaces were removed, and Unicode normalization was performed to deal with the variation in the use of encodings. A task-specific instruction "generate question:" alone was prepended to each input paragraph, which acts as an instruction to the model to effectively learn the task of question generation.
+
+We implemented a custom dataset class Seq2SeqDataset for tokenizing and encoding data with model-specific tokenizers. For mT5, we utilized the SentencePiece tokenizer from the google/mt5-small checkpoint, whereas for BanglaT5, we utilized a Bangla- optimized tokenizer from csebuetnlp/banglat5_qg. Both the "Paragraph" field and the "Question" field were tokenized to 500 input tokens and 100 tokens, respectively, to
+
+align with their natural lengths. Padding and truncation were performed to align input sizes for batch processing.
+
+A custom data collator was developed to handle the conversion of tokenized data into PyTorch tensors, such as attention mask and decoder input. This facilitated batching in training efficiently. The whole dataset was divided into training, validation, and testing sets with respective proportions of 72.25%, 12.75%, and 15%. The dataset features well-balanced input and output lengths, which make it effective for training models for Bangla question generation.
+
+Figure 3.6: Text Length Distribution of Training Our dataset
+
+Figure 3.6, "Text Length Distribution for Training Dataset," presents two histograms representing the distribution of character length of Bangla paragraphs and questions. In the left plot (Bangla Paragraph Text Length), there are high numbers of paragraphs with lengths in the range of 150 to 350 characters, with a peak around 225 to 250 characters. This indicates that the training data contains mostly inputs of moderate size, which makes it particularly suitable for question generation. The right plot (Bangla Question Text Length) indicates that questions are mostly short, with the range being mainly 30 to 70 characters and the peak at around 50. This indicates high consistency with question lengths, which leads to stable model training.
+
+
+Figure 3.7: Text Length Distribution of Our Test dataset
+
+The "Text Length Distribution for Test Dataset" chart contains two histograms that show the distribution of character lengths of Bangla paragraphs and their respective questions. In the left chart (Bangla Paragraph Text Length), the distribution of paragraphs is mostly around the range of 150 to 350 characters with a prominent peak around 225–250 characters. This trend suggests that the test dataset shows a similar moderate-length trend to the training dataset, making it suitable for measuring question generation models. The right chart (Bangla Question Text Length) shows that the questions mostly range from 50 to 90 characters with a high peak around 70. However, there are a few outliers that go over 100 characters, which shows the existence of relatively longer questions compared to the validation set.
+
+Figure 3.8: Text Length Distribution of Our Validation dataset
+
+The figure titled "Text Length Distribution for Validation Dataset" illustrates the character length patterns of Bangla paragraphs and their corresponding generated questions. In the left-hand plot, which represents Bangla Paragraph Text Length, most paragraphs fall within the 150 to 350 character range, with a noticeable peak around 225 to 250 characters. This trend aligns well with the distributions observed in both the training and test datasets. On the right, the Bangla Question Text Length plot reveals that the validation questions are consistently concentrated between 30 and 80 characters, with the highest frequency appearing around 50 to 60 characters. This tight clustering reflects a strong consistency in question length, which contributes to stable validation performance.
+
+Model Fine-tuning
+The setup for fine-tuning mT5 was slightly different. It is a Bangla-based multilingual model trained using Bangla dataset train with the similar configurations of 10 epochs, 1e-3 learning rate, 8 batch size, and with the same 3,000-pair Bangla dataset.
+
+
+Figure 3.9: Architecture of T5 model
+
+The BanglaT5, a pre-trained encoder-decoder model, fine-tuned on Bangla for 10 epochs, had a learning rate of 1e-3 and a batch size of 8. As this is a sequence-to- sequence task and Kaggle environments do have some resource constraints, the gradient accumulation steps were adjusted to 5. This process enabled the model to mimic larger updates without the memory constraint of training on plus-sized batches. A learning rate scheduler (cosine_with_restarts) is also useful to achieve convergence without sudden drop in the performance of the model. In addition, weight decay was used with a coefficient of 0.01 in order to regularize the model and avoid overfitting, which would occur with long training cycles.
+
+Fine-tuning of mT5 was done using a slightly different setup. It is a multilingual model trained on 101 languages including Bangla, and trained for 10 epochs on the same 3,000-pair Bangla dataset with a learning rate of 1e-3 and batch size of 8. Both BanglaT5 and mT5 were set to evaluate their performance at the end of each epoch, automatically save the best-performing model checkpoint, and log training metrics in detail. Dynamic padding was managed through a custom data collator that also handled attention masks and decoder inputs essential for sequence-to-sequence tasks. Training for both models was conducted using a P100 GPU. By embedding task-specific prompts like “generate question” into the inputs and correctly aligning the decoder input sequences, both models were successfully adapted to perform Bangla question generation with high effectiveness.
+
+Evaluation and Metrics
+Once the fine-tuning process was finished, an extensive natural evaluation was performed to evaluate the performance of both BanglaT5 and mT5 models through automated metrics that curate different propertiesthat we want our generated questions to have. These metrics were aimed at measuring both the syntactic correctness and semantic relevance to regard with respect to the reference questions. BLEU was used to measure how many n-grams in the model-generated questions overlapped with the reference questions, giving a fine-grained indication of surface accuracy. We also reported the ROUGE score, especially the ROUGE-L. ROUGE-L, however, is quite effective due to its ability to capture the longest common subsequence (LCS) that an output string has with respect to the input string, which does well in measuring deeper semantic similarity and contextual alignment also.
+
+A widely used library called sacreBLEU was employed for benchmarking weighted BLEU scores, while rouge_score was used to calculate ROUGE scores to ensure reproducibility and fairness. These measures include standardized scoring methods that have found wide acceptance in the NLP research community to allow objective model comparisons. With the same, the evaluation showed BanglaT5 always beat mT5 in terms of fluency, as well as relevance in context. The resulting performance can be attributed to the fact that BanglaT5 has been pretrained on Bangla-specific corpora making it perform better than mT5 in generating syntactically and semantically
+
+correct text in the Bangla language. Below are the respective implementations of metric:
+
+𝑃𝑟𝑒𝑐𝑖𝑠𝑖𝑜𝑛 =
+𝐿𝐶𝑆
+
+
+𝑐𝑎𝑛𝑑𝑖𝑑𝑎𝑡𝑒 𝑙𝑒𝑛𝑔𝑡ℎ
+
+
+LCS is the longest common subsequence between the candidate and reference.
+
+
+𝑅𝑒𝑐𝑎𝑙𝑙 =
+𝐿𝐶𝑆
+
+
+𝑟𝑒𝑓𝑒𝑟𝑒𝑛𝑐𝑒 𝑙𝑒𝑛𝑔𝑡ℎ
+
+
+
+𝐸𝑀 =
+𝑁𝑢𝑚𝑏𝑒𝑟 𝑜𝑓 𝑒𝑥𝑎𝑐𝑡 𝑚𝑎𝑡𝑐ℎ𝑒𝑠
+
+
+𝑇𝑜𝑡𝑎𝑙 𝑛𝑢𝑚𝑏𝑒𝑟 𝑜𝑓 𝑠𝑎𝑚𝑝𝑙𝑒𝑠
+
+
+
+
+𝑅𝑂𝑈𝐺𝐸 − 𝐿 =
+(1 + 𝛽2). 𝑃𝑟𝑒𝑐𝑖𝑠𝑖𝑜𝑛. 𝑅𝑒𝑐𝑎𝑙𝑙
+
+
+𝛽2. 𝑃𝑟𝑒𝑐𝑖𝑠𝑖𝑜𝑛 + 𝑅𝑒𝑐𝑎𝑙𝑙
+
+
+
+𝑅𝑂𝑈𝐺𝐸 − 𝑁 =
+∑𝑛−𝑔𝑟𝑎𝑚 𝑟𝑒𝑓𝑒𝑟𝑒𝑛𝑐𝑒 𝑚𝑖𝑛(𝑐𝑜𝑢𝑛𝑡𝑐𝑎𝑛𝑑𝑖𝑑𝑎𝑡𝑒, 𝑐𝑜𝑢𝑛𝑡𝑟𝑒𝑓𝑒𝑟𝑒𝑛𝑐𝑒)
+
+
+∑	𝑐𝑜𝑢𝑛𝑡
+
+𝑛−𝑔𝑟𝑎𝑚 𝑟𝑒𝑓𝑒𝑟𝑒𝑛𝑐𝑒	𝑟𝑒𝑓𝑒𝑟𝑒𝑛𝑐𝑒
+
+In general, this assessment gave an overall context of each model performance regarding the generation of Bangla factoid questions through a brief idea of the performance characteristics. These results emphasize the need for building domain- focused language-specific models like BanglaT5 rather than building large multilingual models even though they provide some diversity to their performance, which is quite useful for low-resource languages as even a small difference for linguistic nuances such as subject-verb agreement plays a crucial role for natural language generation tasks.
+
+Deployment
+To demonstrate the model inference process, we created a setup using HTML, CSS, and JavaScript to build the frontend and Flask as the back end interface to perform the overall logic and integration.
+
+Model Loading: The BanglaT5 models are loaded into memory.
+
+Input Field: A simple text area in which users enter Bangla paragraph input.
+
+Backend Inference: The inferred model creates a Bangla question dynamically.
+
+Result Display: The generated question is displayed on the UI as soon as it is processed.
+
+
+## [Heading 2] Project Plan
+
+In view of the complexity of the project and the abundance of the tasks involved, meticulous project planning was made and it was ensured that the Bangla Question Generation system was developed, tested and deployed systematically. Given the scope of the project, we set up multiple phases each with concrete deliverables, timelines as well as contingency plans to manage smooth delivery of the project.
+
+The entire phasing of the project workflow was as follows:
+
+Phase 1: Research and Requirement Analysis
+
+Conducted a thorough literature review on automatic question generation, specifically for low-resource languages like Bangla.
+Studied the capabilities of MT5 and BanglaT5 models.
+Finalized the focus on factoid question generation to maintain clear evaluation criteria.
+
+Phase 2: Dataset Curation and Preparation
+
+Compiled Bangla paragraphs and manually generated corresponding factoid questions.
+Performed extensive preprocessing and cleaning to ensure dataset quality.
+Designed data loaders compatible with Huggingface Transformers format.
+
+Phase 3: Model Fine-Tuning
+
+Developed training scripts for MT5 and BanglaT5 models.
+Configured Kaggle GPU environment for efficient training.
+Conducted iterative fine-tuning with hyperparameter tuning and dataset augmentation.
+
+Phase 4: Evaluation and Testing
+
+Used BLEU and ROUGE metrics for automatic evaluation.
+Conducted manual evaluation for linguistic fluency, coherence, and relevance.
+Compared MT5 and BanglaT5 performance quantitatively and qualitatively.
+
+Phase 4: Deployment
+
+Used HTML, CSS, JavaScript to construct and layout the frontend interface.
+The logic and API handling on the backend were implemented utilizing Python
+
+Flask.
+
+Tools and Technologies Used:
+
+Programming Language: Python 3.10
+Deep Learning Frameworks: PyTorch, HuggingFace Transformers
+Training Environment: Kaggle (with GPU)
+Evaluation Libraries: sacreBLEU, ROUGE Score
+Deployment: HTML, CSS, JavaScript, Flask
+
+
+## [Heading 2] Task Allocation
+
+
+Table 3.2: Task Allocation Table
+
+
+This table depicts the timeline of the principal activities in each period of the project, from week 12 to week 48. It is from the Data Collection Phase where relevant Bangla text data was obtained from different sources. Next is the Preprocessing Stage where the data was cleaned, tokenized, and formatted to achieve model training and testing readiness. Subsequently, the Model Training Phase was executed utilizing preprocessed data, including both BanglaT5 and MultilingualT5 models and Evaluation executed using matrices such as EM, ROUGE-L etc. Lastly the demo
+
+application was built. This timeline offers clear insight to the sequential as well as overlapping nature of the above-presented tasks to enable effective planning and implementation of the project.
+
+
+## [Heading 2] Summary
+
+In this chapter, research methodology, system design, and project planning strategy to implement a Bangla Question Generation system utilizing mT5 and BanglaT5 were detailed. The chapter covered the construction of manually annotated data comprised of Bangla context and corresponding factoid-style questions as the training and testing ground for the model. It covered the preprocessing pipeline where operations like text normalization, tokenization etc. were performed to support compatibility with transformer architectures. Fine-tuning both mT5 and BanglaT5 has been covered where hyperparameter exploration, training setup, and performance metrics were experimented to achieve maximum performance. In terms of deployment, the chosen strategy was to implement the solution as a web-based application, offering accessibility through standard browsers.
+
+Chapter  4
+Implementation and Results
+This chapter gives a thorough description of the real-world implementation of the Bangla Question Generation system using the MT5 and BanglaT5 models. It presents information about environment setup, dataset preparation, training procedures of the model, performance testing, methods of evaluation, and discussion about the outcome achieved during development.
+
+Each implementation step was performed in a structured manner to achieve the best model training, effective deployment, and high-quality output of questions generated.
+
+## [Heading 2] Environment Setup
+
+
+Environmental setup was instrumental in facilitating both the fine-tuning and inference stages of the project to run smoothly and with maximum efficiency. With the high computational requirements of transformer-based architectures like mT5 and BanglaT5, the project relied mostly on both in-house infrastructure and cloud services to deliver the best possible performance. It ran on Windows 10. For extensive training processes, it leveraged the services of Kaggle, which provided access to P100 GPUs. Frameworks and libraries of prime importance were PyTorch, Hugging Face Transformers, TensorFlow, whereas development was made easier with tools like Jupyter Notebook, Google Colab, and Visual Studio Code. Google Drive facilitated data synchronization as well as data storage, whereas libraries such as sacreBLEU, ROUGE, NLTK, and NumPy were utilized for performance evaluation.
+
+The process of implementation started by downloading pre-trained mT5-small and BanglaT5 from the Hugging Face Hub. All needed dependencies were then set up in the Python environment, including transformers, torch, sentencepiece, flask, scikit- learn, and sacrebleu. In Kaggle, the GPU runtime was activated to optimize training. The dataset, which was kept in CSV format with two columns “paragraph” and “question”, was handled smoothly through automated tokenization and loading scripts which tackled high-volume text processing during training. This hybrid environment supported efficient, scalable, and cost-effective development and experimentations.
+
+Table 4.1: Model Training Configuration and Achieved Performance
+
+
+
+## [Heading 2] Performance Evaluation and Comparative Analysis
+
+Post-training, extensive testing was performed using an unseen validation set to assess the generalizability and the quality of questions produced by the models. The data was split into 72.25% for training data, 12.75% for validation data, and 15% for testing data. Randomized data sampling was performed to avoid any overlap or leakage to ensure the integrity of the evaluation process. Testing was mainly aimed at examining how well the models were generating contextually correct, fluently written, and semantically valid questions from totally unseen Bangla text paragraphs.
+
+Automated evaluation was conducted using standard NLP metrics, namely BLEU and ROUGE. BLEU (Bilingual Evaluation Understudy) measured the n-gram overlap in the generated versus reference questions as an indicator of similarity both in syntax and lexicon. mT5-small obtained BLEU at 0.4349, whereas BanglaT5 performed better with BLEU at 0.5140. Simultaneously, ROUGE scores provided focus on recall-based matching and were advantageous in measurement at the level of phrases. ROUGE-L, measuring the longest common subsequence in candidate versus reference output, was employed as the primary variant. mT5-small obtained the ROUGE-L at 63.56%, whereas BanglaT5 performed better at 70.77%. The findings support the superiority of language-specific pretraining in BanglaT5 to identify both lexical structure and semantic alignment in question generation in Bangla.
+
+Table 4.2: Comparative Model Performance
+
+
+A comparative evaluation of the model performance of various research works and the proposed system is given in Table 4.2, where differences in the dataset size, model adopted, and outputted ROUGE-L score are noted. Table 4.2 is formulated to illustrate how the proposed approach is competitive to prior works, specifically in low-resource scenarios.
+
+A. R. Fahad et al. [1] employed 123,000 samples to fine-tune the mT5 model to obtain its high score of 63.38% on the ROUGE-L score. This is indicative of the model's capability to absorb large amounts of data to output relatively strong performance in question generation tasks. Yet, the model employed in the current work was not fine- tuned specifically to Bangla but utilized its multilingual nature.
+
+J. F. Ruma et al. [2] utilized BanglaT5 on a moderately large dataset of more than 67,000 samples. In spite of utilizing a Bangla-specific model, the study achieved only a ROUGE-L score of 35.77%. That relatively low score the study attained implies the quality of the dataset, or the model fine-tuning procedure, might not have been adequate to utilize the capabilities of BanglaT5 to its maximum output, indicating possible training or setup efficiency flaws.
+
+By comparison, the proposed methodology made use of considerably fewer samples, at only 3,000 samples, yet performed better. With fine-tuning using the BanglaT5 model, the system obtained a high ROUGE-L score of 70.77%, the best of all the configurations considered. This reflects an improved training and evaluation process even in data- constrained situations. This outcome underscores the effectiveness of using well- annotated data with targeted fine-tuning of the language-specific model.
+
+The MultilingualT5 model, for instance, obtained a ROUGE-L score of 63.56% using the same 3,000-sample data. Although slightly lower than the score obtained by BanglaT5 under similar conditions, the score is still competitive and significantly better than what has been obtained in previous large-scale research. This underscores the importance of careful model adaptation and preprocessing even in data scenarios where fewer samples are available.
+
+In summary, the comparison highlights the strength of the proposed method, illustrating the fact that fewer but high-quality samples, where they are augmented with domain-specific fine-tuning, are sufficient to better perform than base models built using far greater data. It further shows the efficacy of BanglaT5 in handling Bangla Question Generation, most prominently when compared to its multilingual model.
+
+## [Heading 2] Results and Discussion
+
+Both BanglaT5 and MT5 were tested using the same dataset of 3000 Bangla question- paragraph pairs and against standard evaluation metrics such as BLEU, Exact Match, and ROUGE (ROUGE-1, ROUGE-2, and ROUGE-L). We aimed to see how well both models were able to produce grammatically correct, contextually appropriate, and meaning-capturing questions in Bangla.
+
+Figure 4.1: Training vs Validation loss for bT5 model
+
+
+Figure 4.2: Training vs Validation loss for mT5 model
+
+A BLEU score was achieved by MT5 at 43.49% and an EM score at 25.55%, while the ROUGE-L F1 score was at 63.56%. BanglaT5 performed better than MT5 in all the measures on all fronts, attaining a BLEU score of 51.40%, EM score of 28.65%, and ROUGE-L F1 at 70.77%. In addition, BanglaT5 performed better than MT5 in all the sub-metrics of ROUGE, such as ROUGE-1 and ROUGE-2, under precision, recall, and F1. From the above results, we see consistently that BanglaT5, pre-trained on Bangla- specific data, is better positioned to pick up the language's linguistic structure, word order, and context-specific nuances. In comparison, the multilingual model of MT5, while competent, fell short in both its syntactic accuracy and semantic depth. Yet, the performance of BanglaT5 was further enhanced by the fact that it utilized a Bangla- specific tokenizer and its model was better conditioned for the syntax and morphology of Bangla.
+Table 4.3: Performance Analysis of BanglaT5
+
+
+This table presents the evaluation results of the BanglaT5 model on the Bangla question generation task. The model achieves a BLEU score of 51.40%, indicating strong n-gram overlap between generated and reference questions. In terms of ROUGE metrics, the model attains ROUGE-1 F1 of 73.64%, ROUGE-2 F1 of 57.86%, and ROUGE-L F1 of 70.77%, reflecting a high degree of lexical and sequential similarity. These scores suggest that BanglaT5 is highly effective in generating fluent and contextually accurate questions for Bangla paragraphs.
+Table 4.4: Performance Analysis of MultilingualT5
+
+
+This table displays the performance of the MultilingualT5 model on the same task. It achieves a BLEU score of 43.49%, which, while respectable, is noticeably lower than that of BanglaT5. The ROUGE metrics ROUGE-1 F1 of 66.79%, ROUGE-2 F1 of 52.84%, and ROUGE-L F1 of 63.56% also trail behind BanglaT5’s scores. These results indicate that while mT5 can generalize to Bangla to some extent, it is outperformed by the language-specific BanglaT5 model, likely due to the latter's better alignment with linguistic features unique to Bangla.
+
+Table 4.5: Output of Generated Question using BanglaT5
+
+
+This table 4.5 provides some examples of the BanglaT5 model-generated questions along with the original Bangla paragraph and reference question. It is seen from the generated outputs that the semantic similarity with the original questions is high, retaining both relevancy and linguistic coherence. For example, from a paragraph discussing climate change, the model is well able to identify the main problem and output the question "জেিা়েু পবরিিেণ আজনকর বিনের একটট ি়ি সমসযা ক্ষকে?", which is
+
+very much similar to the intent behind the reference question. For another paragraph discussing peace and social stability, the generated question captures the meaning and form of the original. These samples illustrate BanglaT5's high ability to grasp paragraph context and output understandable, question-like answers in Bangla.
+Table 4.6: Output of Generated Question using multilingualT5
+
+
+Table 4.6 presents the question generation outcomes produced by the MultilingualT5 (mT5) model. Although the questions it generates are generally relevant to the content of the input paragraphs, they often come across as slightly broader or less precise than those generated by BanglaT5. For instance, in the climate change example, mT5 generates the question "জেিা়েু পবরিিেণ আমানদর বিনের একটট সিনেন়ে ি়ি সমসযা ক্ষকে?", which is grammatically correct but lacks the nuance and specificity of the original. However, for both sample inputs, the model maintains the same meaning without compromising on the cores of a valid syntax question. We hypothesize that the discrepancy in performance of mT5 compared to BanglaT5 stems from the fine-tuning of mT5 on more general multilingual data results in outputs that are less contextually minimised in comparison to language-specific training for BanglaT5.
+
+In summary, the results speak of a definitive benefit of the language specific pretraining. For example, BanglaT5 once again demonstrated that a language-specific model outperforms any general-purpose multi-lingual system such as mT5, especially in the low-resource setting. It highlights the need to focus on local NLP so that we improve our distance in linguistic accuracy and usability in real-world language constraints.
+
+
+## [Heading 2] Summary
+
+In this chapter, We explained the whole procedure of implementation of the bangla Question Generation project from environment setup to dataset preparation, model fine-tuning, evaluation and testing. An extensive and reusable training pipeline was created for both mT5 and BanglaT5 models, which ensured the handling of data and model optimization was the same. The system was able to produce fluent, relevant, and grammatical factoid questions with its gen set and the evaluation measures BLEU and ROUGE scores assessed the result of the sytemuated. The performance of BanglaT5 was slightly better than that of the other two models, and it strengthened langauge-specific pretraining for low resource languages such as Bangla.
+
+Chapter  5
+Engineering Standards and DesignChallenges
+In this chapter, we introduce the engineering paradigms, standards, practices and some of the challenges we faced while designing and developing the Bangla Question Generation system. These include adherence to software and hardware standards, communication protocols among team members, and broader societal, environmental, and ethical ramifications of the project. It also compares the system to complex engineering tasks and problem-solving categories.
+
+
+## [Heading 2] Compliance with the Standards
+
+The development also focused on compliance with global standards for software development, hardware, communication, and ethical principles.
+
+
+## [Heading 4] Software Standards
+
+The current system for Bangla Question Generation has been developed following standard software engineering and machine learning research practices to ensure future maintainability, extensibility, and ethical reproducibility. All source code adheres to Python’s PEP8 coding standards, promoting clarity, modularity, and consistency. Key functionalities such as data preprocessing, model training, inference, and evaluation are structured into reusable components to facilitate integration into web platform.
+
+Comprehensive exception handling has been incorporated to ensure resilience during model inference and data processing. Pre-trained models utilized in this project were sourced from trusted platforms like Hugging Face and are compliant with research licensing and citation norms. To support future deployment, models were saved in standardized formats as per Hugging Face's recommendations. Although the current API implementation using Flask remains in a local environment, it is designed following RESTful principles and will be deployed in cloud-hosted environments during the next phase. All datasets are anonymized and version-controlled via GitHub to uphold data privacy and reproducibility standards. These software practices lay the foundation for a smooth and standards-compliant deployment in future iterations.
+
+## [Heading 4] Hardware Standards
+
+While full deployment is planned for future work, the system is already optimized for
+
+hardware efficiency and platform independence. During development, the application demonstrated reliable performance on commonly available hardware such as dual-core processors such as Intel i5, AMD Ryzen with 8GB of RAM. For training and fine- tuning, cloud infrastructure such as Kaggle was employed, utilizing high-performance P100 GPUs to minimize training time and resource wastage. Future deployment will leverage cloud hosting solutions to ensure scalability, while potential edge deployment strategies such as model distillation will be explored for low-resource environments.
+
+## [Heading 4] Communication Standards
+
+
+Effective communication protocols were followed throughout the project development cycle, contributing to smooth coordination, clear role delineation, and traceable progress. Project activities were documented using centralized tools such as Google Sheets for logging, GitHub for version control, and Trello for task tracking. Version naming conventions were consistently used across datasets, model checkpoints, and scripts to ensure clarity and traceability.
+
+We had weekly review meetings to get aligned on goals, discuss problems and document the results. Collaborative tools made sure the development continued to cruise ahead even when the project went to larger scales. These communication practices remain in place until deployment, tracking the accountability, maintainability and documentation-driven updates of the insights.
+
+## [Heading 2] Impact on Society, Environment and Sustainability
+
+
+The deployment of the Bangla Question Generation system to contribute to meaningful impact including but not limited to education, society, environment, and ethical AI research.
+
+## [Heading 4] Impact on Life
+
+Such a system, when deployed, could prove to be a game changer in the hands of Bangla speaking learners, educators, and curriculum designers alike. Automatic generation of high-quality quiz and test questions boost productivity and improve instructional design. They have access to tools that support active learning and allow them to understand the content in their own language.
+
+The deployment democratizes accessing to GIQE, but it also plays a role in increasing digital literacy and exposure to AI tools within the Bangla-speaking populations. Designed to be lightweight, it is particularly ideal for rural and low-bandwidth areas and has the potential to support equitable access to educational technology.
+
+
+## [Heading 4] Impact on Society & Environment
+
+
+It indeed paves way towards deeper involvement of Bangla in digital and AI ecosystem both as a cultural identity and as part of any global language technology movement. The system is also environmentally-friendly, being developed not to waste GPU as much as possible and leveraging the shared nature of cloud infrastructure to reduce carbon footprint.
+
+Digital creation of learning materials decreases reliance on printed materials and help save resources. Further, the system's inclusive and open-access nature enables underprivileged communities to participate in learning experiences facilitated by AI, overcoming technological as well as linguistic barriers.
+
+## [Heading 4] Ethical  Aspects
+
+Ethical development has been maintained at every stage of the project and remained at the forefront of any decisions to deploy it in the future. Linguistic diversity has been considered in curating the dataset, including content from different Bangla dialects and writing styles to reduce model bias. Personally, identifiable information has been removed, and all sources have been kept transparent.
+
+For aligning with scholarly integrity and open research principles, the system has made available for educational and non-commercial purposes, facilitating transparent and responsible development of AI. It promoted accessibility using interface design and localization in the eventual deployment.
+
+## [Heading 4] Sustainability Plan
+
+
+A long-term sustainability roadmap underpins the deployment and scaling of the system. The dataset will be periodically updated with new domain-specific content, while newer models will be explored for integration and fine-tuning.
+
+Model compression and distillation techniques had investigated to facilitate efficient deployment on mobile and offline environments. Open-sourcing the system encouraged broader academic and community contributions. Strategic partnerships with Bangladeshi universities and NLP labs will be established to ensure continual growth and localization of the system.
+
+## [Heading 2] Project Management and Financial Analysis
+
+While developing the project, it has been managed efficiently under budget- conscious planning. A detailed financial breakdown is provided below:
+
+Table 5.1: Estimated Cost and Financial Analysis
+
+
+
+## [Heading 2] Complex  Engineering  Problem
+
+
+The Bangla Question Generation project involved addressing various complex engineering problems that required deep domain knowledge, creative problem-solving, and integration of multidisciplinary skills. Below we detail how the project mapped into complex problem solving and engineering activity frameworks.
+
+## [Heading 4] Complex Problem Solving
+
+
+The project satisfied all characteristics of complex engineering problems as defined by standard engineering practices.
+
+Table 5.2: Mapping with complex problem solving.
+
+
+Justification of EP1 attainment: Applied advanced knowledge of Machine Learning (ML), Natural Language Processing (NLP), and Bangla linguistics to design, train, and evaluate models.
+
+Justification of EP3 attainment: Conducted systematic experimentation with hyperparameters, models, and dataset versions.
+
+Justification of EP4 attainment: Addressed multilingual model training issues,
+
+tokenization challenges, and low-resource Bangla data problems.
+
+Justification of EP7 attainment: Integrated dataset preparation, fine-tuning, and evaluation into a single, coherent workflow. Using HuggingFace tools, the process from preprocessing to BLEU/ROUGE-based evaluation was automated in one reproducible environment.
+Mapping with Knowledge Profile for EP1
+This table 5.2 is designed to map the EP1 to the Knowledge Profile.
+
+Table 5.3: Mapping with knowledge Profile.
+
+
+Justification for Each Knowledge Profile Element:
+
+K3: Fundamental engineering knowledge in algorithms, data processing, text encoding, model evaluation metrics (BLEU, ROUGE), and software development were applied extensively.
+
+K5: Systematic design of an end-to-end architecture from dataset preparation, model training, evaluation, to a deployed web application was carried out following engineering design principles.
+
+K8: Literature review presented a critical evaluation of existing models, recommendation systems and different technologies used by other researcher. It informed development of novel approaches so the design of the system is optimized and meets our objective.
+
+
+## [Heading 3] Engineering Activities
+
+In terms of engineering activities, the project mapped across a range of standard categories that define engineering practice complexity.
+
+Table 5.4: Mapping with complex engineering activities.
+
+
+Justification of EA1 attainment: Combined online datasets, custom-generated Bangla data, Kaggle with GPUs, open-source libraries, and manual evaluation teams.
+Justification of EA4 attainment: While no tool was deployed, the trained model lays the groundwork for Bangla educational applications. It uses resource-efficient methods suitable for low-resource environments, supporting inclusive and sustainable digital learning.
+Justification of EA5 attainment: The team had prior knowledge in Python development, ML training leading to fast issue resolution and high-quality output.
+
+
+## [Heading 2] Summary
+
+In this chapter, we defined the alignment of the project with engineering standards, ethical principles, and social obligations, along with its preparedness for eventual deployment of the Bangla Question Generation system. It developed following strict compliance with prespecified software, hardware, and data standards to ensure security, reliability, and long-term maintainability to allow scalable deployment. It incorporated ethical principles like fairness, data privacy, and transparency throughout the process to enable responsible and trustful AI systems in real-life applications. The deployment's potential impact on society was highlighted, ranging from the development of Bangla education to digital inclusion and support for environmentally friendly technologies. Assessment of the system incorporated intricate engineering frameworks to reflect technical depth, domain-specific know-how, and practical viability all needed to move to the production environment. Strategic management of the project and cost-effective planning allowed the system to be scaled within economic constraints.
+
+Chapter  6
+Conclusion
+This chapter gives an overall conclusion to the Bangla Question Generation project. It gives the summary of the accomplishment, reviews the limitations faced during development, and gives ideas about the directions to further improve the system. The development of the project was aimed to utilize cutting-edge Natural Language Processing (NLP) methods to the Bangla language a relatively low- resource language in the context of AI.
+
+## [Heading 2] Summary
+
+
+This paper proposes an all-encompassing methodology for generating questions in Bangla using transformer models, namely MT5 and BanglaT5. The main objective was to create an automated, scalable system to produce factoid-type questions in Bangla from input text. We initiated with contextualizing the current gaps in Bangla NLP and question generation studies, mainly the dearth of high-quality native datasets and sparse language-specific models. A thorough literature survey identified seminal studies, bringing to light shortcomings in dataset quality, model flexibility, and evaluation consistency for Bangla QG models.
+
+The research methodology followed a structured process incorporating data collection, preprocessing, model fine-tuning, and evaluation. A manually annotated dataset of 3,000 Bangla paragraph-question pairs was prepared to ensure linguistic and context richness. Preprocessing involved text normalization, tokenization, and dataset division for efficient training. Preprocessing was performed for both the MT5 and BanglaT5 models using Hugging Face’s Trainer API, using the same training parameters to provide a balanced comparison. Automatic metrics like BLEU, ROUGE-1, ROUGE-2, ROUGE-L, and Exact Match (EM) were evaluated, supported by human evaluation by native Bangla language speakers.
+
+The findings indicated all-around better performance by BanglaT5, with 28.65% EM and 51.40% BLEU, as opposed to 25.55% EM and 43.49% BLEU for MT5. BanglaT5 performed better even in ROUGE scores, which reaffirmed its better performance due to language-specific pretraining. The best and most precise models, following careful assessment, were incorporated into a Flask web application with meticulous care.
+
+This work is meaningfully contributing to Bangla NLP by demonstrating how structured approaches and transformer architectures are beneficial in overcoming low- resource language processing challenges. In general, the system is a preliminary step toward multilingual, domain-customizable, and more sophisticated Bangla QG tools
+
+with great potential to integrate into educational and scholarly technologies.
+
+
+## [Heading 2] Limitation
+
+
+While the project achieved its primary goals, some limitations were encountered which should be noted for transparency and to inform improvements in the future. The most significant constraint was the small size of the dataset. Even though very carefully curated, the dataset was relatively small relative to large-size NLP datasets and impacted the generalizability of the models to widely differing scenarios. Even with explicit attempts at making the data diverse, some bias was manifested in questions generated from unusual or rare topics. In addition, due to the constraints of available hardware only smaller configurations of the MT5 and BanglaT5 models were fine- tunable. More expressive and larger ones similar to MT5-Small or MT5-Large could not be considered due to runtime and memory limitations. In addition, even as the models tended to work well with Bangla grammatical constructs, some outputs grappled with structured sentences with deeply nested clauses and produced slightly lower coherence questions in isolated instances.
+
+
+## [Heading 2] Future Work
+
+Based on the success of the existing system and its limitations, there are various directions for future work proposed to expand its capabilities further. A higher priority is still to increase the dataset, and larger and diversified Bangla datasets with domain- specific text from science, history, and literature will enable model generalization. With access to higher computational power, future directions might include fine-tuning larger models, or with cutting-edge architectures.
+
+Functionality-wise, the system will be expandable to produce various question types other than factoid, such as descriptive, yes/no, and inference questions to better facilitate education assessment. Deployment will take center stage going forward, with intentions to have a user-friendly interface (UI) and backend services for mobile applications. This will entail the development and implementation of an easy-to-use UI accommodating batch input, dataset upload, real-time generation, and user feedback acquisition.
+
+For compatibility with cell phones, model compression methods like knowledge distillation will be utilized to have efficient execution on resource-restricted platforms like cell phones and tablets. Post-processing modules will also be included to correct minor grammatical mistakes automatically to improve quality of output.
+
+Lastly, opening the system under a liberal license will encourage collaboration from
+
+developers, educators, and researchers, stimulating further development and broader adoption. Future improvements will build the project into a strong, scalable, and accessible tool to significantly impact Bangla language learning and digital empowerment.
+
+References
+A. R. Fahad, N. Al Nahian, M. A. Islam, and R. M. Rahman, “Answer Agnostic Question Generation in Bangla Language, ”International Journal of Networked and Distributed Computing, no.1, pp. 82–107, Jan. 2024, doi: 10.1007/s44227-023-00018- 5.\
+
+J. F. Ruma, T. T. Mayeesha, and R. M. Rahman, “Transformer based Answer-Aware Bengali Question Generation,” International Journal of Cognitive Computing in Engineering, pp. 314–326, Jun.2023, doi: 10.1016/j.ijcce.2023.09.003.
+
+[3]S. Sharma, M. K. Hossen, Md. S. Islam, Md. S. A. Chowdhury, and Md. J. Hoque,
+“AUTOMATIC QUESTION AND ANSWER GENERATION FROM BENGALI AND
+ENGLISH	TEXTS,”	GESJ:	Computer	Science	and	Telecommunications	,
+2018,Accessed: Dec. 12, 2024. [Online].
+
+W. Morris, J. S. Choi, L. Holmes, V. Gupta, and S. Crossley, “Automatic Question Generation and Constructed Response Scoring in Intelligent Texts,” Proceedings of the 17th International Conference on Educational Data Mining, Jun. 2024, Accessed: Dec. 12, 2024.
+
+Y. Poon, J. S. Y. Lee, Y. edu. hk Yuylam@hkmu.edu.hk, W. edu.hk Wlsuen@hkmu.edu.hk, E. edu. hk Eong@hkmu.edu.hk, and S.edu. hk Skwchu@hkmu.edu.hk, “Few-shot Question Generation for Reading Comprehension,” Proceedings of the 10th SIGHAN Workshop on Chinese Language Processing (SIGHAN-10), pp. 21–27, 2024, doi: 10.18653/v1/2024.sighan-1.3.
+
+Mr. M. V. K. Rao, N. B. V. Bharath, R. V. P. S. Reddy, S. Raviteja, and V. Ankitha, “Review Paper on Automatic Q&amp;A Generator Using LLM (Large Language Model),” SSRN Electronic Journal, 2024, doi: 10.2139/ssrn.4814781. [Online].
+
+F. Sultana et al., “How Good are LM and LLMs in Bangla Newspaper Article Summarization?,” in Lecture Notes in Computer Science, Springer Nature Switzerland, 2024, pp. 72–86.
+
+M. Moron, J. Scocozza, L. Chiruzzo, and A. Rosa, “A Tool for Automatic Question Generation for Teaching English to Beginner Students,” 2021 40th International Conference of the Chilean Computer Science Society (SCCC), pp. 1–5, Nov. 2021, doi:10.1109/sccc54552.2021.9650423.
+
+E. R. Rhythm et al., “Text-based Q&A: Automated Question Generation and
+
+Answering for Enhanced Data Processing,” 2023 Computer Applications & Technological Solutions (CATS), pp. 1–5, Oct. 2023, doi: 10.1109/cats58046.2023.10424125
+
+M. S. Shahriar, A. A. F. Chowdhury, Md. A. Ehsan, and A. R. Kamal, “Question Answer Generation in Bengali: Mitigating the carcity of QA datasets in a low-resource language,” Proceedings of the 13th International Joint Conference on Natural Language Processing and the 3rd Conference of the Asia-Pacific Chapter of the Association for Computational Linguistics (Volume 1: Long Papers), pp. 430–441, 2023, doi: 10.18653/v1/2023.ijcnlp-main.29.
+
+M. Moron, J. Scocozza, L. Chiruzzo, and A. Rosa, “A Tool for Automatic Question Generation for Teaching English to Beginner Students,” 2021 40th International Conference of the Chilean Computer Science Society (SCCC), pp. 1–5, Nov. 2021, doi: 10.1109/sccc54552.2021.9650423.
+
+T. Tahsin Mayeesha, A. Md Sarwar, and R. M. Rahman, “Deep learning based question answering system in Bengali,” Journal of Information and Telecommunication, pp. 1–34, Nov. 2020, doi: 10.1080/24751839.2020.1833136.
+
+T. T. Aurpa, R. K. Rifat, M. S. Ahmed, Md. M. Anwar, and A. B. M. S. Ali, “Reading comprehension based question answering system in Bangla language with transformer-based learning,” Heliyon, no. 10, p. e11052, Oct. 2022, doi: 10.1016/j.heliyon.2022.e11052.
+
+S. Shaheer, I. Hossain, S. N. Sarna, M. H. Kabir Mehedi, and A. A. Rasel, “Evaluating Question generation models using QA systems and Semantic Textual Similarity,” 2023 IEEE 13th Annual Computing and Communication Workshop and Conference	(CCWC),	pp.	0431–0435,	Mar.	2023,	doi: 10.1109/ccwc57344.2023.10099244.
+
+S. M. S. Ekram et al., “BanglaRQA: A Benchmark Dataset for Under resourced Bangla Language Reading Comprehension-based Question Answering with Diverse Question-Answer Types,” Findings of the Association for Computational Linguistics: EMNLP 2022, pp. 2518–2532, 2022, doi: 10.18653/v1/2022.findings-emnlp.186.
+
+A. Das and D. Saha, “Question Answering System Using Deep Learning in the Low Resource Language Bengali,” Convergence of Deep Learning In Cyber‐IoT Systems and Security, pp. 207–230, Nov. 2022, doi: 10.1002/9781119857686.ch10.
+
+O. Sen et al., “Bangla Natural Language Processing: A Comprehensive Analysis of Classical, Machine Learning, and Deep Learning-Based Methods,” IEEE Access, 10.1109/access.2022.3165563.
+
+H.-C. Wang, M. Maslim, and C.-H. Kan, “A question–answer generation system for an asynchronous distance learning platform,” Education and Information Technologies, no. 9, pp. 12059–12088, Mar. 2023, doi: 10.1007/s10639-023-11675-y.
+
+L. E. Lopez, D. K. Cruz, J. C. B. Cruz, and C. Cheng, “Simplifying Paragraph-Level Question Generation via Transformer Language Models,” in Lecture Notes in Computer Science, Springer International Publishing, 2021, pp. 323–334.
+
+A. Das and D. Saha, “Deep learning based Bengali question answering system using semantic textual similarity,” Multimedia Tools and Applications, no. 1, pp. 589– 613, Sep. 2021, doi: 10.1007/s11042-021 11228-w.
+
+Page 1 of 68 - Cover Page	Submission ID trn:oid:::17268:95626513
+
+
+
+
+
+
+
+
+
+
+Washik Wali Faieaz Sayma Jannat
+Question Generation in Bangla Using Large Language Models Evaluating Transformer Based Approaches for Low-Resource …
+My Files  My Files  University
+
+
+Document Details
+
+Submission ID trn:oid:::17268:95626513
+Submission Date
+May 13, 2025, 12:14 PM GMT+5:30
+
+Download Date
+May 13, 2025, 12:16 PM GMT+5:30
+
+File Name
+Question Generation in Bangla Using Large Language Models Evaluating Transformer Based App…
+.pdf
+
+File Size
+1.3 MB
+
+Page 2 of 68 - Integrity Overview	Submission ID trn:oid:::17268:95626513
+
+
+14% Overall Similarity
+The combined total of all matches, including overlapping sources, for each database.
+
+Filtered from the Report
+Bibliography  Quoted Text  Cited Text
+
+
+Match Groups
+136Not Cited or Quoted 14%
+Matches with neither in-text citation nor quotation marks
+0  Missing Quotations 0%
+Matches that are still very similar to source material
+0  Missing Citation 0%
+Matches that have quotation marks, but no in-text citation
+0  Cited and Quoted 0%
+Matches with in-text citation present, but no quotation marks
+Top Sources
+
+
+
+Integrity Flags
+0 Integrity Flags for Review
+No suspicious text manipulations found.
+
+
+
+Match Groups
+Page 3 of 68 - Integrity Overview	Submission ID trn:oid:::17268:95626513
+
+
+Top Sources
+
+136Not Cited or Quoted 14%
+Matches with neither in-text citation nor quotation marks
+0  Missing Quotations 0%
+Matches that are still very similar to source material
+0  Missing Citation 0%
+Matches that have quotation marks, but no in-text citation
+0  Cited and Quoted 0%
+Matches with in-text citation present, but no quotation marks
+
+
+
+Top Sources
+The sources with the highest number of matches within the submission. Overlapping sources will not be displayed.
+
+Daffodil International University on 2024-12-28	4%
+
+
+Daffodil International University on 2023-07-05	1%
+
+
+dspace.daffodilvarsity.edu.bd:8080	1%
+
+
+aclanthology.org	<1%
+
+
+Daffodil International University on 2019-03-31	<1%
+
+
+Daffodil International University on 2024-12-14	<1%
+
+
+"Natural Language Processing and Information Systems", Springer Science and B…	<1%
+
+
+United International University on 2025-03-02	<1%
+
+
+United International University on 2021-11-14	<1%
+
+
+United International University on 2022-08-22	<1%
+
+
+--- TABLE 1 ---
+References | Title | Dataset | Models | Key Findings
+A.	R. | Fahad	et al. [1] | Bangla Answer- Agnostic QG | SQuAD_bn (118k train, 2.5k val/test) | BanglaT5, mT5-base, BanglaGPT 2 | mT5 + OQL format + Beam Search best; 77% relevancy, 96% grammaticality
+J. F. Ruma et al. [2] | Bangla Answer- Aware QG | SQuAD_bn (54k	train, 13k val) | BanglaT5, mT5-small, mT5-base | BanglaT5	best		with BLEU-1		38.63, | ROUGE-L 35.77, 98% | grammar accuracy
+S. Sharma et al. [3] | Bilingual QA System (Bangla/En glish) | Custom datasets | NLP | techniques | +	Syntax transformat | ion | Accuracy:	76% | (grammar),	78.33% (context relevance)
+W. Morris et al. [4] | iTELL | Educational QG Pipeline | MultiRC dataset | GPT-3.5, BLEURT, | MPNet | GPT-3.5	achieved | 100%	coherent | questions; 75%+ user satisfaction
+Y. Poon et al. [5] | Higher- Order	QG Using LLaMA | DuReader_r obust dataset | Stanford Alpaca | 31.5%	higher-order | questions	vs	8% | baseline;	71% usability
+M.	V.	K. | Rao et al. [6] | Automatic Q&A Using LLM | SQuAD1.1, | SciQ, S2ORC | GPT-3, | Seq2Seq, LSTM | ROUGE-1: 85%, EM: | 70%;	focus	on educational/legal assessment
+--- END TABLE ---
+
+
+--- TABLE 2 ---
+Aspect | Gap Identified | Proposed Methodology
+Dataset Availability | Most datasets are small, synthetic,	or	machine- translated;   limited   native | Bangla data | Use a manually curated dataset of native Bangla paragraph-question pairs
+Model Adaptation | Multilingual	models	often underperform  due  to  lack  of | Bangla-specific training | Fine-tune		Bangla-specific models	like	BanglaT5 | alongside MT5
+Question Quality | Focus	on	simple	factual questions;		higher-order | reasoning is neglected | Train models to generate semantically	rich	and | context-aware questions
+Language Nuance | Machine-translated data fails to	capture	syntactic	and | cultural details in Bangla | Use authentic Bangla text to retain	linguistic	and | contextual integrity
+--- END TABLE ---
+
+
+--- TABLE 3 ---
+Paragraph | Question
+কম্পিউটার বিজ্ঞানের অগ্রগবি মােিজীিনের বিবিন্ন ক্ষেনে বিপ্লি ঘটটন়েনে। ইন্টারনেনটর আবিষ্কানরর ফনে | িথ্য আদাে-প্রদাে দ্রুিির হন়েনে। পাশাপাবশ, কৃত্রেম | িুত্রিমত্তার িযিহারও এখে বিবিন্ন ক্ষেনে েব়িন়ে পন়িনে। | িথ্য আদাে-প্রদানে ক্ষকাে প্রযুত্রির আবিষ্কার বিপ্লি এনেনে?
+িাাংোনদনশর জেসাংখযার একটট ি়ি অাংশ িরুণ। এই | িরুণ প্রজন্ম ক্ষদনশর উন্ন়েনে গুরুত্বপূণ ণ িূবমকা পােে করনি পানর। বশো, প্রযুত্রি, এিাং িযিসান়ের ক্ষেনে | িরুণরা িানদর সৃজেশীেিা ও দেিা বদন়ে ক্ষদশনক | আরও এবগন়ে বেনি সেম। | িাাংোনদনশর ক্ষকাে জেনগাষ্ঠী ক্ষদনশর উন্ন়েনে গুরুত্বপূণ ণ  িূবমকা পােে করনি পানর?
+বশো মােি জীিনের অেযিম ক্ষমৌবেক অবিকার। একজে বশবেি মােুষ িার বেনজর জীিে এিাং সমাজনক উন্নি করনি পানর। বশোর মািযনম মােুষ জ্ঞাে অজণে | কনর এিাং উন্ন়েনের পনথ্ অগ্রসর হ়ে। | বশোর মািযনম মােুষ কী অজণে করনি পানর?
+--- END TABLE ---
+
+
+--- TABLE 4 ---
+Tasks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks
+ | 12 | 14 | 16 | 18 | 20 | 22 | 24 | 26 | 28 | 30 | 32 | 34 | 36 | 38 | 40 | 42 | 44 | 48
+Data collection phase |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+Data collection phase |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+Preproces s all the data |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+Preproces s all the data |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+Model training |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+Model training |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+Create a demo applicati on. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+Create a demo applicati on. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+--- END TABLE ---
+
+
+--- TABLE 5 ---
+Model | Configuration | Max Length | BLEU | Score | ROUGE- L | Score
+MT5-small | Epoch = 10, | Learning Rate = 1e-3, Batch Size = 8 | 500 | 43.49% | 63.56%
+BanglaT5 | Epoch = 10, | Learning Rate = 1e-3, Batch Size = 8 | 500 | 51.40% | 70.77%
+--- END TABLE ---
+
+
+--- TABLE 6 ---
+ | Dataset Size | Best Performing Model | Result
+A. R. Fahad et al. [1] | 123,000 | mT5 | ROUGE-L: 63.38%
+J. F. Ruma et al. [2] | 67000+ | BanglaT5 | ROUGE-L: 35.77%
+Proposed | 3000 | BanglaT5 | ROUGE-L: 70.77%
+Proposed | 3000 | MultilingualT5 | ROUGE-L: 63.56%
+--- END TABLE ---
+
+
+--- TABLE 7 ---
+Metrics | Score
+BLEU | 51.40%
+ROUGE-1 F1 | 73.64%
+ROUGE-2 F1 | 57.86%
+ROUGE-L F1 | 70.77%
+--- END TABLE ---
+
+
+--- TABLE 8 ---
+Metrics | Score
+BLEU | 43.49%
+ROUGE-1 F1 | 66.79%
+ROUGE-2 F1 | 52.84%
+ROUGE-L F1 | 63.56%
+--- END TABLE ---
+
+
+--- TABLE 9 ---
+Paragraph | Original Question | Generated Question | Generated Question
+জেিা়েু	পবরিিেণ	আজনকর |  |  | 
+বিনের	একটট	সিনেন়ে	ি়ি |  |  | 
+সমসযা। এটট বিবেক উষ্ণিা, |  |  | 
+িরনফর গেে, এিাং সমুদ্রপৃনষ্ঠর |  |  | 
+উচ্চিা	িা়িানোর	সানথ্ |  |  | 
+সিবকণি।	বিজ্ঞােীরা	সিকণ |  |  | 
+করনেে ক্ষয, যবদ আমরা যথ্াযথ্ |  |  | 
+পদনেপ ো বেই, িনি এর প্রিাি |  |  | 
+আগামী	প্রজনন্মর	জেয | জেিা়েু পবরিিেণ	ক্ষকে একটট | জেিা়েু	পবরিিেণ	আজনকর | জেিা়েু	পবরিিেণ	আজনকর
+বিপদজেক হনি পানর। এর ফনে | ি়ি সমসযা এিাং এর ফনে কী কী | বিনের একটট ি়ি সমসযা ক্ষকে? | বিনের একটট ি়ি সমসযা ক্ষকে?
+ফসে	উৎপাদে	কনম	ক্ষযনি | প্রিাি প়িনি পানর? |  | 
+পানর, এিাং অনেনক িাস্তুেয যি |  |  | 
+হনি।	ক্ষদনশর	সরকার	এিাং |  |  | 
+আন্তজণাবিক	সাংস্থাগুবে |  |  | 
+একনযানগ কাজ করনে যানি |  |  | 
+জেিা়েু	পবরিিনণ ের	প্রিাি |  |  | 
+ক্ষমাকানিো	করা	যা়ে	এিাং |  |  | 
+ক্ষটকসই উন্ন়েে বেত্রিি করা |  |  | 
+যা়ে। |  |  | 
+শাবন্ত	এিাং	বেরাপত্তা	একটট |  |  | 
+সমানজর বিবত্ত। যখে সমানজ |  |  | 
+শাবন্ত বিরাজমাে থ্ানক, িখে |  |  | 
+মােুষ	িানদর	জীিনের	প্রবি |  |  | 
+আত্মবিোসী	থ্ানক।	শাবন্তর |  |  | 
+কারনণ মােুনষর মনিয সহনযাবগিা |  |  | 
+ও সিকণ গন়ি ওনে। বকন্তু যখে |  |  | 
+সাংঘষ ণ িা সবহাংসিা ঘনট, িখে | শাবন্ত এিাং বেরাপত্তা ক্ষকে একটট | শাবন্ত	এিাং	বেরাপত্তা | একটট
+ক্ষসটট  সামাত্রজক  বস্থবিশীেিানক | সমানজর বিবত্ত? | সমানজর বিবত্ত ক্ষকে? | 
+বিপন্ন কনর। িাই একটট শাবন্তপূণ ণ |  |  | 
+সমাজ গেে করনি সিাইনক |  |  | 
+সনেিে ও দাব়েত্বশীে হনি হনি। |  |  | 
+রানের	পাশাপাবশ	জেগনণরও |  |  | 
+শাবন্তর জেয কাজ করা জরুবর। |  |  | 
+--- END TABLE ---
+
+
+--- TABLE 10 ---
+Paragraph | Original Question | Generated Question | Generated Question
+জেিা়েু	পবরিিেণ	আজনকর |  |  | 
+বিনের	একটট	সিনেন়ে	ি়ি |  |  | 
+সমসযা। এটট বিবেক উষ্ণিা, |  |  | 
+িরনফর গেে, এিাং সমুদ্রপৃনষ্ঠর |  |  | 
+উচ্চিা	িা়িানোর	সানথ্ |  |  | 
+সিবকণি।	বিজ্ঞােীরা	সিকণ |  |  | 
+করনেে ক্ষয, যবদ আমরা যথ্াযথ্ |  |  | 
+পদনেপ ো বেই, িনি এর প্রিাি |  |  | 
+আগামী	প্রজনন্মর	জেয | জেিা়েু পবরিিেণ	ক্ষকে একটট | জেিা়েু	পবরিিেণ	আমানদর | জেিা়েু	পবরিিেণ	আমানদর
+বিপদজেক হনি পানর। এর ফনে | ি়ি সমসযা এিাং এর ফনে কী কী | বিনের একটট সিনেন়ে ি়ি সমসযা | বিনের একটট সিনেন়ে ি়ি সমসযা
+ফসে	উৎপাদে	কনম	ক্ষযনি | প্রিাি প়িনি পানর? | ক্ষকে? | ক্ষকে?
+পানর, এিাং অনেনক িাস্তুেয যি |  |  | 
+হনি।	ক্ষদনশর	সরকার	এিাং |  |  | 
+আন্তজণাবিক	সাংস্থাগুবে |  |  | 
+একনযানগ কাজ করনে যানি |  |  | 
+জেিা়েু	পবরিিনণ ের	প্রিাি |  |  | 
+ক্ষমাকানিো	করা	যা়ে	এিাং |  |  | 
+ক্ষটকসই উন্ন়েে বেত্রিি করা |  |  | 
+যা়ে। |  |  | 
+শাবন্ত	এিাং	বেরাপত্তা	একটট |  |  | 
+সমানজর বিবত্ত। যখে সমানজ |  |  | 
+শাবন্ত বিরাজমাে থ্ানক, িখে |  |  | 
+মােুষ	িানদর	জীিনের	প্রবি |  |  | 
+আত্মবিোসী	থ্ানক।	শাবন্তর |  |  | 
+কারনণ মােুনষর মনিয সহনযাবগিা |  |  | 
+ও সিকণ গন়ি ওনে। বকন্তু যখে |  |  | 
+সাংঘষ ণ িা সবহাংসিা ঘনট, িখে | শাবন্ত এিাং বেরাপত্তা ক্ষকে একটট | শাবন্ত	এিাং	বেরাপত্তা | একটট
+ক্ষসটট  সামাত্রজক  বস্থবিশীেিানক | সমানজর বিবত্ত? | সমানজর বিবত্ত ক্ষকে? | 
+বিপন্ন কনর। িাই একটট শাবন্তপূণ ণ |  |  | 
+সমাজ গেে করনি সিাইনক |  |  | 
+সনেিে ও দাব়েত্বশীে হনি হনি। |  |  | 
+রানের	পাশাপাবশ	জেগনণরও |  |  | 
+শাবন্তর জেয কাজ করা জরুবর। |  |  | 
+--- END TABLE ---
+
+
+--- TABLE 11 ---
+Components | Estimated | Cost (BDT)
+Internet and Cloud Subscription (Google Colab Pro+) | 2,000-3,000
+Software Licenses (None, used Open-source) | 0
+Visiting Libraries, Data Collection | 1,000
+Contingency (10% Buffer) | 500
+Miscellaneous (Printing, Backup Storage) | 500-1,000
+Total Estimated Cost | 4,000-5,500 | BDT
+--- END TABLE ---
+
+
+--- TABLE 12 ---
+EP1 | Depth of Knowled ge | EP2 | Range Of Conflicti ng Require | ments | EP3 | Depth of Analys is | EP4 | Familiar ity of Issues | EP5 | Extent of Applica ble Codes | EP6 | Extent Of Stake- holder Involve | ment | EP7 | Interdependence
+✓ |  | ✓ | ✓ |  |  | ✓
+--- END TABLE ---
+
+
+--- TABLE 13 ---
+K3 | Engineering Fundamentals | K4 | Specialist Knowledge | K5 | Engineering Design | K6 | Engineering Practice | K8 | Research Literature
+✓ |  | ✓ |  | ✓
+--- END TABLE ---
+
+
+--- TABLE 14 ---
+EA1 | Range	of	re- sources | EA2 | Level of Interaction | EA3 | Innovation | EA4 | Consequences for society and | environment | EA5 | Familiarity
+✓ |  |  | ✓ | ✓
+--- END TABLE ---
+
+
+--- TABLE 15 ---
+7% | Internet sources
+4% | Publications
+12% | Submitted works (Student Papers)
+--- END TABLE ---
