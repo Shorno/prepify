@@ -32,19 +32,13 @@ Existing platforms do not address this gap well. Docsity and Studocu host typed 
 
 ## 1.3 Objectives
 
-The work pursues the following objectives:
+The work has been organised around three main objectives. Each objective corresponds to one structural layer of the system. The smaller features that the earlier draft of the proposal had listed separately have been folded into the layer they naturally belong to, so that the project can be argued for and evaluated against a small set of clear targets.
 
-i. To design and build a free, community driven web platform on which university students can upload, organize, browse, and download handwritten academic notes structured by faculty, department, and course.
+**Objective 1: Design and build the core note sharing platform.** The first objective is to deliver a free, community driven web platform on which university students can upload, browse, and download handwritten academic notes that are organised by faculty, department, batch, and course. This objective covers the underlying data model, the upload and discovery flows, the content moderation pipeline with role based dashboards for administrators and moderators (including the moderator application process for ordinary contributors), and the responsive interface itself with dark mode support and an accessible onboarding flow. The platform must be hosted on infrastructure that stays inside a student developer's monthly budget.
 
-ii. To implement engagement features, including likes, threaded comments, follows, in app and email notifications, a points based contributor leaderboard, study streaks, and achievement badges, that encourage continued participation and surface the highest quality contributions.
+**Objective 2: Build the community engagement and curation layer on top of the platform.** The second objective is to make the platform sticky and self sustaining by adding the social and gamification mechanics that decide which content rises to the top and which contributors stay active. This layer includes likes, threaded comments, follows, in app and email notifications, a transactional points based contributor leaderboard, daily study streaks, achievement badges across upload, streak, engagement, and social categories, and a bookmark system organised into private or public collections that students can curate as their own exam preparation playlists. Together these features replace the chaotic group chat sharing pattern with a structured archive whose ranking emerges from peer behaviour rather than from a single instructor.
 
-iii. To build a moderation pipeline with role based dashboards for administrators and moderators so that uploaded content is reviewed before becoming publicly visible, and to allow ordinary contributors to apply for moderator roles through the system.
-
-iv. To integrate a multimodal large language model directly into the note workflow so that the platform can return a structured AI explanation of any approved handwritten note, including a summary, step by step solution, key concepts, observations, and topic tags.
-
-v. To support note discovery through bookmarks, public and private collections, view counters, and a department browser, so that students can curate their own exam preparation material from community ranked sources.
-
-vi. To deliver the platform in a responsive interface with a dark mode option, an accessible onboarding flow, and a domain specific username system, all hosted on infrastructure that fits within a student developer's budget.
+**Objective 3: Integrate a multimodal AI explanation pipeline directly into the note workflow.** The third objective is to integrate a multimodal large language model into the platform so that any approved handwritten note can be turned, on demand, into a structured explanation. The model receives the original images directly, without an intermediate OCR step, and is required to return a strictly typed JSON object containing a one or two sentence summary, an ordered list of solution steps, the key concepts identified in the handwriting, observations such as possible errors or alternate approaches, and topic tags suitable for discovery. The pipeline is provider agnostic, validated through a Zod schema, and capped at three regenerations per note for cost control and abuse prevention.
 
 ## 1.4 Methodology
 
