@@ -1,0 +1,9 @@
+stateDiagram-v2
+    [*] --> PENDING: saveNote() — INSERT note SET status='pending'
+    PENDING --> APPROVED: approveNote(noteId) [moderator/admin]\nUPDATE status='approved', moderatedAt=NOW(), moderatedBy=session.user.id\n→ createNotification('note_approved') + Brevo email + checkAndAwardBadges()
+    PENDING --> REJECTED: rejectNote(noteId, reason) [moderator/admin]\nUPDATE status='rejected', rejectionReason\n→ createNotification('note_rejected') + Brevo email
+    REJECTED --> PENDING: (future work — resubmit flow)
+    APPROVED --> DELETED: deleteNote(noteId) [owner/moderator/admin]
+    PENDING --> DELETED: deleteNote(noteId) [owner/moderator/admin]
+    REJECTED --> DELETED: deleteNote(noteId) [owner/moderator/admin]
+    DELETED --> [*]

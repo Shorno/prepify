@@ -1,0 +1,30 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant Browser as Browser (Client)
+    participant Server as Server (Better Auth)
+    participant Google as Google OAuth
+    participant DB as Database
+
+    User->>Browser: Click "Sign in with Google"
+    Browser->>Server: Init OAuth (/api/auth/sign-in/social)
+    Note right of Server: PKCE prevents code interception
+    Server->>Server: Generate PKCE Challenge
+    Server-->>Browser: Redirect to Google Auth URL
+    Browser->>Google: Request Authorization
+    Google->>User: Show Consent Screen
+    User->>Google: Approve
+    Google-->>Browser: Redirect with Auth Code
+    Browser->>Server: Auth Callback (/api/auth/callback)
+    Server->>Server: Verify State
+    Server->>Google: Exchange Code for Token
+    Google-->>Server: Return Access & ID Tokens
+    Server->>Google: Request User Info
+    Google-->>Server: Return Profile Data
+    Server->>DB: Upsert User Profile
+    Server->>DB: Save OAuth Account
+    Server->>DB: Create Session
+    Note right of Server: HttpOnly cookie secures session
+    Server-->>Browser: Set Session Cookie & Redirect
+    Browser->>Browser: Check Onboarding Status
+    Browser->>User: Show Feed or Onboarding

@@ -1,0 +1,542 @@
+Contextual BiLSTM-Based Approach for Bangla Name Entity Recognition
+
+By
+Jufrin Sultana Farih
+ID:222-15-6264
+
+Omar Faruk Siraji
+ID:222-15-6368
+
+FINAL YEAR DESIGN PROJECT REPORT
+This Report Presented in Partial Fulfillment of the Requirements for the Degree of Bachelor of Science in Computer Science and Engineering
+
+
+## [Heading 3] Supervised by
+
+Md.Sazzadur Ahamed
+Assistant Professor
+Department of Computer Science and Engineering Daffodil International University
+
+## [Heading 3] Co-Supervised by
+
+Mr.Md.Sadekur Rahman
+Assistant Professor
+Department of Computer Science and Engineering Daffodil International University
+
+
+
+
+## [Heading 3] DAFFODIL INTERNATIONAL UNIVERSITY
+
+Dhaka, Bangladesh
+April 11, 2026
+
+APPROVAL
+
+
+This Project titled “Write Your Title Here,” submitted by [write  your  name] and [write your group member’s name (if any)] to the Department of Computer Science and Engineering, Daffodil International University, has been accepted as satisfactory for the partial fulfillment of the requirements for the degree of B.Sc. in Computer Science and Engineering and approved as to its style and contents. The presentation has been held on 26-01-2024.
+
+
+BOARD OF EXAMINERS
+
+
+
+
+
+Name
+Board Chairman
+Designation, Department of CSE, FSIT Daffodil International University
+
+
+
+
+Name
+Internal Examiner 1
+Designation, Department of CSE, FSIT Daffodil International University
+
+
+
+
+Name
+Internal Examiner 2
+Designation, Department of CSE, FSIT Daffodil International University
+
+
+
+
+Name
+External Examiner
+Designation, Department of CSE, FSIT Daffodil International University
+
+
+## [Heading 2] DECLARATION
+
+
+
+We hereby declare that this project has been done by us under the supervision of Name of the Supervisor, Supervisor’s Designation, Department of Computer Science and Engineering, Daffodil International University. We also declare that neither this project nor any part of this project has been submitted elsewhere for the award of any degree or diploma.
+
+
+Supervised by:
+
+
+Supervisor Name
+Designation
+Department of Computer Science and Engineering Daffodil International University
+
+
+Co-Supervised by:
+
+
+Co-Supervisor Name
+Designation
+Department of Computer Science and Engineering Daffodil International University
+
+Submitted by:
+
+
+Team Member 1 Name
+Student ID:
+Department of Computer Science and Engineering Daffodil International University
+
+
+
+Team Member 2 Name (if any)
+Student ID:
+Department of Computer Science and Engineering Daffodil University
+
+
+## [Heading 2] ACKNOWLEDGEMENTS
+
+
+
+This work would not have been possible without the support and contributions of many individuals over the past two semesters. We are deeply grateful to everyone who has as- sisted us in one way or another.
+
+First, we express our heartfelt thanks and gratefulness to the almighty for His divine blessing making it possible for us to complete the Final Year Design Project(FYDP) successfully.
+
+We are grateful and wish our profound indebtedness to Supervisor Name, Supervisor’s Designation, Department of Computer Science and Engineering, Daffodil International University,  Dhaka,  Bangladesh.  Deep knowledge and keen interest of our supervisor in the field of Write the  field  name  here  to  carry  out  this  project. His  endless  pa- tience, scholarly guidance, continual encouragement, constant and energetic supervision, constructive criticism, valuable advice, reading many inferior drafts, and correcting them at all stages have made it possible to complete this project.
+
+We would like to express our heartfelt gratitude to the Head of the Department of Com- puter Science and Engineering, for his kind help in finishing our project and also to other faculty members and the staff of the Department of Computer Science and Engineering, Daffodil International University.
+
+We would like to thank our entire course-mates at Daffodil International University, who took part in this discussion while completing the coursework.
+
+Finally, we must acknowledge with due respect the constant support and patience of our parents.
+
+
+## [Heading 2] ABSTRACT
+
+
+The abstract should contain a summary of the work presented in this report in a single paragraph. An abstract is a concise, well-developed paragraph typically between 100 and 300 words, often adhering to a strict word limit. Its purpose is to provide a brief overview of all key aspects of the paper, giving readers a snapshot of the content.   A strong abstract is succinct yet impactful, offering enough detail to convey the main points without unnecessary elaboration. To craft an effective abstract, it is essential to ensure that every word serves a purpose, efficiently summarizing the research while highlighting its relevance, methodology, findings, and conclusions. The goal is to give readers a clear understanding of the paper’s value in a minimal amount of space. The paragraph should provide a general background of the problem, methodology, results, and implication.
+
+
+## [Heading 1] Table of Contents
+
+
+Approval	i
+
+
+
+## [Heading 1] List of Figures
+
+
+3.1	This is a sample diagram	4
+
+
+## [Heading 1] List of Tables
+
+2.1	Summary of Literature Reviewed.	2
+Mapping with complex problem solving.	8
+Mapping with knowledge Profile.	8
+Mapping with complex engineering activities.	9
+
+Chapter 1
+
+
+## [Heading 1] Introduction
+
+
+
+## [Heading 3] Introduction
+
+
+One of the main areas of artificial intelligence today is Natural Language Processing (NLP), which seeks to enable robots to read, decode, and write human language. Named Entity Recognition (NER) can be considered in this field. Named Entity Recognition (NER) is a fundamental NLP task that identifies and classifies important entities such as persons, locations, organizations, dates, percentages, monetary values, and miscellaneous categories within text.
+
+Considered one of the easiest jobs involving sequence labeling. Labeling and recognizing words or phrases that refer to specific entities (people, locations, organizations, dates) and correspond to a set of preset classes is the aim of Named Entity Recognition (NER), one of the most fundamental NLP tasks.  Information extraction, question answering, summarization, and sentiment analysis are just a few of the downstream applications that frequently use the NER.
+
+Named Entity Recognition (NER) are the core NLP tasks, which form the basis of such advanced tasks as machine translation, information retrieval, question answering, and text summarization. The Linguistic richness of Bangala, however, with its complicated morphology, free word order and high-level ambiguity in the expression of entities, is an obstacle to creating correct and effective models. Current methods typically use independent models to perform NER, which raises computing costs and contextual insight. The lack of large, annotated corpora in Bengali implies that there is very little to use and adapt when training or refining NLP models of the language. Moreover, it is possible to train different models on similar tasks e.g. training Named.
+
+
+
+
+## [Heading 3] Motivation
+
+
+The seventh most spoken language in the world, with almost 250 million speakers, Bangla is of immense cultural and linguistic importance. Although widely used, Bangali is a poorly represented language in Natural Language Processing (NLP) studies relative to languages that have a large amount of resources, including English. The creation of computational tools in Bangali is not only critical to language technology development, but also to maintain inclusivity in the global digitalization arena.
+
+In addition to requiring a lot of time and computing power, entity recognition (NER) are ineffective. Nevertheless, the existing methods do not generalize very well mainly because they have inadequate contextual information on Bangla text. This study offers a hybrid model that Named Entity Recognition (NER) into a single Bidirectional Long Short-Term Memory (BiLSTM) system in order to overcome these issues. The strategy will focus on improving the learning of contextualised word representations which will dramatically decrease the needs of NLP jobs in Bangla.
+
+The primary objective of this research is to develop and evaluate an effective Named Entity Recognition (NER) model for Bangla using a BiLSTM-based architecture capable of learning contextual features and improving entity classification accuracy. The performance of the proposed NER system is assessed using widely accepted evaluation metrics such as accuracy, precision, recall, and F1-score to ensure reliable and comprehensive measurement of its effectiveness. Furthermore, the study aims to enhance model generalization and reduce overfitting by incorporating techniques such as regularization, dropout, and optimized training strategies, ultimately improving the robustness and adaptability of the NER model across diverse Bangla text patterns.
+
+## [Heading 3] Objectives
+
+
+To develop and evaluate Named Entity Recognition (NER) model for Bangla using a BiLSTM learning architecture.
+To assess the performance of the proposed model using standard metrics, including accuracy, precision, recall, and F1-score.
+
+
+## [Heading 3] Methodology
+
+
+This chapter outlines the methodology used in this study to develop a deep learning–based model for Named Entity Recognition (NER) in Bangla text using a Bidirectional Long Short-Term Memory (BiLSTM) architecture. The chapter is divided into key components, beginning with data preprocessing, which includes cleaning, tokenizing, and encoding Bangla text into a suitable format for model training. It also explains the input representation, where token embeddings are used to capture semantic information necessary for accurate entity recognition.
+The methodology further describes the BiLSTM architecture, which is designed to capture contextual information from both preceding and succeeding words in a sequence. A task-specific output layer is then used to predict NER tags for each token. The training process includes the use of an appropriate loss function and optimization strategy to ensure efficient learning and improved performance.
+Finally, the chapter presents the evaluation metrics—Accuracy, Precision, Recall, and F1-score—to assess the effectiveness of the proposed NER model. These metrics provide a comprehensive understanding of the model’s ability to correctly identify and classify named entities in Bangla text. The use of BiLSTM enhances the model by analyzing sequences in both forward and backward directions, allowing it to better understand context. This bidirectional capability is particularly important for NER tasks, where the meaning and classification of entities depend heavily on surrounding words. As a result, the proposed approach enables improved contextual learning and contributes to more accurate and reliable Bangla NER performance.
+
+
+
+## [Heading 3] Project Outcome
+
+
+The main outcome of this project is the development of an efficient BiLSTM-based Named Entity Recognition (NER) model for Bangla text, capable of accurately identifying entities such as persons, locations, and organizations. The model achieves strong performance even with limited data and improves contextual understanding. Additionally, it provides a cost-effective solution for Bangla NLP and can be applied to tasks like information extraction, text summarization, and question answering.
+
+
+## [Heading 3] Organization of the Report
+
+
+This thesis has the following structure. In Chapter II, the related literature on Bangla Named Entity Recognition (NER) is considered, outlining current methods and revealing gaps in the research. The methodology is detailed in Chapter III, and it involves data set preparation, preprocessing, and the design of the proposed BiLSTM-based multi-task learning model
+Chapter 2
+
+
+## [Heading 1] Background
+
+
+
+## [Heading 3] Introduction
+
+
+The history of the development of NLP systems in Bangali has gone through several phases, starting with rule-based systems and then modern systems based on transformers. This section describes the history and some of the contributions to the field of Bangla sequence labeling and NER.
+
+
+## [Heading 3] Literature Review
+
+
+Surveying Bangla NLP methods, Sen et. al. included classical methods, machine, and deep learning methods. The absence of big annotated resources, which restrict the generalization of models, was highlighted in the study. They suggested considering multi-task and transfer learning methods, which would allow combining POS tagging and NER models with similar features, which would perform better when resources are limited.
+
+A multilingual transformer embeddings with a CRF layer based on MURIL was designed by Bose and Sarkar into a Bangali and Hindi NER model. Their findings showed that multilingual trained models have a huge positive effect on NER in low-resource languages. They, however, observed that such models, when adapted to the characteristics of Bangla language are still required to deliver the best performance.
+
+Rabbi et. Al. made a machine learning-based annotated Bangali NLP corpus with Python and emphasized that the quality and variety of training data determine the performance of the models. Their article notes that bigger and well annotated corpora are required to support POS tagging and NER which are critical in building effective Bangla NLP systems especially in deep learning models.
+
+Jillur Rahman Saurav et. al. tested the NER and POS tagging of the Bengali language via end-to-end trained BiLSTM-based deep neural network models that were based on CNN and CRF and did not utilize any handcrafted features. They were accurate on POS tagging to 93.86\% but on NER, they were only 0.6285, thus illustrating the relative complexity of NER. They proposed some improvements in terms of co-learning, pretrained embeddings, and transfer learning to achieve better generalization.
+
+Alam et. al. suggested an intermediate system between rule-based and machine learning systems to integrate Bangla NER. It was moderately effective, but not scalable and not domain adaptable, highlighting the problem of rule-based methods. The authors recommended that the work should be focused more on the neural approaches that are data-driven and supported by more annotated corpora to achieve better performance in the future.
+A contextually trained, cost-sensitive, model of Bangla NER was suggested by Ashrafi et. al. to address rare and ambiguous named entities. The model was more precise than other models that just concentrated on a challenging case, which proved the usefulness of context-aware learning. Improvements might include adding external sources of knowledge such as gazetteers and domain-specific entities in order to improve performance in more specialized settings.
+
+Jueal Mia et. al. contrasted different techniques of Bangla tagging of POS, ranging between rule-based and contemporary machine learning techniques. Their comparison validated that machine learning models are superior to the traditional methods, but they still have to be further adjusted to the syntactic specifics of Bengali to increase the tagging accuracy and address the language-specific grammars better.
+
+A bidirectional LSTM-CRF model in Bangla POS tagging was proposed by Farsin et. al. . The sequence dependencies were learned by LSTM networks and context-related information was utilized by the CRF layer to improve tagging performance to offer a strong framework of aiding to accurate POS annotation in Bangla.
+
+Sarker presented the open-source package called the "BNLP Toolkit" which offers POS tagging, NER, tokenization and word embeddings. Although the toolkit used pretrained embeddings and was effective in the POS tagging, it had only average results in NER. Notably, it did not utilize multi-task learning or shared representations and it is open to future research to investigate their joint modeling techniques.
+
+A popular option in POS tagging and NER is Huang et. al., creators of the Bidirectional LSTM-CRF sequence tagging model. The LSTM-CRF model helps to strengthen the sequence labeling task by considering sequential dependencies of words and keeping the global structure of the sequence. This architecture has been applied successfully to both Bangla POS tagging and NER as well and has shown itself to be performing well when it comes to working with sequential nature of language data.
+Ovi et.al. introduced BANEP, a neural-network based end-to-end POS tagger for Bangla. They developed a model that outperformed classical techniques by harnessing deep learning approaches specifically designed for Bangla’s distinct syntax and morphology. BANEP’s performance reveals the potential of neural network-based methods for language specific NLP tasks, and there is scope for future work in extending this framework to other NER tasks in Bangla, thereby benefiting from joint training of both NER tasks.
+Gers et. al. have been key to the development of many subsequent sequence-based NLP tasks such as POS tagging and NER through LSTM recurrent networks. LSTM models are useful to model long-range dependencies in natural language data, and hence are a good fit for Bangla syntactic tasks. Their work has shown that LSTM-based models are successfully able to deal with complex label sequence problems like Named Entity Recognition and POS tagging, paving the way for further advancements in Bangla NLP.
+
+
+
+
+
+
+
+
+Table 2.1: Summary of Literature Reviewed.
+
+
+
+
+## [Heading 3] Gap Analysis
+
+
+Limited modeling strategies:
+Existing research primarily focuses on comparing classical and deep learning approaches, while advanced, hybrid, or multi-task NER frameworks remain largely unexplored.
+Insufficient handling of Bangla linguistic complexity:
+Multilingual embedding-based NER models do not adequately capture Bangla’s morphological richness, inflectional variations, and contextual dependencies.
+Over-reliance on gazetteer or rule-based methods:
+Several NER approaches depend heavily on gazetteers or handcrafted rules, which restrict scalability, robustness, and adaptability to new domains.
+Small-scale and domain-specific evaluations:
+Most Bangla NER systems are evaluated on small or single-domain datasets, raising concerns about their ability to generalize across larger or multi-domain corpora.
+Lack of robust end-to-end NER systems:
+Existing end-to-end NER models lack comprehensive validation in real-world or cross-domain environments.
+Limited use of Transformer-based NER models:
+Although Transformer-based techniques have been explored, Bangla-specific, context-aware, and resource-efficient NER models remain insufficiently developed.
+
+
+## [Heading 3] Summary
+
+
+This chapter presents a comprehensive overview of the development of Bangla Natural Language Processing (NLP), with a particular focus on Named Entity Recognition (NER). The literature review highlights the evolution of approaches from rule-based and machine learning methods to more advanced deep learning and transformer-based models. While several studies have contributed significantly by proposing multilingual embeddings, annotated datasets, and deep learning architectures such as BiLSTM and CRF, many limitations still exist.
+The findings indicate that Bangla NER systems are often constrained by the lack of large annotated datasets, limited handling of linguistic complexity, and dependence on rule-based or gazetteer-based methods. Additionally, many existing models are evaluated on small or domain-specific datasets, which limits their generalization capability. Although recent advancements include contextual and transformer-based approaches, their application in Bangla remains limited and computationally expensive.
+Overall, the gap analysis reveals the need for more robust, scalable, and context-aware NER models that can effectively address Bangla’s linguistic challenges and perform well in low-resource environments. This motivates the development of improved deep learning–based approaches for Bangla NER in the subsequent chapters.
+
+Chapter 3
+
+
+## [Heading 1] Research Methodology
+
+
+
+## [Heading 3] Methodology/Requirement Analysis & Design Specifi cation
+
+
+## [Heading 4] Overview
+
+
+## [Heading 4] This section outlines the methodology adopted to develop a Bangla Named Entity Recognition (NER) system using a deep learning approach. It includes data preprocessing, model design, requirement analysis, and system-level design considerations. The goal is to build an efficient and context-aware NER model suitable for low-resource Bangla text.
+
+
+## [Heading 4] Proposed Methodology/ System Design
+
+
+
+
+Figure 3.1: Model Architecture
+
+
+Input text → tokenization
+Convert each token into embeddings
+BiLSTM learns contextual meaning from both directions
+Dense layer predicts NER tags for each token
+Model trained using categorical cross-entropy loss
+Evaluation performed on held-out test set
+This design ensures stronger entity boundary detection and contextual awareness.
+
+
+## [Heading 4] Functional and Nonfunctional Requirements
+
+
+
+## [Heading 3] Functional Requirements
+
+The system should take Bangla text as input
+The system should identify named entities (PER, LOC, ORG, etc.)
+The system should classify entities correctly
+The system should output labeled text
+
+## [Heading 3] Non-Functional Requirements
+
+The system should be efficient and fast
+The model should have high accuracy
+The system should handle large datasets
+The model should generalize well to unseen data
+The system should be scalable
+
+
+## [Heading 3] Detailed Methodology and Design
+
+
+You have to mention alternate solutions that you have considered. Why you have selected the specific solution, etc.
+
+
+## [Heading 3] Project Plan
+
+The project is divided into multiple phases:
+Literature Review
+Data Collection
+Model Development
+Training and Testing
+Evaluation
+Documentation
+
+
+## [Heading 3] Task Allocation
+
+
+
+
+
+## [Heading 3] Summary
+
+
+This chapter described the methodology and system design used to develop the Bangla Named Entity Recognition (NER) model. It covered data preprocessing, model architecture, system requirements, and workflow design. The BiLSTM-based approach was selected due to its efficiency and ability to capture contextual information. Additionally, the project plan and task allocation were outlined to ensure structured development. The next chapter will present the experimental results and performance evaluation of the proposed model.
+
+Chapter 4
+
+
+## [Heading 1] Implementation and Results
+
+
+[Must be present in the Final Report. Incomplete version might be included in Phase-1 Progress Report, however it is optional.]
+Every chapter should start with 1-2 sentences on the outline of the chapter.
+
+
+## [Heading 3] Environment Setup
+
+
+
+## [Heading 3] Testing and Evaluation/Performance/ Comparative Anal ysis
+
+
+## [Heading 3] Results and Discussion
+
+
+
+## [Heading 3] Summary
+
+
+Provide a brief summary of this section here.
+
+Chapter 5
+
+
+## [Heading 1] Engineering Standards and Design Challenges
+
+
+[Must be present in Phase-1 Progress Report and  also  in  Final  Report] Every chapter should start with 1-2 sentences on the outline of the chapter.
+
+
+## [Heading 3] Compliance with the Standards
+
+
+Only mention the standards that are related to your project. This list is not complete. For each of the standards discuss the alternates with pros and cons and rationale of selection.
+
+
+## [Heading 4] Software Standards
+
+
+## [Heading 4] Hardware Standards
+
+
+## [Heading 4] Communication Standards
+
+
+
+## [Heading 3] Impact on Society, Environment and Sustainability
+
+
+## [Heading 4] Impact on Life
+
+
+## [Heading 4] Impact on Society & Environment
+
+
+## [Heading 4] Ethical Aspects
+
+
+## [Heading 4] Sustainability Plan
+
+
+
+## [Heading 3] Project Management and Financial Analysis
+
+
+Provide a cost analysis in terms of budget required and revenue model. In case of budget, you must show an alternate budget and rationales.
+
+
+## [Heading 3] Complex Engineering Problem
+
+
+## [Heading 4] Complex Problem Solving
+
+In this section, provide a mapping with problem solving categories. For each mapping add subsections to put rationale (Use Table 5.1).  For P1, you need to put another mapping with Knowledge profile and rational thereof.
+
+
+Table 5.1: Mapping with Complex Engineering Problem.
+
+
+Mapping with Knowledge Profile
+
+This section is designed to map the overall problem and EP1 (multiple between K3, K4, K5, K6, K8 for attaining EP1) to the Knowledge Profile.
+
+
+Table 5.2: Mapping with knowledge Profile.
+
+
+## [Heading 4] Engineering Activities
+
+In this section, provide a mapping with engineering activities. For each mapping add subsections to put rationale (Use Table 5.3).
+Mapping with Complex Engineering Activities
+
+This section is designed to map the overall problem and EA’s (multiple).
+
+Table 5.3: Mapping with Complex Engineering Activities.
+
+
+
+
+## [Heading 3] Summary
+
+
+
+Chapter 6
+
+
+## [Heading 1] Conclusion
+
+
+[Must be present in Phase-1 Progress Report and also in the Final Report. Might be incomplete in FYDP-1 Report.]
+Every chapter should start with 1-2 sentences on the outline of the chapter.
+
+
+## [Heading 3] Summary
+
+
+
+## [Heading 3] Limitation
+
+
+
+## [Heading 3] Future Work
+
+
+
+## [Heading 1] References
+
+[References should be in IEEE format]
+Jon Kleinberg and Eva Tardos. Algorithm design. Pearson Education India, 2006.
+
+First Author and Second. Article title. Journal Name, Volume Number(Issue Num- ber):Start Page–End Page, Year of Publication.
+John Smith and Jane Doe. The impact of climate change on coastal ecosystems. Nature Climate Change, 13(2):123–145, 2023.
+
+--- TABLE 1 ---
+Author(s) | Year | Title | Methodology | Key Findings
+Sen et al. | 2022 | Bangla NLP Methods Survey | ML, and deep learning approaches | Highlighted lack of large annotated data; suggested multi-task and transfer learning for better performance
+Bose and Sarkar | 2024 | Multilingual NER using MURIL | Transformer embeddings + CRF | Multilingual models improve NER in low-resource languages; need Bangla-specific adaptation
+Rabbi et al. | 2024 | Annotated Bangla NLP Corpus | ML-based annotated dataset creation | Emphasized importance of large, high-quality annotated datasets for better NLP performance
+Saurav et al. | 2019 | End-to-End POS & NER Model | BiLSTM + CNN + CRF | High POS accuracy (93.86%) but low NER performance (0.6285); NER is more complex
+Alam et al. | 2021 | Hybrid Bangla NER System | Rule-based + ML hybrid approach | Moderate performance; lacks scalability and domain adaptability
+Ashrafi et al. | 2020 | Context-Sensitive Bangla NER | Cost-sensitive contextual model | Improved precision for ambiguous entities; suggests using gazetteers for better results
+Jueal Mia et al. | 2021 | POS Tagging Techniques Analysis | Comparative study (rule-based vs ML) | ML approaches outperform rule-based but need syntactic optimization
+Farsin et al. | 2016 | BiLSTM-CRF POS Tagging | BiLSTM + CRF | Captures sequence dependency effectively; improves POS tagging accuracy
+Sarker | 2021 | BNLP Toolkit | Pretrained embeddings toolkit | Effective for POS, average NER performance; lacks multi-task learning
+--- END TABLE ---
+
+
+--- TABLE 2 ---
+Tasks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks | Weeks
+ | 12 | 14 | 16 | 18 | 20 | 22 | 24 | 26 | 28 | 30 | 32 | 34 | 36 | 38 | 40 | 42 | 44 | 46 | 48
+Data | collection | phase |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+Data | collection | phase |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+Preprocess all the | data |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+Preprocess all the | data |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+Model | training |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+Model | training |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+Create a | demo | application. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+Create a | demo | application. |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+--- END TABLE ---
+
+
+--- TABLE 3 ---
+EP1 | Dept of Knowledge | EP2 | Range | Of Conflicting Requirements | EP3 | Depth of Analysis | EP4 | Familiarity of Issues | EP5 | Extent of Applicable Codes | EP6 | Extent | Of Stake- holder Involvement | EP7 | Interdependence
+ |  |  |  |  |  | 
+--- END TABLE ---
+
+
+--- TABLE 4 ---
+K1 | K2 | K3 | K4 | K5 | K6 | K7 | K8
+Natural Science | Mathematics | Engineering Fundamentals | Specialist Knowledge | Engineering Design | Engineering Practice | Comprehension | Research Literature
+ |  |  |  |  |  |  | 
+ |  |  |  |  |  |  | 
+--- END TABLE ---
+
+
+--- TABLE 5 ---
+EA1 | Range	of	re- sources | EA2 | Level of Interaction | EA3 | Innovation | EA4 | Consequences for society and environment | EA5 | Familiarity
+ |  |  |  | 
+--- END TABLE ---

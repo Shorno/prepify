@@ -1,0 +1,29 @@
+sequenceDiagram
+    autonumber
+    actor User
+    participant React as HeartButton
+    participant Zustand as Store
+    participant Action as likeNote()
+    participant DB as Database
+
+    Note over React,Zustand: Optimistic UI updates instantly
+
+    User->>React: Click Heart
+    React->>Zustand: optimisticToggleLike
+    Zustand-->>React: Update UI (Count++)
+    React->>Action: call likeNote()
+    Action->>Action: Verify Auth
+    Action->>DB: BEGIN TX
+    Action->>DB: Insert note_like
+    Action->>DB: Update leaderboard_points
+    Action->>DB: Insert transaction
+    Action->>DB: COMMIT
+    Action->>Action: Award Badges
+    Action->>Action: Create Notification
+    Action-->>React: Return Success
+
+    alt Error or Duplicate
+        Action-->>React: Return Error
+        React->>Zustand: Revert Like (Count--)
+        React->>User: Show Error Toast
+    end
