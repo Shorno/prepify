@@ -1,0 +1,56 @@
+sequenceDiagram
+    autonumber
+    actor Uploader as Uploader
+    actor Moderator as Moderator
+    participant Server as Next.js Server
+    participant Ext as Cloudinary / Gemini / Brevo
+    participant DB as Database
+
+    %% Upload Flow
+    Note over Uploader,DB: 1. Note Upload Flow
+    Uploader->>Uploader: Fill form & validate (Zod)
+    Uploader->>Server: POST signCloudinaryPreset()
+    Server-->>Uploader: Return preset & signature
+    Uploader->>Ext: PUT image to Cloudinary
+    Ext-->>Uploader: Return secure_url
+    Uploader->>Server: saveNote(title, urls)
+    Server->>DB: BEGIN TX: Insert note, files, resources
+    Server->>DB: updateStreak(userId)
+    Server-->>Uploader: Success
+
+    %% Moderation Flow
+    Note over Uploader,DB: 2. Moderation Flow
+    Moderator->>Server: getPendingNotes()
+    Server->>DB: SELECT notes WHERE status='pending'
+    DB-->>Server: PendingNote[]
+    Server-->>Moderator: Render Queue
+
+    alt Approve Note
+        Moderator->>Server: approveNote(noteId)
+        Server->>DB: UPDATE status='approved'
+        Server->>DB: createNotification('note_approved')
+        Server->>Ext: Brevo.sendEmail(approval template)
+        Server-->>Moderator: Success
+    else Reject Note
+        Moderator->>Server: rejectNote(noteId, reason)
+        Server->>DB: UPDATE status='rejected'
+        Server->>DB: createNotification('note_rejected')
+        Server->>Ext: Brevo.sendEmail(rejection template)
+        Server-->>Moderator: Success
+    end
+
+    %% AI Explanation Flow
+    Note over Uploader,DB: 3. AI Explanation Flow (If Approved)
+    Uploader->>Server: generateExplanation(noteId)
+    Server->>DB: UPSERT ai_explanation (status='generating')
+    Server->>Ext: Gemini Flash: generateObject(imageUrls)
+    
+    alt Success
+        Ext-->>Server: Return structured JSON
+        Server->>DB: UPDATE status='ready' & save JSON
+        Server-->>Uploader: Return Explanation Data
+    else Failure
+        Ext--xServer: throw error
+        Server->>DB: UPDATE status='failed'
+        Server-->>Uploader: Return Error
+    end

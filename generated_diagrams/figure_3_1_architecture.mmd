@@ -1,0 +1,38 @@
+flowchart TD
+    subgraph Client [Client Tier: Browser]
+        UI[React 19.2 + TailwindCSS]
+    end
+
+    subgraph App [Application Tier: Hostinger VPS]
+        Nginx[Nginx Proxy]
+        subgraph Next [Next.js 16.1]
+            Auth[Auth Module]
+            Notes[Notes Module]
+            Mod[Moderation Module]
+            AI[AI Module]
+        end
+        Nginx --> Next
+    end
+
+    subgraph Data [Data & External Services]
+        DB[(Neon PostgreSQL)]
+        CDN[Cloudinary]
+        OAuth[Google OAuth]
+        Email[Brevo Email]
+        LLM[Gemini 2.5 Flash]
+    end
+
+    %% Flow
+    Client -->|HTTPS| Nginx
+    
+    Auth <-->|OAuth 2.0| OAuth
+    Auth -->|Drizzle ORM| DB
+    
+    Notes -->|Drizzle ORM| DB
+    Notes -->|Signed Preset| CDN
+    Client -.->|Direct Upload & Delivery| CDN
+    
+    Mod -->|Send Emails| Email
+    
+    AI <-->|JSON Objects| LLM
+    AI -->|Drizzle ORM| DB
